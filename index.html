@@ -37,7 +37,8 @@
             x: 10,
             y: canvas.height / 2 - 40,
             color: '#0000ff',
-            speed: 8
+            speed: 8,
+            score: 0
         };
 
         const paddle2 = {
@@ -46,7 +47,8 @@
             x: canvas.width - 20,
             y: canvas.height / 2 - 40,
             color: '#00ff00',
-            speed: 8
+            speed: 8,
+            score: 0
         };
 
         // Draw functions
@@ -63,11 +65,19 @@
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         }
 
+        function drawScore() {
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "#000000";
+            ctx.fillText("Player 1: " + paddle1.score, 20, 30);
+            ctx.fillText("Player 2: " + paddle2.score, canvas.width - 140, 30);
+        }
+
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawBall();
             drawPaddle(paddle1);
             drawPaddle(paddle2);
+            drawScore();
         }
 
         // Update functions
@@ -93,10 +103,35 @@
                 ball.y <= paddle2.y + paddle2.height) {
                 ball.speedX = -ball.speedX;
             }
+
+            // Check for game over
+            if (ball.x - ball.radius <= 0 || ball.x + ball.radius >= canvas.width) {
+                if (ball.x - ball.radius <= 0) {
+                    paddle2.score++;
+                } else {
+                    paddle1.score++;
+                }
+                resetBall();
+            }
+        }
+
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.speedX = -ball.speedX;
+            ball.speedY = Math.random() * 10 - 5; // Randomize vertical direction
         }
 
         // Input handling
         document.addEventListener('keydown', function(event) {
+            // Player 1 controls
+            if (event.key === 'w' && paddle1.y > 0) {
+                paddle1.y -= paddle1.speed;
+            } else if (event.key === 's' && paddle1.y + paddle1.height < canvas.height) {
+                paddle1.y += paddle1.speed;
+            }
+
+            // Player 2 controls
             if (event.key === 'ArrowUp' && paddle2.y > 0) {
                 paddle2.y -= paddle2.speed;
             } else if (event.key === 'ArrowDown' && paddle2.y + paddle2.height < canvas.height) {
