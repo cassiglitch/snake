@@ -51,6 +51,20 @@
             score: 0
         };
 
+        // Power-up object
+        const powerUp = {
+            x: 0,
+            y: 0,
+            width: 20,
+            height: 20,
+            active: false,
+            color: '#ffff00'
+        };
+
+        // Game settings
+        let multiBallMode = false;
+        let powerUpActive = false;
+
         // Draw functions
         function drawBall() {
             ctx.beginPath();
@@ -65,6 +79,13 @@
             ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
         }
 
+        function drawPowerUp() {
+            if (powerUp.active) {
+                ctx.fillStyle = powerUp.color;
+                ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+            }
+        }
+
         function drawScore() {
             ctx.font = "20px Arial";
             ctx.fillStyle = "#000000";
@@ -77,6 +98,7 @@
             drawBall();
             drawPaddle(paddle1);
             drawPaddle(paddle2);
+            drawPowerUp();
             drawScore();
         }
 
@@ -96,12 +118,18 @@
                 ball.y >= paddle1.y &&
                 ball.y <= paddle1.y + paddle1.height) {
                 ball.speedX = -ball.speedX;
+                if (powerUpActive && multiBallMode) {
+                    spawnBall();
+                }
             }
 
             if (ball.x + ball.radius >= paddle2.x &&
                 ball.y >= paddle2.y &&
                 ball.y <= paddle2.y + paddle2.height) {
                 ball.speedX = -ball.speedX;
+                if (powerUpActive && multiBallMode) {
+                    spawnBall();
+                }
             }
 
             // Check for game over
@@ -113,6 +141,15 @@
                 }
                 resetBall();
             }
+
+            // Activate power-up if ball hits it
+            if (powerUp.active &&
+                ball.x + ball.radius >= powerUp.x &&
+                ball.x - ball.radius <= powerUp.x + powerUp.width &&
+                ball.y + ball.radius >= powerUp.y &&
+                ball.y - ball.radius <= powerUp.y + powerUp.height) {
+                activatePowerUp();
+            }
         }
 
         function resetBall() {
@@ -120,6 +157,30 @@
             ball.y = canvas.height / 2;
             ball.speedX = -ball.speedX;
             ball.speedY = Math.random() * 10 - 5; // Randomize vertical direction
+        }
+
+        function spawnBall() {
+            // Create a new ball
+            const newBall = {
+                x: ball.x,
+                y: ball.y,
+                radius: ball.radius,
+                speedX: -ball.speedX,
+                speedY: -ball.speedY,
+                color: ball.color
+            };
+            balls.push(newBall);
+        }
+
+        function activatePowerUp() {
+            // Implement power-up effects
+            powerUpActive = true;
+            setTimeout(deactivatePowerUp, 5000); // Power-up lasts for 5 seconds
+        }
+
+        function deactivatePowerUp() {
+            powerUpActive = false;
+            powerUp.active = false;
         }
 
         // Input handling
