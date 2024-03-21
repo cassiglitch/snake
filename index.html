@@ -2,212 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Pong</title>
+    <title>Touch Events</title>
+    <meta name="viewport" content="width=device-width">
+    <!--  -->
     <style>
-        canvas {
-            border: 2px solid #000;
-            display: block;
-            margin: 0 auto;
+        p{
+            padding: 1rem;
+            font-size: 1.6rem;
+            line-height: 1.5;
+            font-family: "andale mono", sans-serif;
+            background-color: rebeccapurple;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <canvas id="pongCanvas" width="800" height="400"></canvas>
-
+    <h1>Touch Events</h1>
+    <p>This is a paragraph with some text. It is waiting to be touched. It can only be touched on a touch capable device like a mobile phone or tablet. Clicking it with a mouse will not accomplish anything.</p>
     <script>
-        // Initialize canvas
-        const canvas = document.getElementById('pongCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Ball object
-        const ball = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 10,
-            speedX: 5,
-            speedY: 5,
-            color: '#ff0000'
-        };
-
-        // Paddles
-        const paddle1 = {
-            width: 10,
-            height: 80,
-            x: 10,
-            y: canvas.height / 2 - 40,
-            color: '#0000ff',
-            speed: 8,
-            score: 0
-        };
-
-        const paddle2 = {
-            width: 10,
-            height: 80,
-            x: canvas.width - 20,
-            y: canvas.height / 2 - 40,
-            color: '#00ff00',
-            speed: 8,
-            score: 0
-        };
-
-        // Power-up object
-        const powerUp = {
-            x: 0,
-            y: 0,
-            width: 20,
-            height: 20,
-            active: false,
-            color: '#ffff00'
-        };
-
-        // Game settings
-        let multiBallMode = false;
-        let powerUpActive = false;
-
-        // Draw functions
-        function drawBall() {
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = ball.color;
-            ctx.fill();
-            ctx.closePath();
+        //touch events - touchstart, touchend, touchmove, touchcancel
+        //There is NO tap, doubletap, swipe, swipeleft, swiperight, rotate, pinch, or zoom
+        //You would have to create those events yourself by connecting to the touch events.
+        //work on devices that are touch capable
+        //No error on other devices because 'touchstart' is just a name like winlottery
+        //The event will probably just never happen on my laptop
+        document.querySelector('p').addEventListener('touchstart', f);
+        document.querySelector('p').addEventListener('touchend', f);
+        document.querySelector('p').addEventListener('touchmove', f);
+        
+        function f(ev){
+            console.log( ev.touches, ev.type );
         }
-
-        function drawPaddle(paddle) {
-            ctx.fillStyle = paddle.color;
-            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-        }
-
-        function drawPowerUp() {
-            if (powerUp.active) {
-                ctx.fillStyle = powerUp.color;
-                ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-            }
-        }
-
-        function drawScore() {
-            ctx.font = "20px Arial";
-            ctx.fillStyle = "#000000";
-            ctx.fillText("Player 1: " + paddle1.score, 20, 30);
-            ctx.fillText("Player 2: " + paddle2.score, canvas.width - 140, 30);
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBall();
-            drawPaddle(paddle1);
-            drawPaddle(paddle2);
-            drawPowerUp();
-            drawScore();
-        }
-
-        // Update functions
-        function updateBall() {
-            // Move ball
-            ball.x += ball.speedX;
-            ball.y += ball.speedY;
-
-            // Bounce off top and bottom walls
-            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
-                ball.speedY = -ball.speedY;
-            }
-
-            // Check collision with paddles
-            if (ball.x - ball.radius <= paddle1.x + paddle1.width &&
-                ball.y >= paddle1.y &&
-                ball.y <= paddle1.y + paddle1.height) {
-                ball.speedX = -ball.speedX;
-                if (powerUpActive && multiBallMode) {
-                    spawnBall();
-                }
-            }
-
-            if (ball.x + ball.radius >= paddle2.x &&
-                ball.y >= paddle2.y &&
-                ball.y <= paddle2.y + paddle2.height) {
-                ball.speedX = -ball.speedX;
-                if (powerUpActive && multiBallMode) {
-                    spawnBall();
-                }
-            }
-
-            // Check for game over
-            if (ball.x - ball.radius <= 0 || ball.x + ball.radius >= canvas.width) {
-                if (ball.x - ball.radius <= 0) {
-                    paddle2.score++;
-                } else {
-                    paddle1.score++;
-                }
-                resetBall();
-            }
-
-            // Activate power-up if ball hits it
-            if (powerUp.active &&
-                ball.x + ball.radius >= powerUp.x &&
-                ball.x - ball.radius <= powerUp.x + powerUp.width &&
-                ball.y + ball.radius >= powerUp.y &&
-                ball.y - ball.radius <= powerUp.y + powerUp.height) {
-                activatePowerUp();
-            }
-        }
-
-        function resetBall() {
-            ball.x = canvas.width / 2;
-            ball.y = canvas.height / 2;
-            ball.speedX = -ball.speedX;
-            ball.speedY = Math.random() * 10 - 5; // Randomize vertical direction
-        }
-
-        function spawnBall() {
-            // Create a new ball
-            const newBall = {
-                x: ball.x,
-                y: ball.y,
-                radius: ball.radius,
-                speedX: -ball.speedX,
-                speedY: -ball.speedY,
-                color: ball.color
-            };
-            balls.push(newBall);
-        }
-
-        function activatePowerUp() {
-            // Implement power-up effects
-            powerUpActive = true;
-            setTimeout(deactivatePowerUp, 5000); // Power-up lasts for 5 seconds
-        }
-
-        function deactivatePowerUp() {
-            powerUpActive = false;
-            powerUp.active = false;
-        }
-
-        // Input handling
-        document.addEventListener('keydown', function(event) {
-            // Player 1 controls
-            if (event.key === 'w' && paddle1.y > 0) {
-                paddle1.y -= paddle1.speed;
-            } else if (event.key === 's' && paddle1.y + paddle1.height < canvas.height) {
-                paddle1.y += paddle1.speed;
-            }
-
-            // Player 2 controls
-            if (event.key === 'ArrowUp' && paddle2.y > 0) {
-                paddle2.y -= paddle2.speed;
-            } else if (event.key === 'ArrowDown' && paddle2.y + paddle2.height < canvas.height) {
-                paddle2.y += paddle2.speed;
-            }
-        });
-
-        // Main game loop
-        function gameLoop() {
-            updateBall();
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
-
-        gameLoop();
+        
     </script>
 </body>
 </html>
