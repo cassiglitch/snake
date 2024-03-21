@@ -2,38 +2,408 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Touch Events</title>
-    <meta name="viewport" content="width=device-width">
-    <!--  -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        p{
-            padding: 1rem;
-            font-size: 1.6rem;
-            line-height: 1.5;
-            font-family: "andale mono", sans-serif;
-            background-color: rebeccapurple;
-            color: white;
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* No more scrolling for you! */
+            background-color: #f0f0f0; /* Set a background color */
+        }
+
+        #scoreDisplay {
+            margin-top: 20px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0px; /* Adjust the top position as needed */
+            bottom: 0px; /* Adjust the bottom position as needed */
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the canvas */
+        }
+        body {
+            overflow: hidden; /* Disable scrolling */
+            touch-action: none; /* Disable touch actions on the canvas */
         }
     </style>
+    <title>Snake Game</title>
 </head>
 <body>
-    <h1>Touch Events</h1>
-    <p>This is a paragraph with some text. It is waiting to be touched. It can only be touched on a touch capable device like a mobile phone or tablet. Clicking it with a mouse will not accomplish anything.</p>
+    <div id="scoreDisplay">Score: 0</div>
+    <canvas id="snakeCanvas"></canvas>
+
     <script>
-        //touch events - touchstart, touchend, touchmove, touchcancel
-        //There is NO tap, doubletap, swipe, swipeleft, swiperight, rotate, pinch, or zoom
-        //You would have to create those events yourself by connecting to the touch events.
-        //work on devices that are touch capable
-        //No error on other devices because 'touchstart' is just a name like winlottery
-        //The event will probably just never happen on my laptop
-        document.querySelector('p').addEventListener('touchstart', f);
-        document.querySelector('p').addEventListener('touchend', f);
-        document.querySelector('p').addEventListener('touchmove', f);
-        
-        function f(ev){
-            console.log( ev.touches, ev.type );
+        const canvas = document.getElementById('snakeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gridSize = 20;
+        let startingLength = 5;
+        let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
+        let food = { x: 0, y: 0 };
+        let obstacles = [];
+        let dynamicObstacles = [];
+        let direction = 'right';
+        let score = 0;
+        let isEating = false;
+        let eatingAnimationFrames = 0;
+        let isInvincible = false;
+        let invincibilityDuration = 0;
+        let isColliding = false;
+        let collisionAnimationFrames = 10;
+        let isPaused = false;
+
+        function draw() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Layer 1: Draw Invincibility Aura
+            if (isInvincible) {
+                drawInvincibilityAura();
+            }
+
+            // Layer 2: Draw Snake Body
+            snake.forEach((segment, index) => {
+                ctx.fillStyle = segment.color;
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            });
+
+            // Layer 3: Draw Snake Head
+            const head = snake[0];
+            ctx.fillStyle = 'lightgreen'; // Head color
+            ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+
+            // Draw Food
+            ctx.fillStyle = getFoodColor(food.type);
+            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+            // Layer 4: Draw Eating Animation
+            if (isEating) {
+                drawEatingAnimation();
+            }
+
+            // Layer 5: Draw Obstacles
+            ctx.fillStyle = 'black';
+            obstacles.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+
+            // Draw Dynamic Obstacles
+            ctx.fillStyle = 'grey';
+            dynamicObstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
+            });
+
+            // Draw Score
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.textContent = `Score: ${score}`;
         }
-        
+
+        function drawInvincibilityAura() {
+            snake.forEach((segment, index) => {
+                const shadowSize = 8; // Adjust the size of the shadow
+                ctx.fillStyle = 'rgba(255, 165, 0, 0.3)'; // Orange color with transparency
+                ctx.fillRect(segment.x * gridSize - shadowSize, segment.y * gridSize - shadowSize, gridSize + shadowSize * 2, gridSize + shadowSize * 2);
+            });
+        }
+
+        function drawEatingAnimation() {
+            const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
+            const segmentSize = gridSize;
+            const waveSize = 5; // Adjust the size of the wave
+            const maxFrames = 8; // Number of frames for the eating animation
+
+            const head = snake[0];
+            const eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
+            eatenSegments.forEach((segment, index) => {
+                const animationFrame = eatingAnimationFrames - index;
+                const offset = waveSize * (maxFrames - animationFrame); // Calculate offset for the wave effect
+                const segmentX = segment.x * gridSize;
+                const segmentY = segment.y * gridSize;
+
+                ctx.fillStyle = animationColor;
+                ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+
+                // Draw a wave-like effect
+                ctx.fillRect(segmentX - offset, segmentY, segmentSize, segmentSize);
+                ctx.fillRect(segmentX + offset, segmentY, segmentSize, segmentSize);
+                ctx.fillRect(segmentX, segmentY - offset, segmentSize, segmentSize);
+                ctx.fillRect(segmentX, segmentY + offset, segmentSize, segmentSize);
+            });
+        }
+
+        function getFoodColor(foodType) {
+            switch (foodType) {
+                case 'normal':
+                    return 'red';
+                case 'superfood':
+                    return 'gold';
+                case 'poison':
+                    return 'purple';
+                case 'teleport':
+                    return 'blue';
+                case 'invincibility':
+                    return 'orange';
+            }
+        }
+
+        function HaHaNoCollision(duration) {
+            isInvincible = true;
+            invincibilityDuration = duration; // Set the duration for invincibility
+        }
+
+        function update() {
+            // If the snake is invincible, decrement the invincibility duration
+            if (isInvincible) {
+                invincibilityDuration--;
+                // If the invincibility duration has expired, reset the invincibility status
+                if (invincibilityDuration <= 0) {
+                    isInvincible = false;
+                }
+            }
+
+            // Update Snake position
+            const head = { ...snake[0] };
+            switch (direction) {
+                case 'up':
+                    head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+                    break;
+                case 'down':
+                    head.y = (head.y + 1) % (canvas.height / gridSize);
+                    break;
+                case 'left':
+                    head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
+                    break;
+                case 'right':
+                    head.x = (head.x + 1) % (canvas.width / gridSize);
+                    break;
+            }
+
+            // Check if Snake hits obstacles
+            if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
+                dynamicObstacles.some(obstacle => (head.x >=obstacle.x && head.x < obstacle.x + 2) &&
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2)))) {
+                isColliding = true;
+                collisionAnimationFrames = 10;
+                restartGame();
+                return;
+            }
+
+            // Check if Snake eats Food
+            if (head.x === food.x && head.y === food.y) {
+                if (food.type === 'superfood') {
+                    score += 2;
+                    snake.unshift({ ...snake[0], color: 'blue' });
+                    snake.unshift({ ...snake[0], color: 'blue' });
+                } else if (food.type === 'poison') {
+                    if (snake.length < 4) {
+                        restartGame();
+                        return;
+                    }
+                    snake.pop();
+                    snake.pop();
+                    snake.pop();
+                    score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
+                } else if (food.type === 'teleport') {
+                    // Teleport the snake to a random location
+                    const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
+                    const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
+                    head.x = randomX;
+                    head.y = randomY;
+
+                    // Randomize the direction
+                    const directions = ['up', 'down', 'left', 'right']; // Possible directions
+                    const randomIndex = Math.floor(Math.random() * directions.length);
+                    direction = directions[randomIndex];
+                    HaHaNoCollision(10);
+                } else if (food.type === 'invincibility') {
+                    HaHaNoCollision(50);
+                } else {
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'blue' });
+                }
+                isEating = true;
+                eatingAnimationFrames = 8; // Set the number of frames for the eating animation
+                spawnFood();
+
+                // More frequent black blocks as score increases
+                if (Math.random() < calculateObstacleSpawnProbability()) {
+                    spawnObstacle();
+                }
+            }
+
+            // Move Snake
+            snake.pop();
+            snake.unshift(head);
+
+            // Move Dynamic Obstacles
+            dynamicObstacles.forEach(obstacle => {
+                if (obstacle.id === 1) {
+                    // Left to right movement
+                    obstacle.x += 0.25;
+                    if (obstacle.x + 2 > canvas.width / gridSize) {
+                        obstacle.x = 0; // Reset to the left side if it goes beyond the canvas boundary
+                    }
+                } else if (obstacle.id === 2) {
+                    // Up and down movement
+                    obstacle.y += 0.25;
+                    if (obstacle.y + 2 > canvas.height / gridSize) {
+                        obstacle.y = 0; // Reset to the top if it goes beyond the canvas boundary
+                    }
+                }
+            });
+
+            // Handle eating animation
+            // Check for victory
+            if (score >= 50) {
+                declareVictory();
+            }
+        }
+
+        function calculateObstacleSpawnProbability() {
+            // Obstacle spawn probability increases with score
+            return Math.min(0.1 + score / 200, 1); // Adjust the maximum spawn probability as needed
+        }
+
+        function spawnFood() {
+            let newFood;
+            do {
+                newFood = {
+                    x: Math.floor(Math.random() * (canvas.width / gridSize)),
+                    y: Math.floor(Math.random() * (canvas.height / gridSize)),
+                    type: generateFoodType()
+                };
+            } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y) ||
+                obstacles.some(obstacle => obstacle.x === newFood.x && obstacle.y === newFood.y) ||
+                dynamicObstacles.some(obstacle => (newFood.x >= obstacle.x && newFood.x < obstacle.x + 2) &&
+                    (newFood.y >= obstacle.y && newFood.y < obstacle.y + 2)));
+
+            food = newFood;
+        }
+
+        function generateFoodType() {
+            // Adjust the probability for different types of food as needed
+            const random = Math.random();
+            if (random === 0.1) {
+                return 'invincibility';
+            } else if (random <= 0.2) {
+                return 'superfood';
+            } else if (random <= 0.21) {
+                return 'poison';
+            } else if (random <= 0.3) {
+                return 'teleport';
+            } else {
+                return 'normal';
+            }
+        }
+
+        function spawnObstacle() {
+            const x = Math.floor(Math.random() * (canvas.width / gridSize));
+            const y = Math.floor(Math.random() * (canvas.height / gridSize));
+
+            if (Math.random() < 0.5) {
+                obstacles.push({ x: x, y: y });
+            } else {
+                // Randomly assign an ID to the dynamic obstacle
+                const id = Math.random() < 0.5 ? 1 : 2;
+                dynamicObstacles.push({ x: x, y: y, id: id });
+            }
+        }
+
+        function restartGame() {
+            alert(`Game Over! Your score: ${score}`);
+            snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
+            obstacles = [];
+            dynamicObstacles = [];
+            score = 0;
+            isEating = false;
+            eatingAnimationFrames = 0;
+            spawnFood();
+        }
+
+        function declareVictory() {
+            alert(`Victory! You have conquered the Snake kingdom with a score of 100!`);
+            restartGame();
+        }
+
+        function gameLoop() {
+            resizeCanvas(); // Resize the canvas on every game loop iteration
+            update();
+            draw();
+            getZoomFactor();
+
+            // Check if canvas position needs to be reset
+            if (canvasNeedsReset()) {
+                resetCanvasPosition();
+            }
+        }
+
+        function canvasNeedsReset() {
+            // Calculate the size of the invisible bounding box around the canvas
+            var boundingBoxWidth =             canvas.parentElement.clientWidth;
+            var boundingBoxHeight = canvas.parentElement.clientHeight;
+
+            // Check if canvas is outside the viewport bounds
+            return (
+                canvas.offsetLeft < 0 ||
+                canvas.offsetTop < 0 ||
+                canvas.offsetLeft + canvas.width > boundingBoxWidth ||
+                canvas.offsetTop + canvas.height > boundingBoxHeight
+            );
+        }
+
+        function resetCanvasPosition() {
+            // Reset canvas position to the center of the viewport
+            canvas.style.left = '50%';
+            canvas.style.top = '50%';
+            canvas.style.transform = 'translate(-50%, -50%)';
+        }
+
+        function getZoomFactor() {
+            // Calculate the zoom factor of the canvas
+            var scaleX = canvas.width / canvas.offsetWidth;
+            var scaleY = canvas.height / canvas.offsetHeight;
+
+            // Log the zoom factors to the console
+            console.log('Zoom Factor (X):', scaleX);
+            console.log('Zoom Factor (Y):', scaleY);
+        }
+
+        // Resize canvas to match parent container size
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        // Event Listeners
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            resetCanvasPosition();
+        });
+
+        window.addEventListener('keydown', event => {
+            if (event.key === 'ArrowUp' && direction !== 'down') {
+                direction = 'up';
+            } else if (event.key === 'ArrowDown' && direction !== 'up') {
+                direction = 'down';
+            } else if (event.key === 'ArrowLeft' && direction !== 'right') {
+                direction = 'left';
+            } else if (event.key === 'ArrowRight' && direction !== 'left') {
+                direction = 'right';
+            } else if (event.key === ' ') {
+                isPaused = !isPaused;
+            }
+        });
+
+        // Initialize the game
+        resizeCanvas();
+        spawnFood();
+        setInterval(() => {
+            if (!isPaused) {
+                gameLoop();
+            }
+        }, 100);
     </script>
 </body>
 </html>
