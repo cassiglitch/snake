@@ -19,7 +19,7 @@
         }
 
         canvas {
-            position: absolute;
+            position: fixed;
             top: 0px; /* Adjust the top position as needed */
             bottom: 0px; /* Adjust the bottom position as needed */
             border: 1px solid #ddd;
@@ -35,7 +35,7 @@
 <body>
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
-
+    
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
