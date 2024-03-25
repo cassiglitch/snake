@@ -372,8 +372,9 @@ function declareVictory() {
 function createRippleEffect(x, y, radius, maxRadius, ctx) {
     // Create a gradient for the ripple effect
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, 'rgba(255, 0, 0, 0)'); // Start color (red with transparency)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');   // End color (fully transparent)
+    gradient.addColorStop(0, 'rgba(255, 0, 0, 0)'); // Start color (fully transparent)
+    gradient.addColorStop(0.5, 'rgba(255, 0, 0, 0.5)'); // Middle color (red with transparency)
+    gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');   // End color (fully opaque red)
 
     // Apply the gradient to the canvas
     ctx.fillStyle = gradient;
