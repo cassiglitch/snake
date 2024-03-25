@@ -367,47 +367,66 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-function restartGame() {
-    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
-    const explosionSteps = 10; // Number of steps in the explosion animation
-    const maxRadius = Math.max(canvas.width, canvas.height); // Maximum radius for the explosion
+// Function to create the water ripple effect on the canvas and erase anything it touches
+function createRippleEffect(x, y, radius) {
+    // Get the canvas element
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
 
-    // Function to draw a pixelated circle
-    function drawPixelatedCircle(x, y, radius) {
-        for (let i = 0; i < radius; i++) {
-            for (let j = 0; j < radius; j++) {
-                if (Math.sqrt((i - radius / 2) ** 2 + (j - radius / 2) ** 2) < radius / 2) {
-                    ctx.fillRect(x + i - radius / 2, y + j - radius / 2, 1, 1);
-                }
-            }
-        }
-    }
+    // Clear the canvas in the ripple area
+    ctx.clearRect(x - radius, y - radius, radius * 2, radius * 2);
 
-    // Start the explosion animation from the snake's head position
+    // Create a gradient for the ripple effect
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)'); // Start color (red with transparency)
+    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');   // End color (fully transparent)
+
+    // Apply the gradient to the canvas
+    ctx.fillStyle = gradient;
+
+    // Draw the ripple effect as a filled circle
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// Function to trigger the death animation with a ripple effect
+function triggerDeathAnimation() {
     const head = snake[0];
-    let explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
-    let explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
+    const explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
+    const explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
+    const maxRadius = Math.max(canvas.width, canvas.height); // Maximum radius for the ripple effect
 
-    // Start the explosion animation
+    // Define the parameters for the ripple effect
+    const rippleRadius = 20; // Radius of the ripple
+    const rippleSteps = 10; // Number of steps in the ripple animation
+
+    // Start the ripple animation
     let currentStep = 0;
-    const explosionInterval = setInterval(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.fillStyle = 'red'; // Explosion color
+    const rippleInterval = setInterval(() => {
+        // Clear the canvas
+        const canvas = document.getElementById('snakeCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw expanding concentric circles with increasing pixelation
-        for (let i = 0; i < currentStep; i++) {
-            const radius = maxRadius * (i / explosionSteps);
-            drawPixelatedCircle(explosionCenterX, explosionCenterY, radius);
-        }
+        // Draw the ripple effect for the current step
+        const stepRadius = (maxRadius / rippleSteps) * currentStep;
+        createRippleEffect(explosionCenterX, explosionCenterY, stepRadius);
 
         currentStep++;
 
-        // Stop the explosion animation when completed
-        if (currentStep > explosionSteps) {
-            clearInterval(explosionInterval);
-            respawnSnake(); // Respawn the snake after the explosion animation
+        // Stop the ripple animation when completed
+        if (currentStep > rippleSteps) {
+            clearInterval(rippleInterval);
+            respawnSnake(); // Respawn the snake after the ripple animation
         }
-    }, 20);
+    }, 100); // Adjust the interval as needed for the desired animation speed
+}
+
+// Function to restart the game
+function restartGame() {
+    triggerDeathAnimation(); // Trigger the death animation
+    // Note: The respawnSnake function is called after the death animation completes, inside the triggerDeathAnimation function
 }
 
 function respawnSnake() {
