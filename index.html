@@ -368,30 +368,47 @@ function declareVictory() {
 }
 
 function restartGame() {
-    // Death Animation (ripple effect)
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    stopGame(); // Stop the game loop
 
-    const explosionCenterX = snake[0].x * gridSize + gridSize / 2;
-    const explosionCenterY = snake[0].y * gridSize + gridSize / 2;
-    const maxExplosionRadius = Math.max(canvas.width, canvas.height) * 2;
+    // Death Animation (snake explosion)
     const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
-    const pixelsPerFrame = 5; // Number of pixels to increase the explosion radius per frame
+    const explosionSize = 50; // Initial size of the explosion
 
-    let explosionRadius = 0;
+    // Get the snake's head position and direction
+    const head = snake[0];
+    const direction = getSnakeDirection();
 
+    // Draw explosion animation
+    let currentSize = explosionSize;
     const explosionInterval = setInterval(() => {
-        ctx.beginPath();
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        ctx.ellipse(explosionCenterX, explosionCenterY, explosionRadius, explosionRadius * 0.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        explosionRadius += pixelsPerFrame;
-        if (explosionRadius >= maxExplosionRadius) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        drawExplosion(head.x * gridSize, head.y * gridSize, currentSize, direction); // Draw explosion
+        currentSize += 5; // Increase explosion size
+        if (currentSize > Math.max(canvas.width, canvas.height)) {
             clearInterval(explosionInterval); // Stop the explosion animation
             respawnSnake(); // Respawn the snake after the explosion animation
         }
-    }, explosionDuration / (maxExplosionRadius / pixelsPerFrame)); // Adjust the explosion speed
+    }, explosionDuration / (Math.max(canvas.width, canvas.height) / 5)); // Adjust the explosion speed
+
+    // Reset obstacles and score
+    obstacles = [];
+    score = 0;
 }
+
+function getSnakeDirection() {
+    // Determine snake's direction based on head and next segment position
+    const head = snake[0];
+    const nextSegment = snake[1];
+    if (nextSegment) {
+        if (head.x === nextSegment.x) {
+            return head.y > nextSegment.y ? 'up' : 'down';
+        } else {
+            return head.x > nextSegment.x ? 'left' : 'right';
+        }
+    }
+    return null; // If there's no next segment, return null
+}
+
 
 
 
