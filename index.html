@@ -368,54 +368,33 @@ function declareVictory() {
 }
 
 function restartGame() {
-    // Pause the game loop
-    clearInterval(gameInterval);
+    
+    // Define explosion parameters
+    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
+    const explosionSize = Math.max(canvas.width, canvas.height); // Maximum explosion size
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Create a ripple-like explosion effect centered around the snake's position
-    const explosionSize = 50; // Initial size of the explosion
-    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
+    // Calculate the position of the snake's head
+    const head = snake[0];
+    const centerX = head.x * gridSize + gridSize / 2;
+    const centerY = head.y * gridSize + gridSize / 2;
 
-    // Start the explosion animation
+    // Draw the explosion animation
     let explosionFrame = 0;
     const explosionInterval = setInterval(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        drawExplosion(snake[0].x * gridSize, snake[0].y * gridSize, explosionSize + explosionFrame * 2, direction);
-        explosionFrame++;
-
-        // Stop the explosion animation after reaching the desired size
-        if (explosionFrame * 2 >= canvas.width) {
-            clearInterval(explosionInterval);
-
-            // Respawn the snake after the explosion animation
-            respawnSnake();
-
-            // Restart the game loop
-            gameInterval = setInterval(gameLoop, 100);
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY, explosionSize * explosionFrame / explosionDuration, explosionSize * 0.5 * explosionFrame / explosionDuration, 0, 0, Math.PI * 2);
+        ctx.fill();
+        explosionFrame += 10; // Increase explosion frame
+        if (explosionFrame > explosionDuration) {
+            clearInterval(explosionInterval); // Stop the explosion animation
+            respawnSnake(); // Respawn the snake after the explosion animation
         }
-    }
+    }, 10); // Adjust the interval for smoother animation
 }
-
-
-function getSnakeDirection() {
-    // Determine snake's direction based on head and next segment position
-    const head = snake[0];
-    const nextSegment = snake[1];
-    if (nextSegment) {
-        if (head.x === nextSegment.x) {
-            return head.y > nextSegment.y ? 'up' : 'down';
-        } else {
-            return head.x > nextSegment.x ? 'left' : 'right';
-        }
-    }
-    return null; // If there's no next segment, return null
-}
-
-
-
-
 function respawnSnake() {
     // Reinitialize snake and food
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
