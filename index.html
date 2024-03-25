@@ -427,7 +427,10 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
         if (radius < maxRadius) {
             // Create the next ripple
             createRippleEffect(x, y, radius + 2, maxRadius, ctx); // Increase the ripple radius by 2 for a faster effect
-        }
+                    } else if (allErased) {
+            // Trigger respawn of the snake if all canvas content has been erased
+            respawnSnake();
+        }           
     }, 25); // Adjust the fading speed for a faster effect
 
     // Draw a bigger red radius surrounding the erasing radius
