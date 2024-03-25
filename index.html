@@ -367,65 +367,77 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-// Function to create the water ripple effect on the canvas and gradually fade away
-function createRippleEffect(x, y, radius, maxRadius, ctx) {
-    // Create a gradient for the ripple effect
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)'); // Start color (red with transparency)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');   // End color (fully transparent)
+// Function to trigger death animation and handle snake respawn
+function triggerDeathAnimation() {
+    // Freeze the game temporarily
+    clearInterval(gameInterval);
 
-    // Apply the gradient to the canvas
-    ctx.fillStyle = gradient;
+    // Get the canvas element
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
 
-    // Draw the ripple effect as a filled rectangle
-    ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    // Define the position and size of the red rectangle for the ripple effect
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const rectWidth = canvas.width;
+    const rectHeight = canvas.height;
 
-    // Gradually fade away the ripple effect
-    setTimeout(() => {
-        if (radius < maxRadius) {
-            // Create the next ripple
-            createRippleEffect(x, y, radius + 2, maxRadius, ctx); // Increase the ripple radius by 2 for a faster effect
-        } else {
-            // Check if the ripple touches the canvas edge
-            if (x - maxRadius <= 0 || x + maxRadius >= canvas.width || y - maxRadius <= 0 || y + maxRadius >= canvas.height) {
-                // Trigger the respawnSnake function
-                respawnSnake();
+    // Function to create the water ripple effect on the canvas and gradually fade away
+    function createRippleEffect(x, y, width, height, ctx) {
+        // Draw the ripple effect as a filled rectangle
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.8)'; // Red color with transparency
+        ctx.fillRect(x - width / 2, y - height / 2, width, height);
+
+        // Get the canvas image data within the erasing rectangle
+        const imageData = ctx.getImageData(x - width / 2, y - height / 2, width, height);
+        const data = imageData.data;
+
+        // Flag to check if all canvas content has been "erased"
+        let allErased = true;
+
+        // Get the exact color of the canvas
+        const canvasColor = getComputedStyle(document.body).backgroundColor; // Get the background color of the canvas
+
+        // Iterate through the image data and change the color of non-transparent pixels
+        for (let i = 0; i < data.length; i += 4) {
+            const alpha = data[i + 3];
+            if (alpha !== 0) {
+                // Set other non-transparent pixels to match the canvas color
+                const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
+                data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
+                data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
+                data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
+                // Leave alpha channel unchanged
+
+                // Check if there are still non-transparent pixels
+                allErased = false;
             }
         }
-    }, 25); // Adjust the fading speed for a faster effect
+
+        // Put the modified image data back onto the canvas
+        ctx.putImageData(imageData, x - width / 2, y - height / 2);
+
+        // Check if all canvas content has been "erased"
+        if (allErased) {
+            // Trigger the respawnSnake function
+            respawnSnake();
+            // Resume the game loop
+            gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
+        }
+    }
+
+    // Create the water ripple effect
+    createRippleEffect(centerX, centerY, rectWidth, rectHeight, ctx);
+
+    // Check if the red rectangle touches the sides of the canvas
+    if (centerX - rectWidth / 2 <= 0 || centerX + rectWidth / 2 >= canvas.width ||
+        centerY - rectHeight / 2 <= 0 || centerY + rectHeight / 2 >= canvas.height) {
+        // Trigger the respawnSnake function
+        respawnSnake();
+        // Resume the game loop
+        gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
+    }
 }
-
-// Function to trigger the death animation with a smoother water ripple effect
-function triggerDeathAnimation() {
-    clearInterval(gameInterval); // Pause the game loop
-
-    const head = snake[0];
-    const explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
-    const explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
-    const maxRadius = Math.max(canvas.width, canvas.height) + 50; // Maximum radius for the ripple effect (extend by 50 pixels)
-    const ctx = canvas.getContext('2d'); // Get the canvas context
-
-    // Start the ripple animation
-    createRippleEffect(explosionCenterX, explosionCenterY, 1, maxRadius, ctx);
-}
-
-
-
-        
-    function triggerDeathAnimation() {
-    clearInterval(gameInterval); // Pause the game loop
-    const head = snake[0];
-    const middleIndex = Math.max(0, Math.ceil(Math.floor(snake.length / 2)));
-    const middleSegment = snake[middleIndex];
-    const explosionCenterX = (middleSegment.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
-    const explosionCenterY = (middleSegment.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
-    const maxRadius = Math.max(canvas.width, canvas.height); // M
-    const ctx = canvas.getContext('2d'); // Get the canvas context
-
-    // Start the ripple animation
-    createRippleEffect(explosionCenterX, explosionCenterY, 1, maxRadius, ctx);
-}
-
 
 
 
