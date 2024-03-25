@@ -368,7 +368,6 @@ function declareVictory() {
 }
 
 // Function to trigger death animation and handle snake respawn
-// Function to trigger death animation and handle snake respawn
 function triggerDeathAnimation() {
     // Freeze the game temporarily
     clearInterval(gameInterval);
@@ -388,8 +387,18 @@ function triggerDeathAnimation() {
     let rectWidth = gridSize;
     let rectHeight = gridSize;
 
+    // Define the initial size and position of the surrounding red rectangle
+    let redRectX = startX - gridSize; // Expand one grid size beyond the ripple rectangle
+    let redRectY = startY - gridSize; // Expand one grid size beyond the ripple rectangle
+    let redRectWidth = gridSize * 3; // Expand two grid sizes horizontally
+    let redRectHeight = gridSize * 3; // Expand two grid sizes vertically
+
     // Function to create the water ripple effect on the canvas and gradually expand
     function createRippleEffect(ctx) {
+        // Draw the surrounding red rectangle
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Red color with transparency
+        ctx.fillRect(redRectX, redRectY, redRectWidth, redRectHeight);
+
         // Draw the ripple effect as a filled rectangle
         ctx.fillStyle = 'rgba(255, 0, 0, 0.8)'; // Red color with transparency
         ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
@@ -423,7 +432,7 @@ function triggerDeathAnimation() {
         ctx.putImageData(imageData, rectX, rectY);
 
         // Check if all canvas content has been "erased"
-        if (allErased) {
+        if (allErased || rectX <= 0 || rectY <= 0 || rectX + rectWidth >= canvas.width || rectY + rectHeight >= canvas.height) {
             // Trigger the respawnSnake function
             respawnSnake();
             // Resume the game loop
@@ -437,6 +446,12 @@ function triggerDeathAnimation() {
         rectWidth += gridSize * 2; // Expand horizontally
         rectHeight += gridSize * 2; // Expand vertically
 
+        // Expand the surrounding red rectangle
+        redRectX -= gridSize; // Move left
+        redRectY -= gridSize; // Move up
+        redRectWidth += gridSize * 2; // Expand horizontally
+        redRectHeight += gridSize * 2; // Expand vertically
+
         // Schedule the next frame of the ripple effect
         requestAnimationFrame(() => createRippleEffect(ctx));
     }
@@ -444,7 +459,6 @@ function triggerDeathAnimation() {
     // Create the water ripple effect
     createRippleEffect(ctx);
 }
-
 
 
 
