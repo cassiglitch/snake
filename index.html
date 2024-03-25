@@ -368,33 +368,37 @@ function declareVictory() {
 }
 
 function restartGame() {
-    
-    // Define explosion parameters
-    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
-    const explosionSize = Math.max(canvas.width, canvas.height); // Maximum explosion size
+function restartGame() {
+    // Pause the game loop
+    clearInterval(gameInterval);
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Calculate the position of the snake's head
-    const head = snake[0];
-    const centerX = head.x * gridSize + gridSize / 2;
-    const centerY = head.y * gridSize + gridSize / 2;
+    // Calculate the initial explosion size to cover the entire screen
+    const explosionSize = Math.max(canvas.width, canvas.height) * 2;
 
-    // Draw the explosion animation
+    // Start the explosion animation
     let explosionFrame = 0;
+    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
     const explosionInterval = setInterval(() => {
-        ctx.fillStyle = 'red';
-        ctx.beginPath();
-        ctx.ellipse(centerX, centerY, explosionSize * explosionFrame / explosionDuration, explosionSize * 0.5 * explosionFrame / explosionDuration, 0, 0, Math.PI * 2);
-        ctx.fill();
-        explosionFrame += 10; // Increase explosion frame
-        if (explosionFrame > explosionDuration) {
-            clearInterval(explosionInterval); // Stop the explosion animation
-            respawnSnake(); // Respawn the snake after the explosion animation
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        drawExplosion(canvas.width / 2, canvas.height / 2, explosionSize + explosionFrame * 2);
+        explosionFrame++;
+
+        // Stop the explosion animation after reaching the desired size
+        if (explosionFrame * 2 >= explosionSize) {
+            clearInterval(explosionInterval);
+
+            // Respawn the snake after the explosion animation
+            respawnSnake();
+
+            // Restart the game loop
+            gameInterval = setInterval(gameLoop, 100);
         }
-    }, 10); // Adjust the interval for smoother animation
+    }, 
 }
+
 function respawnSnake() {
     // Reinitialize snake and food
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
