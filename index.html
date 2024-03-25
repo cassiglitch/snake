@@ -368,6 +368,7 @@ function declareVictory() {
 }
 
 // Function to trigger death animation and handle snake respawn
+// Function to trigger death animation and handle snake respawn
 function triggerDeathAnimation() {
     // Freeze the game temporarily
     clearInterval(gameInterval);
@@ -376,20 +377,25 @@ function triggerDeathAnimation() {
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Define the position and size of the red rectangle for the ripple effect
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const rectWidth = canvas.width;
-    const rectHeight = canvas.height;
+    // Get the snake's head position
+    const head = snake[0];
+    const startX = head.x * gridSize; // Convert grid coordinates to pixels
+    const startY = head.y * gridSize;
 
-    // Function to create the water ripple effect on the canvas and gradually fade away
-    function createRippleEffect(x, y, width, height, ctx) {
+    // Define the initial size and position of the ripple rectangle
+    let rectX = startX;
+    let rectY = startY;
+    let rectWidth = gridSize;
+    let rectHeight = gridSize;
+
+    // Function to create the water ripple effect on the canvas and gradually expand
+    function createRippleEffect(ctx) {
         // Draw the ripple effect as a filled rectangle
         ctx.fillStyle = 'rgba(255, 0, 0, 0.8)'; // Red color with transparency
-        ctx.fillRect(x - width / 2, y - height / 2, width, height);
+        ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
 
-        // Get the canvas image data within the erasing rectangle
-        const imageData = ctx.getImageData(x - width / 2, y - height / 2, width, height);
+        // Get the canvas image data within the ripple rectangle
+        const imageData = ctx.getImageData(rectX, rectY, rectWidth, rectHeight);
         const data = imageData.data;
 
         // Flag to check if all canvas content has been "erased"
@@ -408,14 +414,13 @@ function triggerDeathAnimation() {
                 data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
                 data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
                 // Leave alpha channel unchanged
-
                 // Check if there are still non-transparent pixels
                 allErased = false;
             }
         }
 
         // Put the modified image data back onto the canvas
-        ctx.putImageData(imageData, x - width / 2, y - height / 2);
+        ctx.putImageData(imageData, rectX, rectY);
 
         // Check if all canvas content has been "erased"
         if (allErased) {
@@ -423,21 +428,23 @@ function triggerDeathAnimation() {
             respawnSnake();
             // Resume the game loop
             gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
+            return; // Exit the function
         }
+
+        // Expand the ripple rectangle
+        rectX -= gridSize; // Move left
+        rectY -= gridSize; // Move up
+        rectWidth += gridSize * 2; // Expand horizontally
+        rectHeight += gridSize * 2; // Expand vertically
+
+        // Schedule the next frame of the ripple effect
+        requestAnimationFrame(() => createRippleEffect(ctx));
     }
 
     // Create the water ripple effect
-    createRippleEffect(centerX, centerY, rectWidth, rectHeight, ctx);
-
-    // Check if the red rectangle touches the sides of the canvas
-    if (centerX - rectWidth / 2 <= 0 || centerX + rectWidth / 2 >= canvas.width ||
-        centerY - rectHeight / 2 <= 0 || centerY + rectHeight / 2 >= canvas.height) {
-        // Trigger the respawnSnake function
-        respawnSnake();
-        // Resume the game loop
-        gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
-    }
+    createRippleEffect(ctx);
 }
+
 
 
 
