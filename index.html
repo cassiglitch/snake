@@ -383,6 +383,11 @@ function restartGame() {
         }
     }
 
+    // Start the explosion animation from the snake's head position
+    const head = snake[0];
+    let explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
+    let explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
+
     // Start the explosion animation
     let currentStep = 0;
     const explosionInterval = setInterval(() => {
@@ -392,7 +397,7 @@ function restartGame() {
         // Draw expanding concentric circles with increasing pixelation
         for (let i = 0; i < currentStep; i++) {
             const radius = maxRadius * (i / explosionSteps);
-            drawPixelatedCircle(canvas.width / 2, canvas.height / 2, radius);
+            drawPixelatedCircle(explosionCenterX, explosionCenterY, radius);
         }
 
         currentStep++;
@@ -402,7 +407,7 @@ function restartGame() {
             clearInterval(explosionInterval);
             respawnSnake(); // Respawn the snake after the explosion animation
         }
-    }, explosionDuration / explosionSteps);
+    }, 20);
 }
 
 function respawnSnake() {
