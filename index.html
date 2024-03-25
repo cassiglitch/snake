@@ -93,7 +93,7 @@ function draw() {
     // Draw Dynamic Obstacles
     ctx.fillStyle = 'grey';
     dynamicObstacles.forEach(obstacle => {
-        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 1, gridSize * 1);
+        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
     });
 
     // Draw Score
@@ -244,20 +244,20 @@ HaHaNoCollision(50)
                 if (obstacle.id === 1) {
                     // Left to right movement
                     obstacle.x += 0.25;
-                    if (obstacle.x + 2 > canvas.width / gridSize) {
+                    if (obstacle.x + 1 > canvas.width / gridSize) {
                         obstacle.x = 0; // Reset to the left side if it goes beyond the canvas boundary
                     }
                 } else if (obstacle.id === 2) {
                     // Up and down movement
                     obstacle.y += 0.25;
-                    if (obstacle.y + 2 > canvas.height / gridSize) {
+                    if (obstacle.y + 1 > canvas.height / gridSize) {
                         obstacle.y = 0; // Reset to the top if it goes beyond the canvas boundary
                     }
                 }
             });
 
             // Check for victory
-            if (score >= 50) {
+            if (score >= 100) {
                 declareVictory();
             }
         }
@@ -277,8 +277,8 @@ HaHaNoCollision(50)
                 };
             } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y) ||
                 obstacles.some(obstacle => obstacle.x === newFood.x && obstacle.y === newFood.y) ||
-                dynamicObstacles.some(obstacle => (newFood.x >= obstacle.x && newFood.x < obstacle.x + 2) &&
-                    (newFood.y >= obstacle.y && newFood.y < obstacle.y + 2)));
+                dynamicObstacles.some(obstacle => (newFood.x >= obstacle.x && newFood.x < obstacle.x + 1) &&
+                    (newFood.y >= obstacle.y && newFood.y < obstacle.y + 1)));
 
             food = newFood;
         }
@@ -312,8 +312,91 @@ HaHaNoCollision(50)
             }
         }
 
-        function restartGame() {
-            alert(`Game Over! Your score: ${score}`);
+
+function declareVictory() {
+    clearInterval(gameInterval); // Pause the game loop
+    gameLoopRunning = false; // Set game loop flag to false
+
+    // Display "You win" message
+    const victoryMessage = document.createElement('div');
+    victoryMessage.textContent = 'You win';
+    victoryMessage.style.position = 'fixed';
+    victoryMessage.style.top = '50%';
+    victoryMessage.style.left = '50%';
+    victoryMessage.style.transform = 'translate(-50%, -50%)';
+    victoryMessage.style.fontSize = '48px';
+    victoryMessage.style.color = 'gold';
+    document.body.appendChild(victoryMessage);
+
+    // Crown Animation (moving up and down)
+    const crownEmoji = document.createElement('span');
+    crownEmoji.textContent = '👑';
+    crownEmoji.style.position = 'fixed';
+    crownEmoji.style.top = '0';
+    crownEmoji.style.left = '50%';
+    crownEmoji.style.transform = 'translate(-50%, -50%)';
+    crownEmoji.style.fontSize = '100px';
+    crownEmoji.style.transition = 'top 2s ease-in-out, opacity 1s ease-in-out';
+    crownEmoji.style.opacity = '1'; // Initially visible
+
+    // Add crown emoji to the DOM
+    document.body.appendChild(crownEmoji);
+
+    // Move crown up and down
+    setTimeout(() => {
+        crownEmoji.style.top = '100%'; // Move crown down
+    }, 1000);
+
+    // Fade out crown
+    setTimeout(() => {
+        crownEmoji.style.opacity = '0';
+    }, 3000);
+
+    // Wait for the animations to finish before restarting the game
+    setTimeout(() => {
+        // Remove the crown emoji and victory message
+        document.body.removeChild(crownEmoji);
+        document.body.removeChild(victoryMessage);
+
+        // Restart the game
+        restartGame();
+
+        // Resume the game loop
+        gameLoopRunning = true; // Set game loop flag to true
+        gameInterval = setInterval(gameLoop, 100);
+    }, 4000); // Adjust the total duration of the animation (in milliseconds)
+}
+
+function restartGame() {
+    // Death Animation (ripple effect)
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+
+    const explosionCenterX = snake[0].x * gridSize + gridSize / 2;
+    const explosionCenterY = snake[0].y * gridSize + gridSize / 2;
+    const maxExplosionRadius = Math.max(canvas.width, canvas.height) * 2;
+    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
+    const pixelsPerFrame = 5; // Number of pixels to increase the explosion radius per frame
+
+    let explosionRadius = 0;
+
+    const explosionInterval = setInterval(() => {
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.ellipse(explosionCenterX, explosionCenterY, explosionRadius, explosionRadius * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        explosionRadius += pixelsPerFrame;
+        if (explosionRadius >= maxExplosionRadius) {
+            clearInterval(explosionInterval); // Stop the explosion animation
+            respawnSnake(); // Respawn the snake after the explosion animation
+        }
+    }, explosionDuration / (maxExplosionRadius / pixelsPerFrame)); // Adjust the explosion speed
+}
+
+
+
+function respawnSnake() {
+    // Reinitialize snake and food
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
             dynamicObstacles = [];
@@ -321,14 +404,12 @@ HaHaNoCollision(50)
             isEating = false;
             eatingAnimationFrames = 0;
             spawnFood();
-        }
+}
 
-        function declareVictory() {
-            alert(`Victory! You have conquered the Snake kingdom with a score of 100!`);
-            restartGame();
-        }
+
 
         function gameLoop() {
+                if (gameInterval === undefined) return;
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
@@ -351,6 +432,7 @@ HaHaNoCollision(50)
                     isEating = false;
                 }
             }
+            gameLoopRunning = false;
         }
 
 function closestNumber(n, m) {
