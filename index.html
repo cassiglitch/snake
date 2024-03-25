@@ -368,9 +368,9 @@ function declareVictory() {
 }
 
 // Function to create the water ripple effect on the canvas and gradually fade away
-function createRippleEffect(x, y, radius, maxRadius, ctx) {
+function createRippleEffect(x, y, rippleRadius, eraseRadius, maxRadius, ctx) {
     // Create a gradient for the ripple effect
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, rippleRadius);
     gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)'); // Start color (red with transparency)
     gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');   // End color (fully transparent)
 
@@ -379,11 +379,11 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
 
     // Draw the ripple effect as a filled circle
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.arc(x, y, rippleRadius, 0, Math.PI * 2);
     ctx.fill();
 
     // Get the canvas image data within the ripple radius
-    const imageData = ctx.getImageData(x - radius, y - radius, radius * 2, radius * 2);
+    const imageData = ctx.getImageData(x - rippleRadius, y - rippleRadius, rippleRadius * 2, rippleRadius * 2);
     const data = imageData.data;
 
     // Flag to check if all canvas content has been "erased"
@@ -395,7 +395,7 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     // Iterate through the image data and change the color of non-transparent pixels
     for (let i = 0; i < data.length; i += 4) {
         const alpha = data[i + 3];
-        if (alpha !== 0 && radius > 50) {
+        if (alpha !== 0 && eraseRadius <= rippleRadius - 50) {
             // Set non-transparent pixels outside the red ripple area to match the canvas color
             const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
             data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
@@ -404,7 +404,7 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
             // Leave alpha channel unchanged
             // Check if there are still non-transparent pixels
             allErased = false;
-        } else if (radius <= 50) {
+        } else if (eraseRadius > rippleRadius - 50) {
             // Set non-transparent pixels within the red ripple area to red
             data[i] = 255;       // Set red channel to 255 (red)
             data[i + 1] = 0;     // Set green channel to 0 (green)
@@ -416,20 +416,38 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     }
 
     // Put the modified image data back onto the canvas
-    ctx.putImageData(imageData, x - radius, y - radius);
+    ctx.putImageData(imageData, x - rippleRadius, y - rippleRadius);
 
     // If all canvas content has been "erased", trigger respawnSnake function
     if (allErased) {
         respawnSnake();
     }
 
-    // Gradually fade away the ripple effect
-    setTimeout(() => {
-        if (radius < maxRadius) {
-            // Create the next ripple
-            createRippleEffect(x, y, radius + 1, maxRadius, ctx);
-        }
-    }, 50); // Adjust the fading speed
+    // Gradually increase the ripple and erasing radii
+    rippleRadius += 2; // Increase the ripple radius
+    eraseRadius += 2;  // Increase the erasing radius
+
+    // If the ripple radius is less than the maximum radius, continue the animation
+    if (rippleRadius < maxRadius) {
+        // Create the next ripple
+        setTimeout(() => {
+            createRippleEffect(x, y, rippleRadius, eraseRadius, maxRadius, ctx);
+        }, 25); // Adjust the animation speed
+    }
+}
+
+// Function to trigger the death animation with a smoother water ripple effect
+function triggerDeathAnimation() {
+    clearInterval(gameInterval); // Pause the game loop
+
+    const head = snake[0];
+    const explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
+    const explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
+    const maxRadius = Math.max(canvas.width, canvas.height); // Maximum radius for the ripple effect
+    const ctx = canvas.getContext('2d'); // Get the canvas context
+
+    // Start the ripple animation with initial radii and increase rate
+    createRippleEffect(explosionCenterX, explosionCenterY, 50, 0, maxRadius, ctx);
 }
 
         
