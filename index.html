@@ -382,8 +382,8 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Get the canvas image data within the ripple radius
-    const imageData = ctx.getImageData(x - radius - 50, y - radius - 50, (radius + 50) * 2, (radius + 50) * 2);
+    // Get the canvas image data within the ripple radius and a larger radius for the red exterior
+    const imageData = ctx.getImageData(x - radius - 100, y - radius - 100, (radius + 100) * 2, (radius + 100) * 2);
     const data = imageData.data;
 
     // Flag to check if all canvas content has been "erased"
@@ -403,11 +403,10 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
                 data[i + 2] = 0;       // Set blue channel to 0 (black)
                 data[i + 3] = 128;     // Set alpha channel to 128 (semi-transparent)
             } else {
-                // Set other non-transparent pixels to match the canvas color
-                const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
-                data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
-                data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
-                data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
+                // Set other non-transparent pixels to red
+                data[i] = 255;       // Set red channel to 255 (red)
+                data[i + 1] = 0;     // Set green channel to 0 (green)
+                data[i + 2] = 0;     // Set blue channel to 0 (blue)
                 // Leave alpha channel unchanged
             }
             // Check if there are still non-transparent pixels
@@ -416,7 +415,7 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     }
 
     // Put the modified image data back onto the canvas
-    ctx.putImageData(imageData, x - radius - 50, y - radius - 50);
+    ctx.putImageData(imageData, x - radius - 100, y - radius - 100);
 
     // If all canvas content has been "erased", trigger respawnSnake function
     if (allErased) {
