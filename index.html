@@ -371,9 +371,6 @@ function restartGame() {
     // Pause the game loop
     clearInterval(gameInterval);
 
-    // Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     // Calculate the initial explosion size to cover the entire screen
     const explosionSize = Math.max(canvas.width, canvas.height) * 2;
 
@@ -386,7 +383,7 @@ function restartGame() {
         explosionFrame++;
 
         // Stop the explosion animation after reaching the desired size
-        if (explosionFrame * 2 >= explosionSize) {
+        if (explosionFrame * 5 >= explosionSize) {
             clearInterval(explosionInterval);
 
             // Respawn the snake after the explosion animation
