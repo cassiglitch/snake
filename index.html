@@ -368,17 +368,12 @@ function declareVictory() {
 }
 
 // Function to create the water ripple effect on the canvas and gradually fade away
-// Function to create the water ripple effect on the canvas and gradually fade away
 function createRippleEffect(x, y, radius, maxRadius, ctx) {
     // Create a gradient for the ripple effect
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, 'rgba(255, 0, 0, 0)'); // Start color (fully transparent)
-    gradient.addColorStop(0.5, 'rgba(255, 0, 0, 0.5)'); // Middle color (red with transparency)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');   // End color (fully opaque red)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');   // End color (fully opaque red)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');   // End color (fully opaque red)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');   // End color (fully opaque red)
- 
+    gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)'); // Start color (red with transparency)
+    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');   // End color (fully transparent)
+
     // Apply the gradient to the canvas
     ctx.fillStyle = gradient;
 
@@ -391,41 +386,34 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     const imageData = ctx.getImageData(x - radius, y - radius, radius * 2, radius * 2);
     const data = imageData.data;
 
-    // Flag to check if all canvas content has been "erased"
-    let allErased = true;
+    // If the ripple is still visible, proceed with "erasing" code
+    if (radius <= maxRadius) {
+        // Get the exact color of the canvas
+        const canvasColor = getComputedStyle(document.body).backgroundColor; // Get the background color of the canvas
 
-    // Get the exact color of the canvas
-    const canvasColor = getComputedStyle(document.body).backgroundColor; // Get the background color of the canvas
-
-    // Iterate through the image data and change the color of non-transparent pixels
-    for (let i = 0; i < data.length; i += 4) {
-        const alpha = data[i + 3];
-        if (alpha !== 0) {
-            if (i === (data.length / 2) - 2) {
-                // Set the center pixel to be semi-transparent
-                data[i] = 255;         // Set red channel to 255 (white)
-                data[i + 1] = 0;       // Set green channel to 0 (black)
-                data[i + 2] = 0;       // Set blue channel to 0 (black)
-                data[i + 3] = 128;     // Set alpha channel to 128 (semi-transparent)
-            } else {
-                // Set other non-transparent pixels to match the canvas color
-                const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
-                data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
-                data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
-                data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
-                // Leave alpha channel unchanged
+        // Iterate through the image data and change the color of non-transparent pixels
+        for (let i = 0; i < data.length; i += 4) {
+            const alpha = data[i + 3];
+            if (alpha !== 0) {
+                if (i === (data.length / 2) - 2) {
+                    // Set the center pixel to be semi-transparent
+                    data[i] = 255;         // Set red channel to 255 (white)
+                    data[i + 1] = 0;       // Set green channel to 0 (black)
+                    data[i + 2] = 0;       // Set blue channel to 0 (black)
+                    data[i + 3] = 128;     // Set alpha channel to 128 (semi-transparent)
+                } else {
+                    // Set other non-transparent pixels to match the canvas color
+                    const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
+                    data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
+                    data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
+                    data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
+                    // Leave alpha channel unchanged
+                }
             }
-            // Check if there are still non-transparent pixels
-            allErased = false;
         }
-    }
 
-    // Put the modified image data back onto the canvas
-    ctx.putImageData(imageData, x - radius, y - radius);
-
-    // If all canvas content has been "erased", trigger respawnSnake function
-    if (allErased) {
-        respawnSnake();
+        // Put the modified image data back onto the canvas
+        ctx.putImageData(imageData, x - radius, y - radius);
     }
 
     // Gradually fade away the ripple effect
@@ -436,8 +424,8 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
         }
     }, 50); // Adjust the fading speed
 }
-
-function triggerDeathAnimation() {
+        
+    function triggerDeathAnimation() {
     clearInterval(gameInterval); // Pause the game loop
     const head = snake[0];
     const middleIndex = Math.max(0, Math.ceil(Math.floor(snake.length / 2)));
