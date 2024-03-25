@@ -411,7 +411,7 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
                 // Leave alpha channel unchanged
             }
             // Check if there are still non-transparent pixels
-            allErased = true;
+            allErased = false;
         }
     }
 
@@ -434,7 +434,7 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     ctx.beginPath();
     ctx.arc(x, y, radius + 10, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)'; // Red color with transparency
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 10;
     ctx.stroke();
 }
 
@@ -453,19 +453,6 @@ function triggerDeathAnimation() {
 }
 
 
-// Function to trigger the death animation with a smoother water ripple effect
-function triggerDeathAnimation() {
-    clearInterval(gameInterval); // Pause the game loop
-
-    const head = snake[0];
-    const explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
-    const explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
-    const maxRadius = Math.max(canvas.width, canvas.height); // Maximum radius for the ripple effect
-    const ctx = canvas.getContext('2d'); // Get the canvas context
-
-    // Start the ripple animation with initial radii and increase rate
-    createRippleEffect(explosionCenterX, explosionCenterY, 50, 0, maxRadius, ctx);
-}
 
         
     function triggerDeathAnimation() {
