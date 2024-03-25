@@ -368,14 +368,8 @@ function declareVictory() {
 }
 
 // Function to create the water ripple effect on the canvas and gradually fade away
-function createRippleEffect(x, y, radius, maxRadius) {
-    // Get the canvas element
-    const canvas = document.getElementById('snakeCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Clear the canvas in the ripple area
-    ctx.clearRect(x - maxRadius, y - maxRadius, maxRadius * 2, maxRadius * 2);
-
+// Function to create the water ripple effect on the canvas and gradually fade away
+function createRippleEffect(x, y, radius, maxRadius, ctx) {
     // Create a gradient for the ripple effect
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
     gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)'); // Start color (red with transparency)
@@ -392,24 +386,31 @@ function createRippleEffect(x, y, radius, maxRadius) {
     // Gradually fade away the ripple effect
     setTimeout(() => {
         if (radius < maxRadius) {
-            createRippleEffect(x, y, radius + 1, maxRadius);
-        } else {
-            // Clear the canvas in the ripple area once the ripple effect fades away completely
+            // Clear the previous ripple
             ctx.clearRect(x - maxRadius, y - maxRadius, maxRadius * 2, maxRadius * 2);
+            // Create the next ripple
+            createRippleEffect(x, y, radius + 1, maxRadius, ctx);
         }
     }, 50); // Adjust the fading speed
 }
 
 // Function to trigger the death animation with a smoother water ripple effect
+// Function to trigger the death animation with a smoother water ripple effect
 function triggerDeathAnimation() {
-    const head = snake[0];
-    const explosionCenterX = (head.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
-    const explosionCenterY = (head.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
+    // Get the middle position of the snake
+    const middleIndex = Math.floor(snake.length / 2);
+    const middleSegment = snake[middleIndex];
+    const explosionCenterX = (middleSegment.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
+    const explosionCenterY = (middleSegment.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
     const maxRadius = Math.max(canvas.width, canvas.height); // Maximum radius for the ripple effect
+    const ctx = canvas.getContext('2d'); // Get the canvas context
 
     // Start the ripple animation
-    createRippleEffect(explosionCenterX, explosionCenterY, 1, maxRadius);
+    createRippleEffect(explosionCenterX, explosionCenterY, 1, maxRadius, ctx);
 }
+
+
+
 
 // Function to restart the game
 function restartGame() {
