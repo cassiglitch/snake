@@ -368,7 +368,6 @@ function declareVictory() {
 }
 
 // Function to create the water ripple effect on the canvas and gradually fade away
-// Function to create the water ripple effect on the canvas and gradually fade away
 function createRippleEffect(x, y, radius, maxRadius, ctx) {
     // Create a gradient for the ripple effect
     const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
@@ -383,11 +382,46 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fill();
 
+    // Get the canvas image data within the ripple radius
+    const imageData = ctx.getImageData(x - radius, y - radius, radius * 2, radius * 2);
+    const data = imageData.data;
+
+    // Flag to check if all canvas content has been "erased"
+    let allErased = true;
+
+    // Iterate through the image data and change the color of non-transparent pixels
+    for (let i = 0; i < data.length; i += 4) {
+        const alpha = data[i + 3];
+        if (alpha !== 0) {
+            if (i === (data.length / 2) - 2) {
+                // Set the center pixel to be semi-transparent
+                data[i] = 255;       // Set red channel to 255 (white)
+                data[i + 1] = 255;   // Set green channel to 255 (white)
+                data[i + 2] = 255;   // Set blue channel to 255 (white)
+                data[i + 3] = 128;   // Set alpha channel to 128 (semi-transparent)
+            } else {
+                // Set other non-transparent pixels to white
+                data[i] = 255;       // Set red channel to 255 (white)
+                data[i + 1] = 255;   // Set green channel to 255 (white)
+                data[i + 2] = 255;   // Set blue channel to 255 (white)
+                // Leave alpha channel unchanged
+            }
+            // Check if there are still non-transparent pixels
+            allErased = false;
+        }
+    }
+
+    // Put the modified image data back onto the canvas
+    ctx.putImageData(imageData, x - radius, y - radius);
+
+    // If all canvas content has been "erased", trigger respawnSnake function
+    if (allErased) {
+        respawnSnake();
+    }
+
     // Gradually fade away the ripple effect
     setTimeout(() => {
         if (radius < maxRadius) {
-            // Clear the previous ripple
-            ctx.clearRect(x - maxRadius, y - maxRadius, maxRadius * 2, maxRadius * 2);
             // Create the next ripple
             createRippleEffect(x, y, radius + 1, maxRadius, ctx);
         }
@@ -395,14 +429,13 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
 }
 
 // Function to trigger the death animation with a smoother water ripple effect
-// Function to trigger the death animation with a smoother water ripple effect
 function triggerDeathAnimation() {
-    // Get the middle position of the snake
-    const middleIndex = Math.floor(snake.length / 2);
+    const head = snake[0];
+    const middleIndex = Math.max(0, Math.ceil(Math.floor(snake.length / 2)));
     const middleSegment = snake[middleIndex];
     const explosionCenterX = (middleSegment.x * gridSize) + (gridSize / 2); // X-coordinate of the explosion center
     const explosionCenterY = (middleSegment.y * gridSize) + (gridSize / 2); // Y-coordinate of the explosion center
-    const maxRadius = Math.max(canvas.width, canvas.height); // Maximum radius for the ripple effect
+    const maxRadius = Math.max(canvas.width, canvas.height); // M
     const ctx = canvas.getContext('2d'); // Get the canvas context
 
     // Start the ripple animation
