@@ -368,32 +368,36 @@ function declareVictory() {
 }
 
 function restartGame() {
-    stopGame(); // Stop the game loop
+    // Pause the game loop
+    clearInterval(gameInterval);
 
-    // Death Animation (snake explosion)
-    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Create a ripple-like explosion effect centered around the snake's position
     const explosionSize = 50; // Initial size of the explosion
+    const explosionDuration = 1000; // Duration of the explosion animation (in milliseconds)
 
-    // Get the snake's head position and direction
-    const head = snake[0];
-    const direction = getSnakeDirection();
-
-    // Draw explosion animation
-    let currentSize = explosionSize;
+    // Start the explosion animation
+    let explosionFrame = 0;
     const explosionInterval = setInterval(() => {
         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        drawExplosion(head.x * gridSize, head.y * gridSize, currentSize, direction); // Draw explosion
-        currentSize += 5; // Increase explosion size
-        if (currentSize > Math.max(canvas.width, canvas.height)) {
-            clearInterval(explosionInterval); // Stop the explosion animation
-            respawnSnake(); // Respawn the snake after the explosion animation
-        }
-    }, explosionDuration / (Math.max(canvas.width, canvas.height) / 5)); // Adjust the explosion speed
+        drawExplosion(snake[0].x * gridSize, snake[0].y * gridSize, explosionSize + explosionFrame * 2, direction);
+        explosionFrame++;
 
-    // Reset obstacles and score
-    obstacles = [];
-    score = 0;
+        // Stop the explosion animation after reaching the desired size
+        if (explosionFrame * 2 >= canvas.width) {
+            clearInterval(explosionInterval);
+
+            // Respawn the snake after the explosion animation
+            respawnSnake();
+
+            // Restart the game loop
+            gameInterval = setInterval(gameLoop, 100);
+        }
+    }, explosionDuration / (explosionSize * 2)); // Adjust the explosion animation speed
 }
+
 
 function getSnakeDirection() {
     // Determine snake's direction based on head and next segment position
