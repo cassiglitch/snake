@@ -386,34 +386,41 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
     const imageData = ctx.getImageData(x - radius, y - radius, radius * 2, radius * 2);
     const data = imageData.data;
 
-    // If the ripple is still visible, proceed with "erasing" code
-    if (radius <= maxRadius) {
-        // Get the exact color of the canvas
-        const canvasColor = getComputedStyle(document.body).backgroundColor; // Get the background color of the canvas
+    // Flag to check if all canvas content has been "erased"
+    let allErased = true;
 
-        // Iterate through the image data and change the color of non-transparent pixels
-        for (let i = 0; i < data.length; i += 4) {
-            const alpha = data[i + 3];
-            if (alpha !== 0) {
-                if (i === (data.length / 2) - 2) {
-                    // Set the center pixel to be semi-transparent
-                    data[i] = 255;         // Set red channel to 255 (white)
-                    data[i + 1] = 0;       // Set green channel to 0 (black)
-                    data[i + 2] = 0;       // Set blue channel to 0 (black)
-                    data[i + 3] = 128;     // Set alpha channel to 128 (semi-transparent)
-                } else {
-                    // Set other non-transparent pixels to match the canvas color
-                    const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
-                    data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
-                    data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
-                    data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
-                    // Leave alpha channel unchanged
-                }
-            }
+    // Get the exact color of the canvas
+    const canvasColor = getComputedStyle(document.body).backgroundColor; // Get the background color of the canvas
+
+    // Iterate through the image data and change the color of non-transparent pixels
+    for (let i = 0; i < data.length; i += 4) {
+        const alpha = data[i + 3];
+        if (alpha !== 0 && radius > 50) {
+            // Set non-transparent pixels outside the red ripple area to match the canvas color
+            const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
+            data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
+            data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
+            data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
+            // Leave alpha channel unchanged
+            // Check if there are still non-transparent pixels
+            allErased = false;
+        } else if (radius <= 50) {
+            // Set non-transparent pixels within the red ripple area to red
+            data[i] = 255;       // Set red channel to 255 (red)
+            data[i + 1] = 0;     // Set green channel to 0 (green)
+            data[i + 2] = 0;     // Set blue channel to 0 (blue)
+            // Leave alpha channel unchanged
+            // Check if there are still non-transparent pixels
+            allErased = false;
         }
+    }
 
-        // Put the modified image data back onto the canvas
-        ctx.putImageData(imageData, x - radius, y - radius);
+    // Put the modified image data back onto the canvas
+    ctx.putImageData(imageData, x - radius, y - radius);
+
+    // If all canvas content has been "erased", trigger respawnSnake function
+    if (allErased) {
+        respawnSnake();
     }
 
     // Gradually fade away the ripple effect
@@ -424,6 +431,7 @@ function createRippleEffect(x, y, radius, maxRadius, ctx) {
         }
     }, 50); // Adjust the fading speed
 }
+
         
     function triggerDeathAnimation() {
     clearInterval(gameInterval); // Pause the game loop
