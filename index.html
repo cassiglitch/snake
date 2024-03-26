@@ -368,34 +368,64 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-function triggerDeathAnimation(ctx) {
-    const snakeHead = snake[0];
-    const snakeSize = snake.length * gridSize;
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
+function restartGame
+triggerDeathAnimation(snake[0])
+    
+function triggerDeathAnimation(snakeHeadPosition) {
+    // Extracting snake head position
+    const [snakeHeadX, snakeHeadY] = snakeHeadPosition;
+    
+    // Getting canvas context
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
 
-    // Calculate the starting position and size of the ripple effect
-    const x = Math.max(0, snakeHead.x * gridSize - snakeSize / 2);
-    const y = Math.max(0, snakeHead.y * gridSize - snakeSize / 2);
-    const width = Math.min(canvasWidth, snakeSize);
-    const height = Math.min(canvasHeight, snakeSize);
+    // Constants
+    const gridSize = 20;
+    const deathSpeed = 1; // Adjust as needed
 
-    // Define the animation loop
-    const animationLoop = setInterval(() => {
-        // Draw the ripple effect
-        createRippleEffect(x, y, width, height, ctx);
+    // Variables to track rectangle size and position
+    let rectWidth = gridSize;
+    let rectHeight = gridSize;
+    let rectX = snakeHeadX - (gridSize / 2);
+    let rectY = snakeHeadY - (gridSize / 2);
 
-        // Increase the size of the ripple effect
-        width += gridSize;
-        height += gridSize;
+    // Animation loop
+    function animate() {
+        // Clearing previous frame
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Check if the ripple effect has reached the edges of the canvas
-        if (x <= 0 && y <= 0 && x + width >= canvasWidth && y + height >= canvasHeight) {
-            clearInterval(animationLoop); // Stop the animation loop
-            respawnSnake(); // Respawn the snake
+        // Drawing semi-transparent red rectangle
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+        // Drawing rectangle using canvas color to create effect
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Increasing rectangle size
+        rectWidth += deathSpeed;
+        rectHeight += deathSpeed;
+
+        // Check for collision with canvas edges
+        if (
+            rectX <= 0 || 
+            rectX + rectWidth >= canvas.width || 
+            rectY <= 0 || 
+            rectY + rectHeight >= canvas.height
+        ) {
+            // Trigger respawnSnake function when all four sides are touched
+            respawnSnake();
+            return; // Exit animation loop
         }
-    }, 50); // Adjust the animation speed as needed
+
+        // Requesting next frame
+        requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    animate();
 }
+
 
 
 function respawnSnake() {
