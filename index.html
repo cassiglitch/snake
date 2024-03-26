@@ -93,7 +93,7 @@ function draw() {
     // Draw Dynamic Obstacles
     ctx.fillStyle = 'grey';
     dynamicObstacles.forEach(obstacle => {
-        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
+        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 1, gridSize * 1);
     });
 
     // Draw Score
@@ -108,7 +108,6 @@ function drawInvincibilityAura() {
         ctx.fillRect(segment.x * gridSize - shadowSize, segment.y * gridSize - shadowSize, gridSize + shadowSize * 2, gridSize + shadowSize * 2);
     });
 }
-
 
         function drawEatingAnimation() {
             const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
@@ -258,7 +257,7 @@ HaHaNoCollision(50)
             });
 
             // Check for victory
-            if (score >= 100) {
+            if (score >= 50) {
                 declareVictory();
             }
         }
@@ -313,6 +312,16 @@ HaHaNoCollision(50)
             }
         }
 
+        function restartGame() {
+            alert(`Game Over! Your score: ${score}`);
+            snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
+            obstacles = [];
+            dynamicObstacles = [];
+            score = 0;
+            isEating = false;
+            eatingAnimationFrames = 0;
+            spawnFood();
+        }
 
 function declareVictory() {
     clearInterval(gameInterval); // Pause the game loop
@@ -368,24 +377,8 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-function restartGame
-respawnSnake()
-    
-function respawnSnake() {
-    // Reinitialize snake and food
-            snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-            obstacles = [];
-            dynamicObstacles = [];
-            score = 0;
-            isEating = false;
-            eatingAnimationFrames = 0;
-            spawnFood();
-}
-
-
 
         function gameLoop() {
-                if (gameInterval === undefined) return;
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
@@ -408,7 +401,7 @@ function respawnSnake() {
                     isEating = false;
                 }
             }
-    }
+        }
 
 function closestNumber(n, m) {
     // Find the quotient
