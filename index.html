@@ -123,6 +123,15 @@ function stopGameLoop() {
         gameLoopInterval = null;
     }
 }
+function manageGameLoop() {
+    if (gameLoopInterval) {
+        stopGameLoop();
+    } else {
+        startGameLoop();
+    }
+}
+// Call the manageGameLoop function in an interval
+setInterval(manageGameLoop, 1000); // Adjust the interval as needed
 
         function drawEatingAnimation() {
             const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
