@@ -521,7 +521,10 @@ function respawnSnake() {
                 }
             }
             gameLoopRunning = false;
-        }
+                if (gameLoopInterval) {
+        stopGameLoop();
+    }
+}
 
 function closestNumber(n, m) {
     // Find the quotient
