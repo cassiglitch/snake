@@ -368,10 +368,11 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-// Function to trigger death animation and handle snake respawn
+// // Function to trigger death animation and handle snake respawn
 function triggerDeathAnimation() {
     // Freeze the game temporarily
-    
+    clearInterval(gameInterval);
+
     // Get the canvas element
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
@@ -435,8 +436,6 @@ function triggerDeathAnimation() {
         if (allErased || rectX <= 0 || rectY <= 0 || rectX + rectWidth >= canvas.width || rectY + rectHeight >= canvas.height) {
             // Trigger the respawnSnake function
             respawnSnake();
-            // Resume the game loop
-            gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
             return; // Exit the function
         }
 
@@ -460,13 +459,7 @@ function triggerDeathAnimation() {
     createRippleEffect(ctx);
 }
 
-
-
-// Function to restart the game
-function restartGame() {
-    triggerDeathAnimation(); // Trigger the death animation
-    // Note: The respawnSnake function is called after the death animation completes, inside the createRippleEffect function
-}
+ 
 
 function respawnSnake() {
     // Reinitialize snake and food
