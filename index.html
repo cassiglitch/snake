@@ -368,11 +368,10 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-// // Function to trigger death animation and handle snake respawn
-function triggerDeathAnimation() {
-    // Freeze the game temporarily
-    clearInterval(gameInterval);
+let rippleTriggered = false; // Flag to track if the ripple animation has been triggered
 
+// Function to handle the ripple animation
+function startRippleAnimation() {
     // Get the canvas element
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
@@ -395,7 +394,7 @@ function triggerDeathAnimation() {
     let redRectHeight = gridSize * 3; // Expand two grid sizes vertically
 
     // Function to create the water ripple effect on the canvas and gradually expand
-    function createRippleEffect(ctx) {
+    function createRippleEffect() {
         // Draw the surrounding red rectangle
         ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Red color with transparency
         ctx.fillRect(redRectX, redRectY, redRectWidth, redRectHeight);
@@ -432,10 +431,10 @@ function triggerDeathAnimation() {
         // Put the modified image data back onto the canvas
         ctx.putImageData(imageData, rectX, rectY);
 
-        // Check if all canvas content has been "erased"
+        // Check if all canvas content has been "erased" or if the ripple reaches the canvas boundaries
         if (allErased || rectX <= 0 || rectY <= 0 || rectX + rectWidth >= canvas.width || rectY + rectHeight >= canvas.height) {
-            // Trigger the respawnSnake function
-            respawnSnake();
+            // Reset the flag to allow the ripple animation to trigger again
+            rippleTriggered = false;
             return; // Exit the function
         }
 
@@ -452,12 +451,28 @@ function triggerDeathAnimation() {
         redRectHeight += gridSize * 2; // Expand vertically
 
         // Schedule the next frame of the ripple effect
-        requestAnimationFrame(() => createRippleEffect(ctx));
+        requestAnimationFrame(createRippleEffect);
     }
 
-    // Create the water ripple effect
-    createRippleEffect(ctx);
+    // Start the ripple animation
+    createRippleEffect();
 }
+
+// Function to trigger death animation and handle snake respawn
+function triggerDeathAnimation() {
+    // Freeze the game temporarily
+    clearInterval(gameInterval);
+
+    // Trigger the ripple animation if it hasn't been triggered yet
+    if (!rippleTriggered) {
+        rippleTriggered = true;
+        startRippleAnimation();
+    }
+
+    // Respawn the snake after the ripple animation completes
+    setTimeout(respawnSnake, 500); // Adjust the delay as needed
+}
+
 
  
 
