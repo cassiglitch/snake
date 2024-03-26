@@ -369,7 +369,7 @@ function declareVictory() {
 }
 
 function restartGame
-triggerDeathAnimation(snake[0])
+triggerDeathAnimation([head.x, head.y])
     
 function triggerDeathAnimation(snakeHeadPosition) {
     // Extracting snake head position
