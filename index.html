@@ -372,57 +372,8 @@ function restartGame
 triggerDeathAnimation()
     
 function triggerDeathAnimation() {
-    // Get the canvas context
-    var ctx = snakeCanvas.getContext("2d");
-
-    // Set variables
-    var gridSize = 20; // Size of each grid
-    var squareSize = gridSize * 2; // Size of the squares
-
-    // Calculate the position of the squares
-    var x = snake[0].x - gridSize;
-    var y = snake[0].y - gridSize;
-
-    // Set initial size and opacity
-    var size = 0;
-    var opacity = 0.5; // Semi-transparent red
-
-    // Function to draw the squares
-    function drawSquares() {
-        // Draw semi-transparent red square
-        ctx.fillStyle = `rgba(255, 0, 0, ${opacity})`;
-        ctx.fillRect(x, y, size, size);
-
-        // Draw erasing square
-        ctx.clearRect(x + gridSize, y + gridSize, size - gridSize * 2, size - gridSize * 2);
-    }
-
-    // Animation loop
-    function animate() {
-        // Clear the canvas
-        //ctx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height); // Do not clear the canvas
-
-        // Draw the squares
-        drawSquares();
-
-        // Increase size
-        size += 2;
-
-        // Check if the squares have touched all sides of the canvas
-        if (x <= 0 && y <= 0 && x + size >= snakeCanvas.width && y + size >= snakeCanvas.height) {
-            // Trigger respawnSnake function
-            respawnSnake();
-            return; // Exit the animation loop
-        }
-
-        // Request animation frame
-        requestAnimationFrame(animate);
-    }
-
-    // Start the animation
-    animate();
-}
-
+respawnSnake()
+    
 function respawnSnake() {
     // Reinitialize snake and food
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
