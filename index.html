@@ -374,13 +374,6 @@ triggerDeathAnimation([head.x, head.y])
 function triggerDeathAnimation(snakeHeadPosition) {
     // Extracting snake head position
     const [snakeHeadX, snakeHeadY] = snakeHeadPosition;
-    
-    // Getting canvas context
-    const canvas = document.getElementById('snakeCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Constants
-    const gridSize = 20;
     const deathSpeed = 1; // Adjust as needed
 
     // Variables to track rectangle size and position
@@ -391,9 +384,6 @@ function triggerDeathAnimation(snakeHeadPosition) {
 
     // Animation loop
     function animate() {
-        // Clearing previous frame
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         // Drawing semi-transparent red rectangle
         ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
         ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
