@@ -368,31 +368,6 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-let rippleTriggered = false; // Flag to track if the ripple animation has been triggered
-
-// Function to handle the ripple animation
-function startRippleAnimation() {
-    // Get the canvas element
-    const canvas = document.getElementById('snakeCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Get the snake's head position
-    const head = snake[0];
-    const startX = head.x * gridSize; // Convert grid coordinates to pixels
-    const startY = head.y * gridSize;
-
-    // Define the initial size and position of the ripple rectangle
-    let rectX = startX;
-    let rectY = startY;
-    let rectWidth = gridSize;
-    let rectHeight = gridSize;
-
-    // Define the initial size and position of the surrounding red rectangle
-    let redRectX = startX - gridSize; // Expand one grid size beyond the ripple rectangle
-    let redRectY = startY - gridSize; // Expand one grid size beyond the ripple rectangle
-    let redRectWidth = gridSize * 3; // Expand two grid sizes horizontally
-    let redRectHeight = gridSize * 3; // Expand two grid sizes vertically
-
 // Function to trigger death animation and handle snake respawn
 function triggerDeathAnimation() {
     // Freeze the game temporarily
@@ -461,6 +436,8 @@ function triggerDeathAnimation() {
         if (allErased || rectX <= 0 || rectY <= 0 || rectX + rectWidth >= canvas.width || rectY + rectHeight >= canvas.height) {
             // Trigger the respawnSnake function
             respawnSnake();
+            // Resume the game loop
+            gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
             return; // Exit the function
         }
 
@@ -482,14 +459,6 @@ function triggerDeathAnimation() {
 
     // Create the water ripple effect
     createRippleEffect(ctx);
-}
-
-// Function to respawn the snake and restart the game loop
-function respawnSnake() {
-    // Reset the snake to its initial state
-    snake = [...initialSnake];
-    // Resume the game loop
-    gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
 }
 
 
