@@ -313,7 +313,7 @@ HaHaNoCollision(50)
         }
 
         function restartGame() {
-            alert(`Game Over! Your score: ${score}`);
+            createRippleEffect()
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
             dynamicObstacles = [];
@@ -322,6 +322,87 @@ HaHaNoCollision(50)
             eatingAnimationFrames = 0;
             spawnFood();
         }
+
+function createRippleEffect() {
+  // Canvas setup
+    // Variables
+    var gridSize = 20; // Size of the grid
+    var rippleSize = gridSize; // Initial ripple size
+    var rippleX = canvas.width / 2; // X-coordinate of the ripple's center
+    var rippleY = canvas.height / 2; // Y-coordinate of the ripple's center
+    var canvasColor = ""; // Color of the canvas
+    var animationDelay = 50; // Delay between frames in milliseconds
+    var topReached = false;
+    var bottomReached = false;
+    var leftReached = false;
+    var rightReached = false;
+    
+    // Function to get the color of the canvas at a specific point
+    function getCanvasColor(x, y) {
+      var imageData = ctx.getImageData(x, y, 1, 1);
+      var pixelData = imageData.data;
+      var red = pixelData[0];
+      var green = pixelData[1];
+      var blue = pixelData[2];
+      var alpha = pixelData[3];
+      return 'rgba(' + red + ',' + green + ',' + blue + ',' + (alpha / 255) + ')';
+    }
+    
+    // Function to clear the canvas
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    
+    // Function to draw the ripple effect
+    function drawRippleEffect() {
+      // Draw the canvas color square
+      ctx.fillStyle = canvasColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw the ripple
+      ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+      ctx.fillRect(rippleX - rippleSize/2, rippleY - rippleSize/2, rippleSize, rippleSize);
+      
+      // Draw the inner square
+      var innerSize = rippleSize - gridSize; // Adjust inner size to be smaller than ripple size
+      ctx.clearRect(rippleX - innerSize/2, rippleY - innerSize/2, innerSize, innerSize);
+      
+      // Increase the ripple size
+      rippleSize += gridSize;
+      
+      // Check if the ripple has reached the edges of the canvas
+      if (!topReached && rippleY - rippleSize/2 <= 0) {
+        topReached = true;
+      }
+      if (!bottomReached && rippleY + rippleSize/2 >= canvas.height) {
+        bottomReached = true;
+      }
+      if (!leftReached && rippleX - rippleSize/2 <= 0) {
+        leftReached = true;
+      }
+      if (!rightReached && rippleX + rippleSize/2 >= canvas.width) {
+        rightReached = true;
+      }
+      
+      // Clear the canvas once all sides of the ripple have reached the edges
+      if (topReached && bottomReached && leftReached && rightReached) {
+        clearCanvas();
+      } else {
+        // Continue drawing the ripple with a delay
+        setTimeout(function() {
+          requestAnimationFrame(drawRippleEffect);
+        }, animationDelay);
+      }
+    }
+    
+    // Handle click event to trigger the ripple from the middle of the canvas
+    drawRippleEffect();
+  }
+  
+  // Call the drawRipple function to create the ripple effect
+  drawRipple();
+}
+
 
 function declareVictory() {
     clearInterval(gameInterval); // Pause the game loop
