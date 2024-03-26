@@ -109,6 +109,21 @@ function drawInvincibilityAura() {
     });
 }
 
+let gameLoopInterval = null; // Variable to store the interval ID
+
+function startGameLoop() {
+    if (!gameLoopInterval) {
+        gameLoopInterval = setInterval(gameLoop, 100);
+    }
+}
+
+function stopGameLoop() {
+    if (gameLoopInterval) {
+        clearInterval(gameLoopInterval);
+        gameLoopInterval = null;
+    }
+}
+
         function drawEatingAnimation() {
             const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
             const segmentSize = gridSize;
