@@ -369,54 +369,59 @@ function declareVictory() {
 }
 
 function restartGame
-triggerDeathAnimation([head.x, head.y])
+triggerDeathAnimation()
     
-function triggerDeathAnimation(snakeHeadPosition) {
-    // Extracting snake head position
-    const [snakeHeadX, snakeHeadY] = snakeHeadPosition;
-    const deathSpeed = 1; // Adjust as needed
+function triggerDeathAnimation() {
+    // Get the canvas context
+    var ctx = snakeCanvas.getContext("2d");
 
-    // Variables to track rectangle size and position
-    let rectWidth = gridSize;
-    let rectHeight = gridSize;
-    let rectX = snakeHeadX - (gridSize / 2);
-    let rectY = snakeHeadY - (gridSize / 2);
+    // Set variables
+    var gridSize = 20; // Size of each grid
+    var squareSize = gridSize * 2; // Size of the squares
+
+    // Calculate the position of the squares
+    var x = snake[0].x - gridSize;
+    var y = snake[0].y - gridSize;
+
+    // Set initial size and opacity
+    var size = 0;
+    var opacity = 0.5; // Semi-transparent red
+
+    // Function to draw the squares
+    function drawSquares() {
+        // Draw semi-transparent red square
+        ctx.fillStyle = `rgba(255, 0, 0, ${opacity})`;
+        ctx.fillRect(x, y, size, size);
+
+        // Draw erasing square
+        ctx.clearRect(x + gridSize, y + gridSize, size - gridSize * 2, size - gridSize * 2);
+    }
 
     // Animation loop
     function animate() {
-        // Drawing semi-transparent red rectangle
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+        // Clear the canvas
+        //ctx.clearRect(0, 0, snakeCanvas.width, snakeCanvas.height); // Do not clear the canvas
 
-        // Drawing rectangle using canvas color to create effect
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Draw the squares
+        drawSquares();
 
-        // Increasing rectangle size
-        rectWidth += deathSpeed;
-        rectHeight += deathSpeed;
+        // Increase size
+        size += 2;
 
-        // Check for collision with canvas edges
-        if (
-            rectX <= 0 || 
-            rectX + rectWidth >= canvas.width || 
-            rectY <= 0 || 
-            rectY + rectHeight >= canvas.height
-        ) {
-            // Trigger respawnSnake function when all four sides are touched
+        // Check if the squares have touched all sides of the canvas
+        if (x <= 0 && y <= 0 && x + size >= snakeCanvas.width && y + size >= snakeCanvas.height) {
+            // Trigger respawnSnake function
             respawnSnake();
-            return; // Exit animation loop
+            return; // Exit the animation loop
         }
 
-        // Requesting next frame
+        // Request animation frame
         requestAnimationFrame(animate);
     }
 
-    // Start animation
+    // Start the animation
     animate();
 }
-
-
 
 function respawnSnake() {
     // Reinitialize snake and food
