@@ -93,7 +93,7 @@ function draw() {
     // Draw Dynamic Obstacles
     ctx.fillStyle = 'grey';
     dynamicObstacles.forEach(obstacle => {
-        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 1, gridSize * 1);
+        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
     });
 
     // Draw Score
