@@ -109,29 +109,6 @@ function drawInvincibilityAura() {
     });
 }
 
-let gameLoopInterval = null; // Variable to store the interval ID
-
-function startGameLoop() {
-    if (!gameLoopInterval) {
-        gameLoopInterval = setInterval(gameLoop, 100);
-    }
-}
-
-function stopGameLoop() {
-    if (gameLoopInterval) {
-        clearInterval(gameLoopInterval);
-        gameLoopInterval = null;
-    }
-}
-function manageGameLoop() {
-    if (gameLoopInterval) {
-        stopGameLoop();
-    } else {
-        startGameLoop();
-    }
-}
-// Call the manageGameLoop function in an interval
-setInterval(manageGameLoop, 1000); // Adjust the interval as needed
 
         function drawEatingAnimation() {
             const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
@@ -394,8 +371,7 @@ function declareVictory() {
 // Function to trigger death animation and handle snake respawn
 function triggerDeathAnimation() {
     // Freeze the game temporarily
-    clearInterval(gameInterval);
-
+    
     // Get the canvas element
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
