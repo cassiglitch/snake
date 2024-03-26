@@ -368,90 +368,34 @@ function declareVictory() {
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
-// Function to create the water ripple effect on the canvas and gradually fade away
-function createRippleEffect(x, y, width, height, ctx) {
-    // Create a gradient for the ripple effect
-    const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
-    gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)'); // Start color (red with transparency)
-    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');   // End color (fully transparent)
+function triggerDeathAnimation(ctx) {
+    const snakeHead = snake[0];
+    const snakeSize = snake.length * gridSize;
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
 
-    // Apply the gradient to the canvas
-    ctx.fillStyle = gradient;
+    // Calculate the starting position and size of the ripple effect
+    const x = Math.max(0, snakeHead.x * gridSize - snakeSize / 2);
+    const y = Math.max(0, snakeHead.y * gridSize - snakeSize / 2);
+    const width = Math.min(canvasWidth, snakeSize);
+    const height = Math.min(canvasHeight, snakeSize);
 
-    // Draw the ripple effect as a filled rectangle
-    ctx.fillRect(x, y, width, height);
+    // Define the animation loop
+    const animationLoop = setInterval(() => {
+        // Draw the ripple effect
+        createRippleEffect(x, y, width, height, ctx);
 
-    // Get the canvas image data within the ripple rectangle
-    const imageData = ctx.getImageData(x, y, width, height);
-    const data = imageData.data;
+        // Increase the size of the ripple effect
+        width += gridSize;
+        height += gridSize;
 
-    // Get the exact color of the canvas
-    const canvasColor = getComputedStyle(document.body).backgroundColor; // Get the background color of the canvas
-
-    // Flag to check if all canvas content has been "erased"
-    let allErased = true;
-
-    // Iterate through the image data and change the color of non-transparent pixels
-    for (let i = 0; i < data.length; i += 4) {
-        const alpha = data[i + 3];
-        if (alpha !== 0) {
-            // Set non-transparent pixels to match the canvas color
-            const canvasColorArray = canvasColor.substring(4, canvasColor.length - 1).split(','); // Convert color string to array
-            data[i] = parseInt(canvasColorArray[0].trim());       // Set red channel to canvas color's red value
-            data[i + 1] = parseInt(canvasColorArray[1].trim());   // Set green channel to canvas color's green value
-            data[i + 2] = parseInt(canvasColorArray[2].trim());   // Set blue channel to canvas color's blue value
-            // Leave alpha channel unchanged
-            // Check if there are still non-transparent pixels
-            allErased = false;
+        // Check if the ripple effect has reached the edges of the canvas
+        if (x <= 0 && y <= 0 && x + width >= canvasWidth && y + height >= canvasHeight) {
+            clearInterval(animationLoop); // Stop the animation loop
+            respawnSnake(); // Respawn the snake
         }
-    }
-
-    // Put the modified image data back onto the canvas
-    ctx.putImageData(imageData, x, y);
-
-    // If all canvas content has been "erased", trigger respawnSnake function
-    if (allErased) {
-        respawnSnake();
-    }
+    }, 50); // Adjust the animation speed as needed
 }
-
-// Function to trigger the death animation and ripple effect
-function triggerDeathAnimation(x, y, width, height, ctx) {
-    // Draw the smaller rectangle for the erasing effect
-    const smallerRectWidth = width - 20;
-    const smallerRectHeight = height - 20;
-    const smallerRectX = x + 10;
-    const smallerRectY = y + 10;
-
-    // Call createRippleEffect for the smaller rectangle
-    createRippleEffect(smallerRectX, smallerRectY, smallerRectWidth, smallerRectHeight, ctx);
-
-    // Call createRippleEffect for the main rectangle
-    createRippleEffect(x, y, width, height, ctx);
-}
-
-// Function to respawn the snake when it touches the edge of the canvas
-function respawnSnake(canvasWidth, canvasHeight, snakeWidth, snakeHeight) {
-    if (snakeX <= 0 || snakeX + snakeWidth >= canvasWidth || snakeY <= 0 || snakeY + snakeHeight >= canvasHeight) {
-        // Respawn the snake at the center of the canvas
-        snakeX = canvasWidth / 2;
-        snakeY = canvasHeight / 2;
-        // Add your code to respawn the snake here
-    }
-}
-
-// Example usage:
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const canvasWidth = canvas.width;
-const canvasHeight = canvas.height;
-const snakeWidth = 20; // Example snake width
-const snakeHeight = 20; // Example snake height
-let snakeX = canvasWidth / 2;
-let snakeY = canvasHeight / 2;
-
-// Trigger the death animation and ripple effect
-triggerDeathAnimation(100, 100, 200, 150, ctx); // Example rectangle position (100, 100) and size (200x150)
 
 
 function respawnSnake() {
