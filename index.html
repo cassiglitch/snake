@@ -345,37 +345,15 @@ HaHaNoCollision(50)
 
 
 function declareVictory() {
-pauseGame()
-    // Display "You win" message
-    const victoryMessage = document.createElement('div');
-    victoryMessage.textContent = 'You win';
-    victoryMessage.style.position = 'fixed';
-    victoryMessage.style.top = '50%';
-    victoryMessage.style.left = '50%';
-    victoryMessage.style.transform = 'translate(-50%, -50%)';
-    victoryMessage.style.fontSize = '48px';
-    victoryMessage.style.color = 'black';
-    document.body.appendChild(victoryMessage);
-
-
-    // Add crown emoji to the DOM
-document.body.appendChild(victoryMessage);
-
-
-    // Fade out crown
-    setTimeout(() => {
-        victoryMessage.style.opacity = '0';
-      pauseGame()  
-      restartGame();    
-    }, 2000);
-        document.body.removeChild(victoryMessage);
-
+restartGame();    
 
 }
         
+// Set up explosion animation properties
 let particles = [];
-const numParticles = 100;
-const explosionForce = 5;
+const numParticles = 200;
+const explosionForce = 10;
+const holeSize = 20;
 
 // Function to create a particle
 function Particle(x, y, radius, color, velocity) {
@@ -408,9 +386,19 @@ function Particle(x, y, radius, color, velocity) {
 // Function to create explosion particles
 function createParticles() {
     for (let i = 0; i < numParticles; i++) {
-        const particle = new Particle(canvas.width / 2, canvas.height / 2, 3, 'green');
+        const particle = new Particle(canvas.width / 2, canvas.height / 2, 5, 'red');
         particles.push(particle);
     }
+}
+
+// Function to simulate holes in the canvas
+function simulateHoles() {
+    ctx.fillStyle = '#000'; // Fill color of the canvas (black)
+    particles.forEach(particle => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, holeSize, 0, Math.PI * 2);
+        ctx.fill();
+    });
 }
 
 // Function to animate explosion
@@ -426,11 +414,15 @@ function animateExplosion() {
         }
     });
 
+    // Simulate holes
+    simulateHoles();
+
     // Request animation frame
     if (particles.length > 0) {
         requestAnimationFrame(animateExplosion);
     }
 }
+
 
         function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
