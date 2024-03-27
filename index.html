@@ -350,30 +350,18 @@ pauseGame()
     victoryMessage.style.left = '50%';
     victoryMessage.style.transform = 'translate(-50%, -50%)';
     victoryMessage.style.fontSize = '48px';
-    victoryMessage.style.color = 'gold';
+    victoryMessage.style.color = 'black';
     document.body.appendChild(victoryMessage);
 
-    // Crown Animation (moving up and down)
-    const crownEmoji = document.createElement('span');
-    crownEmoji.textContent = '👑';
-    crownEmoji.style.position = 'fixed';
-    crownEmoji.style.top = '0';
-    crownEmoji.style.left = '50%';
-    crownEmoji.style.transform = 'translate(-50%, -50%)';
-    crownEmoji.style.fontSize = '100px';
-    crownEmoji.style.transition = 'top 2s ease-in-out, opacity 1s ease-in-out';
-    crownEmoji.style.opacity = '1'; // Initially visible
 
     // Add crown emoji to the DOM
-    document.body.appendChild(crownEmoji);
+document.body.appendChild(victoryMessage);
 
 
     // Fade out crown
     setTimeout(() => {
-        crownEmoji.style.opacity = '0';
+        victoryMessage.style.opacity = '0';
     }, 200);
-
-       document.body.removeChild(crownEmoji);
         document.body.removeChild(victoryMessage);
 
  // Adjust the total duration of the animation (in milliseconds)
