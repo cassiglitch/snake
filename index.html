@@ -57,6 +57,7 @@
         let isColliding = false;
         let collisionAnimationFrames = 10;
         let isPaused = false;
+        let originalSnakeColor = '#00FF00';
 
 // Function to pause the game
 function pauseGame() {
@@ -144,6 +145,7 @@ function drawInvincibilityAura() {
                 ctx.fillRect(segmentX, segmentY - offset, segmentSize, segmentSize);
                 ctx.fillRect(segmentX, segmentY + offset, segmentSize, segmentSize);
             });
+            originalSnakeColor = '#0000FF';
         }
 
         function getFoodColor(foodType) {
