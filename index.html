@@ -371,20 +371,15 @@ pauseGame()
     // Fade out crown
     setTimeout(() => {
         crownEmoji.style.opacity = '0';
-    }, 3000);
+    }, 200);
 
-    // Wait for the animations to finish before restarting the game
-    setTimeout(() => {
-        // Remove the crown emoji and victory message
-        document.body.removeChild(crownEmoji);
+       document.body.removeChild(crownEmoji);
         document.body.removeChild(victoryMessage);
 
-
-    }, 2000); // Adjust the total duration of the animation (in milliseconds)
+ // Adjust the total duration of the animation (in milliseconds)
            // Restart the game
-        restartGame();
-
-pauseGame()
+      pauseGame()  
+      restartGame();
 
 }
         
