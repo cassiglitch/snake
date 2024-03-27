@@ -57,6 +57,20 @@
         let isColliding = false;
         let collisionAnimationFrames = 10;
         let isPaused = false;
+        // Define a variable to keep track of whether the game is paused or not
+let isPaused = false;
+
+// Function to pause the game
+function pauseGame() {
+    isPaused = !isPaused; // Toggle the paused state
+}
+
+// Event listener to call the pauseGame function when the 'p' key is pressed
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'p') {
+        pauseGame();
+    }
+});
 function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -235,26 +249,28 @@ HaHaNoCollision(50)
                 }
             }
 
-            // Move Snake
-            snake.pop();
-            snake.unshift(head);
+    if (!isPaused) { // Check if the game is not paused
+        // Move Snake
+        snake.pop();
+        snake.unshift(head);
 
-            // Move Dynamic Obstacles
-            dynamicObstacles.forEach(obstacle => {
-                if (obstacle.id === 1) {
-                    // Left to right movement
-                    obstacle.x += 0.25;
-                    if (obstacle.x + 1 > canvas.width / gridSize) {
-                        obstacle.x = 0; // Reset to the left side if it goes beyond the canvas boundary
-                    }
-                } else if (obstacle.id === 2) {
-                    // Up and down movement
-                    obstacle.y += 0.25;
-                    if (obstacle.y + 1 > canvas.height / gridSize) {
-                        obstacle.y = 0; // Reset to the top if it goes beyond the canvas boundary
-                    }
+        // Move Dynamic Obstacles
+        dynamicObstacles.forEach(obstacle => {
+            if (obstacle.id === 1) {
+                // Left to right movement
+                obstacle.x += 0.25;
+                if (obstacle.x + 1 > canvas.width / gridSize) {
+                    obstacle.x = 0; // Reset to the left side if it goes beyond the canvas boundary
                 }
-            });
+            } else if (obstacle.id === 2) {
+                // Up and down movement
+                obstacle.y += 0.25;
+                if (obstacle.y + 1 > canvas.height / gridSize) {
+                    obstacle.y = 0; // Reset to the top if it goes beyond the canvas boundary
+                }
+            }
+        });
+    }
 
             // Check for victory
             if (score >= 50) {
