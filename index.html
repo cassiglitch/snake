@@ -339,9 +339,7 @@ HaHaNoCollision(50)
 
 
 function declareVictory() {
-    clearInterval(gameInterval); // Pause the game loop
-    gameLoopRunning = false; // Set game loop flag to false
-
+pauseGame()
     // Display "You win" message
     const victoryMessage = document.createElement('div');
     victoryMessage.textContent = 'You win';
@@ -386,9 +384,7 @@ function declareVictory() {
         // Restart the game
         restartGame();
 
-        // Resume the game loop
-        gameLoopRunning = true; // Set game loop flag to true
-        gameInterval = setInterval(gameLoop, 100);
+pauseGame()
     }, 4000); // Adjust the total duration of the animation (in milliseconds)
 }
 
