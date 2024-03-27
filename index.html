@@ -361,13 +361,11 @@ document.body.appendChild(victoryMessage);
     // Fade out crown
     setTimeout(() => {
         victoryMessage.style.opacity = '0';
-    }, 200);
+      pauseGame()  
+      restartGame();    
+    }, 300);
         document.body.removeChild(victoryMessage);
 
- // Adjust the total duration of the animation (in milliseconds)
-           // Restart the game
-      pauseGame()  
-      restartGame();
 
 }
         
