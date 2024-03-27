@@ -393,7 +393,7 @@ function createParticles() {
 
 // Function to simulate holes in the canvas
 function simulateHoles() {
-    ctx.fillStyle = '#000'; // Fill color of the canvas (black)
+    ctx.fillStyle = '#FF0000'; // Fill color of the canvas (black)
     particles.forEach(particle => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, holeSize, 0, Math.PI * 2);
