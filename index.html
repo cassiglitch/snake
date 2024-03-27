@@ -379,12 +379,15 @@ pauseGame()
         document.body.removeChild(crownEmoji);
         document.body.removeChild(victoryMessage);
 
-        // Restart the game
+
+    }, 2000); // Adjust the total duration of the animation (in milliseconds)
+           // Restart the game
         restartGame();
 
 pauseGame()
-    }, 4000); // Adjust the total duration of the animation (in milliseconds)
+
 }
+        
 
 
         function gameLoop() {
