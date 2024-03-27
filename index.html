@@ -329,6 +329,10 @@ HaHaNoCollision(50)
         }
 
         function restartGame() {
+            pauseGame();
+            createParticles();
+            animateExplosion();
+            pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
             dynamicObstacles = [];
@@ -369,7 +373,64 @@ document.body.appendChild(victoryMessage);
 
 }
         
+let particles = [];
+const numParticles = 100;
+const explosionForce = 5;
 
+// Function to create a particle
+function Particle(x, y, radius, color, velocity) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.color = color;
+    this.velocity = {
+        x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
+        y: (Math.random() - 0.5) * explosionForce * (Math.random() * 2)
+    };
+    this.alpha = 1;
+    this.update = function() {
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= 0.01;
+        this.draw();
+    };
+    this.draw = function() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+    };
+}
+
+// Function to create explosion particles
+function createParticles() {
+    for (let i = 0; i < numParticles; i++) {
+        const particle = new Particle(canvas.width / 2, canvas.height / 2, 3, 'green');
+        particles.push(particle);
+    }
+}
+
+// Function to animate explosion
+function animateExplosion() {
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Update and draw particles
+    particles.forEach((particle, index) => {
+        particle.update();
+        if (particle.alpha <= 0) {
+            particles.splice(index, 1);
+        }
+    });
+
+    // Request animation frame
+    if (particles.length > 0) {
+        requestAnimationFrame(animateExplosion);
+    }
+}
 
         function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
