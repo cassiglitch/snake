@@ -14,9 +14,14 @@
             background-color: #f0f0f0; /* Set a background color */
         }
 
+        :root {
+            --grid-size: 20px; /* Define the grid size variable */
+        }
+
         #scoreDisplay {
-            margin-top: 20px;
+            margin-top: calc(var(--grid-size) * 1.5); /* Adjust margin based on grid size */
             position: fixed;
+            font-size: var(--grid-size); /* Set font size equal to grid size */
         }
 
         canvas {
@@ -558,6 +563,7 @@ document.addEventListener('keydown', event => {
             // Apply zoom and anti-zoom factors to grid size
             gridSize = Math.max(0, Math.ceil(startingGridSize * antiZoomFactor));
             document.getElementById('scoreDisplay').style.top = (20 * antiZoomFactor) + 'px';
+            document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
         }
 
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
@@ -579,6 +585,20 @@ resizeCanvasHeight();
 // Call the resizeCanvasHeight function whenever the window is resized
 window.addEventListener('resize', resizeCanvasHeight);
 
+                function adjustForZoom() {
+            // Calculate the zoom factor
+            const zoomFactor = window.innerWidth / window.screen.availWidth;
+            // Adjust the grid size based on the zoom factor
+            document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
+            // Adjust the position of the score display
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.style.marginTop = `calc(var(--grid-size) * antiZoomFactor)`;
+            scoreDisplay.style.fontSize = `var(--grid-size)`;
+        }
+
+        // Call the adjustForZoom function initially and on window resize
+        window.addEventListener('resize', adjustForZoom);
+        adjustForZoom();
         
     </script>
 </body>
