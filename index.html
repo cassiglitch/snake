@@ -60,10 +60,10 @@
     <title>Snake Game</title>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.4.2/dist/tinycolor-min.js"></script>
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
         <div id="victoryMessage"></div>
-    
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
@@ -438,14 +438,15 @@ function Particle(x, y, radius, color, headX, headY) {
 }
 
 // Modify the createParticles function to pass head position parameters
-function createParticles(color) {
-    const headX = getSnakeHeadX();
-    const headY = getSnakeHeadY();
-    for (let i = 0; i < numParticles; i++) {
-        const particle = new Particle(0, 0, 5, color, headX, headY);
-        particles.push(particle);
-    }
-}
+        function createParticles(colorName) {
+            const color = tinycolor(colorName).toHexString(); // Convert color name to hexadecimal color code
+            const headX = getSnakeHeadX();
+            const headY = getSnakeHeadY();
+            for (let i = 0; i < numParticles; i++) {
+                const particle = new Particle(0, 0, 5, color, headX, headY);
+                particles.push(particle);
+            }
+        }
 
 
 function simulateHoles(color) {
