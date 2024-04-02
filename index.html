@@ -368,8 +368,6 @@ HaHaNoCollision(50)
 
         function restartGame() {
             pauseGame();
-            createParticles('red');
-            animateExplosion();
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
@@ -385,6 +383,7 @@ HaHaNoCollision(50)
         function declareVictory() {
             pauseGame()
             createParticles('yellow');
+            animateExplosion();
             createParticles('green');
             animateExplosion();
             pauseGame()
