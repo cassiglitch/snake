@@ -62,6 +62,7 @@
 <body>
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
+        <div id="victoryMessage">you win</div>
     
     <script>
         const canvas = document.getElementById('snakeCanvas');
@@ -378,24 +379,12 @@ HaHaNoCollision(50)
             spawnFood();
         }
 
- function generateConfetti() {
-            const numConfetti = 100; // Number of confetti particles
-
-            for (let i = 0; i < numConfetti; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti');
-                confetti.style.left = Math.random() * canvas.width + 'px'; // Random horizontal position within canvas width
-                confetti.style.animationDelay = Math.random() * 2 + 's'; // Random animation delay
-                canvas.parentNode.appendChild(confetti); // Append confetti to the canvas parent
-            }
-        }
-
+ 
 
         function declareVictory() {
             pauseGame()
             document.getElementById('victoryMessage').style.display = 'block';
             document.getElementById('victoryMessage').classList.add('flash');
-            generateConfetti(); // Generate confetti when victory is declared
             pauseGame()
             restartGame();
         }
