@@ -446,9 +446,8 @@ function createParticles(color) {
 }
 
 
-// Function to simulate holes in the canvas
-function simulateHoles() {
-    ctx.fillStyle = '#FF0000'; // Fill color of the canvas (black)
+function simulateHoles(color) {
+    ctx.fillStyle = color; // Use the color passed as a parameter
     particles.forEach(particle => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, holeSize, 0, Math.PI * 2);
@@ -456,7 +455,6 @@ function simulateHoles() {
     });
 }
 
-// Function to animate explosion
 function animateExplosion() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -469,8 +467,8 @@ function animateExplosion() {
         }
     });
 
-    // Simulate holes
-    simulateHoles();
+    // Simulate holes with the color of the particles
+    simulateHoles(particles[0].color); // Pass the color of the first particle
 
     // Request animation frame
     if (particles.length > 0) {
