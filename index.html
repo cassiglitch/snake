@@ -45,10 +45,9 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-
-        let maxscore = 50
+        
         let startingGridSize = 20;
-        let gridSize = startingGridSize;
+        let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0 };
@@ -281,7 +280,7 @@ HaHaNoCollision(50)
     }
 
             // Check for victory
-            if (score >= maxscore) {
+            if (score >= 50) {
                 declareVictory();
             }
         }
