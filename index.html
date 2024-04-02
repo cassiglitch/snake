@@ -419,7 +419,7 @@ function Particle(x, y, radius, color, velocity) {
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.restore();
     };
