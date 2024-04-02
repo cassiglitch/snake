@@ -68,7 +68,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-        let maxscore = 50
+        let maxscore = 5;
         let startingGridSize = 20;
         let gridSize = 20;
         let startingLength = 5;
@@ -368,7 +368,7 @@ HaHaNoCollision(50)
 
         function restartGame() {
             pauseGame();
-            createParticles();
+            createParticles(red);
             animateExplosion();
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
@@ -384,8 +384,8 @@ HaHaNoCollision(50)
 
         function declareVictory() {
             pauseGame()
-            document.getElementById('victoryMessage').style.display = 'block';
-            document.getElementById('victoryMessage').classList.add('flash');
+            createParticles(yellow);
+            createParticles(green);
             pauseGame()
             restartGame();
         }
@@ -394,13 +394,13 @@ HaHaNoCollision(50)
 let particles = [];
 const numParticles = 200;
 const explosionForce = 50;
-const holeSize = 20;
+const holeSize = 20 * antiZoomFactor;
 
 // Function to create a particle
 function Particle(x, y, radius, color, velocity) {
     this.x = x;
     this.y = y;
-    this.radius = radius;
+    this.radius = radius * antiZoomFactor;
     this.color = color;
     this.velocity = {
         x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
@@ -425,9 +425,9 @@ function Particle(x, y, radius, color, velocity) {
 }
 
 // Function to create explosion particles
-function createParticles() {
+function createParticles(color) {
     for (let i = 0; i < numParticles; i++) {
-        const particle = new Particle(canvas.width / 2, canvas.height / 2, 5, 'red');
+        const particle = new Particle(canvas.width / 2, canvas.height / 2, 5, 'color');
         particles.push(particle);
     }
 }
