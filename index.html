@@ -62,12 +62,13 @@
 <body>
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
-        <div id="victoryMessage">you win</div>
+        <div id="victoryMessage"></div>
     
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-        
+
+        let maxscore = 50
         let startingGridSize = 20;
         let gridSize = 20;
         let startingLength = 5;
@@ -310,7 +311,7 @@ HaHaNoCollision(50)
     }
 
             // Check for victory
-            if (score >= 5) {
+            if (score >= maxscore) {
                 declareVictory();
             }
         }
