@@ -398,10 +398,21 @@ const explosionForce = 50;
 const holeSize = 20 * antiZoomFactor;
 
 // Function to create a particle
-function Particle(x, y, radius, color, velocity) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius * antiZoomFactor;
+// Function to calculate the X position of the snake's head
+function getSnakeHeadX() {
+    return snake[0].x * gridSize + gridSize / 2;
+}
+
+// Function to calculate the Y position of the snake's head
+function getSnakeHeadY() {
+    return snake[0].y * gridSize + gridSize / 2;
+}
+
+// Modify the Particle constructor to accept head position parameters
+function Particle(x, y, radius, color, headX, headY) {
+    this.x = x + headX; // Calculate the particle's position relative to the snake's head
+    this.y = y + headY;
+    this.radius = radius;
     this.color = color;
     this.velocity = {
         x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
@@ -419,19 +430,22 @@ function Particle(x, y, radius, color, velocity) {
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = color;
+        ctx.fillStyle = this.color;
         ctx.fill();
         ctx.restore();
     };
 }
 
-// Function to create explosion particles
+// Modify the createParticles function to pass head position parameters
 function createParticles(color) {
+    const headX = getSnakeHeadX();
+    const headY = getSnakeHeadY();
     for (let i = 0; i < numParticles; i++) {
-        const particle = new Particle(canvas.width / 2, canvas.height / 2, 5, color);
+        const particle = new Particle(0, 0, 5, color, headX, headY);
         particles.push(particle);
     }
 }
+
 
 // Function to simulate holes in the canvas
 function simulateHoles() {
