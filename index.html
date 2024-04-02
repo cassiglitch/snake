@@ -129,8 +129,8 @@ function drawInvincibilityAura() {
 
 function drawEatingAnimation() {
     const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
-    const segmentSize = gridSize * antiZoomFactor; // Adjust segment size based on anti-zoom factor
-    const waveSize = 5 * antiZoomFactor; // Adjust the size of the wave based on anti-zoom factor
+    const segmentSize = gridSize; // Adjust segment size based on anti-zoom factor
+    const waveSize = 5; // Adjust the size of the wave based on anti-zoom factor
     const maxFrames = 8; // Number of frames for the eating animation
 
     const head = snake[0];
