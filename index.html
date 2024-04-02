@@ -34,6 +34,19 @@
         body {
             overflow: hidden; /* Disable scrolling */
             touch-action: none; /* Disable touch actions on the canvas */
+}
+        fetti-fall 2s ease-out infinite; /* Confetti falling animation */
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotateZ(0deg); /* Start above the viewport */
+                opacity: 1; /* Fully visible */
+            }
+            100% {
+                transform: translateY(100vh) rotateZ(720deg); /* End below the viewport with rotation */
+                opacity: 0; /* Invisible */
+            }
         }
     </style>
     <title>Snake Game</title>
@@ -41,6 +54,7 @@
 <body>
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
+    <div id="confettiContainer"></div>
     
     <script>
         const canvas = document.getElementById('snakeCanvas');
@@ -288,7 +302,7 @@ HaHaNoCollision(50)
     }
 
             // Check for victory
-            if (score >= 50) {
+            if (score >= 5) {
                 declareVictory();
             }
         }
@@ -359,10 +373,27 @@ HaHaNoCollision(50)
 
 
 
-function declareVictory() {
-restartGame();    
+        function generateConfetti() {
+            const confettiContainer = document.getElementById('confettiContainer');
+            const numConfetti = 100; // Number of confetti particles
 
-}
+            for (let i = 0; i < numConfetti; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * window.innerWidth + 'px'; // Random horizontal position
+                confetti.style.animationDelay = Math.random() * 2 + 's'; // Random animation delay
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        function declareVictory() {
+            pauseGame()
+            document.getElementById('victoryMessage').style.display = 'block';
+            document.getElementById('victoryMessage').classList.add('flash');
+            generateConfetti(); // Generate confetti when victory is declared
+            pauseGame()
+            restartGame();
+        }
         
 // Set up explosion animation properties
 let particles = [];
