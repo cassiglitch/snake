@@ -368,7 +368,7 @@ HaHaNoCollision(50)
 
         function restartGame() {
             pauseGame();
-            createParticles(red);
+            createParticles('red');
             animateExplosion();
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
@@ -384,8 +384,8 @@ HaHaNoCollision(50)
 
         function declareVictory() {
             pauseGame()
-            createParticles(yellow);
-            createParticles(green);
+            createParticles('yellow');
+            createParticles('green');
             pauseGame()
             restartGame();
         }
@@ -427,7 +427,7 @@ function Particle(x, y, radius, color, velocity) {
 // Function to create explosion particles
 function createParticles(color) {
     for (let i = 0; i < numParticles; i++) {
-        const particle = new Particle(canvas.width / 2, canvas.height / 2, 5, 'color');
+        const particle = new Particle(canvas.width / 2, canvas.height / 2, 5, color);
         particles.push(particle);
     }
 }
