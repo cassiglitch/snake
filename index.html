@@ -151,7 +151,8 @@ function draw() {
 }
 
 function drawInvincibilityAura() {
-    snake.forEach((segment, index) => {
+        getZoomFactor()
+        snake.forEach((segment, index) => {
         const shadowSize = 8; // Adjust the size of the shadow
         ctx.fillStyle = 'rgba(255, 165, 0, 0.3)'; // Orange color with transparency
         ctx.fillRect(segment.x * gridSize - shadowSize, segment.y * gridSize - shadowSize, gridSize + shadowSize * 2, gridSize + shadowSize * 2);
@@ -159,11 +160,11 @@ function drawInvincibilityAura() {
 }
 
 function drawEatingAnimation() {
+    getZoomFactor()
     const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
     const segmentSize = gridSize; // Adjust segment size based on anti-zoom factor
     const waveSize = 5; // Adjust the size of the wave based on anti-zoom factor
     const maxFrames = 8; // Number of frames for the eating animation
-
     const head = snake[0];
     const eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
     eatenSegments.forEach((segment, index) => {
