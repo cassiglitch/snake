@@ -173,8 +173,8 @@ eatenSegments.forEach((segment, index) => {
     const segmentX = segment.x * gridSize;
     const segmentY = segment.y * gridSize;
 
-    let originalOffset = waveSize * (maxFrames - animationFrame);
-    let scaledOffset = originalOffset * antiZoomFactor;
+    var originalOffset = waveSize * (maxFrames - animationFrame);
+    var scaledOffset = originalOffset * antiZoomFactor;
 
     // Draw the wave-like effect
     ctx.fillStyle = animationColor;
