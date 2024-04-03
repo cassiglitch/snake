@@ -164,27 +164,31 @@ function drawEatingAnimation() {
     const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
     const segmentSize = gridSize; // Adjust segment size based on anti-zoom factor
     const waveSize = 5 * antiZoomFactor; // Adjust the size of the wave based on anti-zoom factor
-    const maxFrames = 8 * antiZoomFactor; // Number of frames for the eating animation
+    const maxFrames = 8; // Number of frames for the eating animation
 
     const head = snake[0];
     const eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
-    eatenSegments.forEach((segment, index) => {
-        const animationFrame = (eatingAnimationFrames - index) * antiZoomFactor;
-        const offset = waveSize * (maxFrames - animationFrame); // Calculate offset for the wave effect
-        const segmentX = (segment.x * gridSize);
-        const segmentY = (segment.y * gridSize);
+eatenSegments.forEach((segment, index) => {
+    const animationFrame = eatingAnimationFrames - index;
+    const segmentX = segment.x * gridSize;
+    const segmentY = segment.y * gridSize;
 
-        ctx.fillStyle = animationColor;
-        ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+    const originalOffset = waveSize * (maxFrames - animationFrame);
+    const scaledOffset = originalOffset * antiZoomFactor;
 
-        // Draw a wave-like effect
-        ctx.fillRect(segmentX - offset, segmentY, segmentSize, segmentSize);
-        ctx.fillRect(segmentX + offset, segmentY, segmentSize, segmentSize);
-        ctx.fillRect(segmentX, segmentY - offset, segmentSize, segmentSize);
-        ctx.fillRect(segmentX, segmentY + offset, segmentSize, segmentSize);
-    });
+    // Draw the wave-like effect
+    ctx.fillStyle = animationColor;
+    ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+    ctx.fillRect(segmentX - scaledOffset, segmentY, segmentSize, segmentSize);
+    ctx.fillRect(segmentX + scaledOffset, segmentY, segmentSize, segmentSize);
+    ctx.fillRect(segmentX, segmentY - scaledOffset, segmentSize, segmentSize);
+    ctx.fillRect(segmentX, segmentY + scaledOffset, segmentSize, segmentSize);
 
-    originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
+    // Draw the original segment
+    ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+});
+
+originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
 
 
