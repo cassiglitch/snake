@@ -171,17 +171,17 @@ function drawEatingAnimation() {
     eatenSegments.forEach((segment, index) => {
         const animationFrame = eatingAnimationFrames - index;
         const offset = waveSize * (maxFrames - animationFrame); // Calculate offset for the wave effect
-        const segmentX = (segment.x * gridSize) * antiZoomFactor;
-        const segmentY = (segment.y * gridSize) * antiZoomFactor;
+        const segmentX = (segment.x * gridSize);
+        const segmentY = (segment.y * gridSize);
 
         ctx.fillStyle = animationColor;
         ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
 
         // Draw a wave-like effect
-        ctx.fillRect(segmentX - offset, segmentY, segmentSize, segmentSize);
-        ctx.fillRect(segmentX + offset, segmentY, segmentSize, segmentSize);
-        ctx.fillRect(segmentX, segmentY - offset, segmentSize, segmentSize);
-        ctx.fillRect(segmentX, segmentY + offset, segmentSize, segmentSize);
+        ctx.fillRect((segmentX - offset, segmentY, segmentSize, segmentSize) * antiZoomFactor);
+        ctx.fillRect((segmentX + offset, segmentY, segmentSize, segmentSize) * antiZoomFactor);
+        ctx.fillRect((segmentX, segmentY - offset, segmentSize, segmentSize) * antiZoomFactor);
+        ctx.fillRect((segmentX, segmentY + offset, segmentSize, segmentSize) * antiZoomFactor);
     });
 
     originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
