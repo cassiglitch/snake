@@ -169,7 +169,7 @@ function drawEatingAnimation() {
     const eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
     eatenSegments.forEach((segment, index) => {
         const animationFrame = eatingAnimationFrames - index;
-const offset = waveSize * (maxFrames - animationFrame) * antiZoomFactor; // Adjust the offset based on the anti-zoom factor
+        let offset = waveSize * (maxFrames - animationFrame) * antiZoomFactor; // Adjust the offset based on the anti-zoom factor
         const segmentX = segment.x * gridSize;
         const segmentY = segment.y * gridSize;
 
@@ -177,7 +177,6 @@ const offset = waveSize * (maxFrames - animationFrame) * antiZoomFactor; // Adju
         ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
 
         // Draw a wave-like effect
-        const offset = waveSize * (maxFrames - i) * antiZoomFactor; 
         ctx.fillRect(segmentX - offset, segmentY, segmentSize, segmentSize);
         ctx.fillRect(segmentX + offset, segmentY, segmentSize, segmentSize);
         ctx.fillRect(segmentX, segmentY - offset, segmentSize, segmentSize);
