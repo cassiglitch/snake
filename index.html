@@ -160,12 +160,15 @@ function drawInvincibilityAura() {
 }
 
 function drawEatingAnimation() {
-    const animationColor = '#0000FF'; // Blue color without transparency
+    const animationColor = 'blue'; // Solid blue color
 
     const head = snake[0];
     const snakeLength = snake.length;
 
-    for (let i = 1; i < snakeLength; i++) {
+    // Calculate the number of animation frames based on snake length
+    const animationFrames = Math.min(snakeLength, eatingAnimationFrames);
+
+    for (let i = 0; i < animationFrames; i++) {
         const segment = snake[i];
         const segmentX = segment.x * gridSize;
         const segmentY = segment.y * gridSize;
@@ -175,27 +178,14 @@ function drawEatingAnimation() {
         ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
 
         // Draw the animated segment
-        if (i === 1) {
-            const waveSize = 5 * antiZoomFactor; // Adjust the size of the wave based on anti-zoom factor
-            const animationFrame = eatingAnimationFrames;
-            const scaledOffset = waveSize * animationFrame;
-
-            // Draw the wave-like effect
-            drawWave(segmentX, segmentY, scaledOffset);
-        }
+        ctx.fillStyle = animationColor;
+        ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
     }
 
-    originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
+    // Reset snake color after eating animation
+    originalSnakeColor = '#00FF00';
 }
 
-function drawWave(x, y, offset) {
-    const animationColor = '#0000FF'; // Blue color without transparency
-    ctx.fillStyle = animationColor;
-    ctx.fillRect(x - offset, y, gridSize, gridSize);
-    ctx.fillRect(x + offset, y, gridSize, gridSize);
-    ctx.fillRect(x, y - offset, gridSize, gridSize);
-    ctx.fillRect(x, y + offset, gridSize, gridSize);
-}
 
         function getFoodColor(foodType) {
             switch (foodType) {
