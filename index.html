@@ -162,24 +162,22 @@ function drawInvincibilityAura() {
 function drawEatingAnimation() {
     const animationColor = 'blue'; // Solid blue color
 
-    const head = snake[0];
+    if (snake.length >= 2) {
+        const head = snake[0];
+        const secondSegment = snake[1];
 
-    if (head) {
-        // Draw the original head segment
-        ctx.fillStyle = originalSnakeColor;
-        ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+        // Draw the original snake
+        snake.forEach(segment => {
+            ctx.fillStyle = originalSnakeColor;
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+        });
 
-        // Draw the animated segment (blue line below the head)
+        // Draw the animated segments (blue line below the head)
         ctx.fillStyle = animationColor;
-        const animationY = (head.y + 1) * gridSize; // Y position for the animation (one segment below the head)
-        ctx.fillRect(head.x * gridSize, animationY, gridSize, gridSize);
+        ctx.fillRect(head.x * gridSize, (head.y + 1) * gridSize, gridSize, gridSize);
+        ctx.fillRect(secondSegment.x * gridSize, (head.y + 1) * gridSize, gridSize, gridSize);
     }
-
-    // Reset snake color after eating animation
-    originalSnakeColor = '#00FF00';
 }
-
-
 
         function getFoodColor(foodType) {
             switch (foodType) {
