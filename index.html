@@ -163,28 +163,22 @@ function drawEatingAnimation() {
     const animationColor = 'blue'; // Solid blue color
 
     const head = snake[0];
-    const snakeLength = snake.length;
 
-    // Calculate the number of animation frames based on snake length
-    const animationFrames = Math.min(snakeLength, eatingAnimationFrames);
-
-    for (let i = 0; i < animationFrames; i++) {
-        const segment = snake[i];
-        const segmentX = segment.x * gridSize;
-        const segmentY = segment.y * gridSize;
-
-        // Draw the original segment
+    if (head) {
+        // Draw the original head segment
         ctx.fillStyle = originalSnakeColor;
-        ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
+        ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
 
-        // Draw the animated segment
+        // Draw the animated segment (blue line below the head)
         ctx.fillStyle = animationColor;
-        ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
+        const animationY = (head.y + 1) * gridSize; // Y position for the animation (one segment below the head)
+        ctx.fillRect(head.x * gridSize, animationY, gridSize, gridSize);
     }
 
     // Reset snake color after eating animation
     originalSnakeColor = '#00FF00';
 }
+
 
 
         function getFoodColor(foodType) {
