@@ -175,8 +175,10 @@ function drawEatingAnimation() {
         ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
 
         // Draw the animated segment
-        ctx.fillStyle = animationColor;
-        ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
+        if (i === 1) {
+            ctx.fillStyle = animationColor;
+            ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
+        }
     }
 
     originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
