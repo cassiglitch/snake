@@ -161,20 +161,30 @@ function drawInvincibilityAura() {
 
 function drawEatingAnimation() {
     const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
-    const segmentSize = gridSize; // Adjust segment size based on anti-zoom factor
+    const segmentSize = gridSize * antiZoomFactor; // Adjust segment size based on anti-zoom factor
     const head = snake[0];
 
     // Draw two blue segments under the snake's head
-    const segmentX = head.x * gridSize;
-    const segmentY = head.y * gridSize;
+    const segmentX = head.x * gridSize * antiZoomFactor;
+    const segmentY = head.y * gridSize * antiZoomFactor;
     ctx.fillStyle = animationColor;
     ctx.fillRect(segmentX, segmentY + segmentSize, segmentSize, segmentSize);
     ctx.fillRect(segmentX, segmentY + (2 * segmentSize), segmentSize, segmentSize);
 
-    // Draw the original segment
-    ctx.fillStyle = originalSnakeColor;
-    ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+    // Redraw the snake
+    drawSnake();
 }
+
+function drawSnake() {
+    // Draw each segment of the snake
+    snake.forEach(segment => {
+        const segmentX = segment.x * gridSize * antiZoomFactor;
+        const segmentY = segment.y * gridSize * antiZoomFactor;
+        ctx.fillStyle = originalSnakeColor;
+        ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+    });
+}
+
 
 
         function getFoodColor(foodType) {
