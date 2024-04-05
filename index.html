@@ -176,15 +176,26 @@ function drawEatingAnimation() {
 
         // Draw the animated segment
         if (i === 1) {
-            ctx.fillStyle = animationColor;
-            ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
+            const waveSize = 5 * antiZoomFactor; // Adjust the size of the wave based on anti-zoom factor
+            const animationFrame = eatingAnimationFrames;
+            const scaledOffset = waveSize * animationFrame;
+
+            // Draw the wave-like effect
+            drawWave(segmentX, segmentY, scaledOffset);
         }
     }
 
     originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
 
-
+function drawWave(x, y, offset) {
+    const animationColor = '#0000FF'; // Blue color without transparency
+    ctx.fillStyle = animationColor;
+    ctx.fillRect(x - offset, y, gridSize, gridSize);
+    ctx.fillRect(x + offset, y, gridSize, gridSize);
+    ctx.fillRect(x, y - offset, gridSize, gridSize);
+    ctx.fillRect(x, y + offset, gridSize, gridSize);
+}
 
         function getFoodColor(foodType) {
             switch (foodType) {
