@@ -163,11 +163,10 @@ function drawEatingAnimation() {
     const animationColor = '#0000FF'; // Blue color without transparency
 
     const head = snake[0];
-    const eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
+    const snakeLength = snake.length;
 
-    eatenSegments.forEach((segment, index) => {
-        const animationFrame = eatingAnimationFrames - index;
-        const nextSegment = snake[index + 1];
+    for (let i = 1; i < snakeLength; i++) {
+        const segment = snake[i];
         const segmentX = segment.x * gridSize;
         const segmentY = segment.y * gridSize;
 
@@ -176,16 +175,9 @@ function drawEatingAnimation() {
         ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
 
         // Draw the animated segment
-        if (index === 0 && animationFrame !== 0) {
-            ctx.fillStyle = animationColor;
-            ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
-        } else if (nextSegment) {
-            const nextSegmentX = nextSegment.x * gridSize;
-            const nextSegmentY = nextSegment.y * gridSize;
-            ctx.fillStyle = animationColor;
-            ctx.fillRect(nextSegmentX, nextSegmentY, gridSize, gridSize);
-        }
-    });
+        ctx.fillStyle = animationColor;
+        ctx.fillRect(segmentX, segmentY, gridSize, gridSize);
+    }
 
     originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
