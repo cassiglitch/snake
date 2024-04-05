@@ -160,24 +160,28 @@ function drawInvincibilityAura() {
 }
 
 function drawEatingAnimation() {
-    const animationColor = 'blue'; // Solid blue color
+    const animationColor = 'rgba(0, 0, 255, 0.5)'; // Blue color with transparency
+    const segmentSize = gridSize * antiZoomFactor; // Adjust segment size based on anti-zoom factor
 
-    if (snake.length >= 2) {
-        const head = snake[0];
-        const secondSegment = snake[1];
+    const head = snake[0];
+    const eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
 
-        // Draw the original snake
-        snake.forEach(segment => {
+    eatenSegments.forEach((segment, index) => {
+        // Draw the blue segment
+        if (index === 0) {
+            ctx.fillStyle = animationColor;
+            ctx.fillRect(segment.x * gridSize * antiZoomFactor, segment.y * gridSize * antiZoomFactor, segmentSize * 2, segmentSize);
+        }
+        // Draw the original segment
+        else {
             ctx.fillStyle = originalSnakeColor;
-            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-        });
+            ctx.fillRect(segment.x * gridSize * antiZoomFactor, segment.y * gridSize * antiZoomFactor, segmentSize, segmentSize);
+        }
+    });
 
-        // Draw the animated segments (blue line below the head)
-        ctx.fillStyle = animationColor;
-        ctx.fillRect(head.x * gridSize, (head.y + 1) * gridSize, gridSize, gridSize);
-        ctx.fillRect(secondSegment.x * gridSize, (head.y + 1) * gridSize, gridSize, gridSize);
-    }
+    originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
+
 
         function getFoodColor(foodType) {
             switch (foodType) {
