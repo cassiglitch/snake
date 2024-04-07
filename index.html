@@ -586,33 +586,40 @@ document.addEventListener('keydown', event => {
     }
 });
 
-        // Handle touch events for mobile controls
-        let touchStartX = 0;
-        let touchStartY = 0;
+// Handle touch events for mobile controls
+let touchStartX = 0;
+let touchStartY = 0;
 
-        function handleTouchStart(event) {
-            touchStartX = event.touches[0].clientX;
-            touchStartY = event.touches[0].clientY;
+function handleTouchStart(event) {
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+}
+
+function handleTouchEnd(event) {
+    const touchEndX = event.changedTouches[0].clientX;
+    const touchEndY = event.changedTouches[0].clientY;
+
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe
+        direction = deltaX > 0 ? 'right' : 'left';
+    } else {
+        // Vertical swipe
+        direction = deltaY > 0 ? 'down' : 'up';
+        if (Math.abs(deltaY) > 20) { // adjust this threshold as needed
+            direction = 'up'; // consider it an upwards swipe only if deltaY is significant
+        } else {
+            direction = 'tap'; // if deltaY is small, consider it a tap
         }
+    }
+    console.log('Direction:', direction);
+}
 
-        function handleTouchEnd(event) {
-            const touchEndX = event.changedTouches[0].clientX;
-            const touchEndY = event.changedTouches[0].clientY;
+canvas.addEventListener('touchstart', handleTouchStart);
+canvas.addEventListener('touchend', handleTouchEnd);
 
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = touchEndY - touchStartY;
-
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // Horizontal swipe
-                direction = deltaX > 0 ? 'right' : 'left';
-            } else {
-                // Vertical swipe
-                direction = deltaY > 0 ? 'down' : 'up';
-            }
-        }
-
-        canvas.addEventListener('touchstart', handleTouchStart);
-        canvas.addEventListener('touchend', handleTouchEnd);
 
         // Start the game loop
         const gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
