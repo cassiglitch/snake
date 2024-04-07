@@ -609,11 +609,7 @@ function handleTouchEnd(event) {
         // Vertical swipe
         if (Math.abs(deltaY) > 10) {
             direction = deltaY > 0 ? 'down' : 'up';
-        } else {
-            // Tap event
-            direction = 'tap';
-            return; // Exit function, do nothing further
-        }
+        } 
     }
 
     // Perform actions based on direction if needed
