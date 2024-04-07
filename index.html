@@ -248,15 +248,26 @@ function HaHaNoCollision(duration) {
                     break;
             }
 
-            // Check if Snake hits obstacles
-            if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
-                dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2)))) {
-                isColliding = true;
-                collisionAnimationFrames = 10;
-                restartGame();
-                return;
-            }
+   if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
+        dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
+            (head.y >= obstacle.y && head.y < obstacle.y + 2)))) {
+        isColliding = true;
+        collisionAnimationFrames = 10;
+        
+        // Decrement segments (lives) by 5%
+        const numSegmentsToRemove = Math.ceil(snake.length * 0.05);
+        if (snake.length > numSegmentsToRemove) {
+            snake.splice(0, numSegmentsToRemove);
+        } else {
+            restartGame(); // End the game if segments (lives) run out
+            return;
+        }
+        
+        // Apply invincibility and reset if there are remaining segments (lives)
+        isInvincible = true;
+        invincibilityDuration = 2; // Set the duration for invincibility
+        return;
+    }
 
             // Check if Snake eats Food
             if (head.x === food.x && head.y === food.y) {
