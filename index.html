@@ -439,9 +439,15 @@ function getSnakeHeadY() {
 
 // Modify the Particle constructor to accept head position parameters
 function Particle(x, y, radius, color, headX, headY) {
+                var deviceWidth, landscape = Math.abs(window.orientation) == 90
+            // workaround for strange screen.height on the iPhone (v3.1.3)
+            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+            else deviceWidth = window.screen[landscape ? "height" : "width"]
+            var zoomFactor = deviceWidth / window.innerWidth;
+            var antiZoomFactor = 1 / zoomFactor;
     this.x = x + headX; // Calculate the particle's position relative to the snake's head
     this.y = y + headY;
-    this.radius = radius;
+    this.radius = ((radius / 2) * antiZoomFactor);
     this.color = color;
     this.velocity = {
         x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
