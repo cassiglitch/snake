@@ -259,7 +259,7 @@ function HaHaNoCollision(duration) {
         const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
-            lives = (lives * 1.5)
+            lives = (lives * 1.5);
         } else {
             restartGame(); // End the game if segments (lives) run out
             return;
@@ -402,6 +402,7 @@ HaHaNoCollision(50)
             obstacles = [];
             dynamicObstacles = [];
             score = 0;
+            lives = 0.5;
             isEating = false;
             eatingAnimationFrames = 0;
             spawnFood();
