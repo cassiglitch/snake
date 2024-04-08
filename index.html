@@ -68,6 +68,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
+        let lives = 0.5
         let maxscore = 50;
         let startingGridSize = 20;
         let gridSize = 20;
@@ -255,9 +256,10 @@ function HaHaNoCollision(duration) {
         collisionAnimationFrames = 10;
         
         // Decrement segments (lives) by 5%
-        const numSegmentsToRemove = Math.ceil(snake.length * 0.5);
+        const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
+            lives = (lives * 1.5)
         } else {
             restartGame(); // End the game if segments (lives) run out
             return;
