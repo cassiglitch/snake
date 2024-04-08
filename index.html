@@ -255,7 +255,7 @@ function HaHaNoCollision(duration) {
         collisionAnimationFrames = 10;
         
         // Decrement segments (lives) by 5%
-        const numSegmentsToRemove = Math.ceil(snake.length * 0.2);
+        const numSegmentsToRemove = Math.ceil(snake.length * 0.5);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
         } else {
