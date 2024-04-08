@@ -69,7 +69,7 @@
         const ctx = canvas.getContext('2d');
 
         let lives = 0.5
-        let maxscore = 50;
+        let maxscore = 100;
         let startingGridSize = 20;
         let gridSize = 20;
         let startingLength = 5;
@@ -259,7 +259,7 @@ function HaHaNoCollision(duration) {
         const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
-            lives = (lives * 1.5);
+            lives = (lives * 2);
         } else {
             restartGame(); // End the game if segments (lives) run out
             return;
