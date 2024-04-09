@@ -170,6 +170,10 @@ let cooldownProgress = 0; // Current progress of the cooldown bar (in millisecon
 const cooldownDuration = 10000; // Duration of the cooldown period in milliseconds
 
 // Function to handle shooting the laser
+let lastLaserShot = 0; // Timestamp of the last laser shot
+const laserCooldown = 30 * 1000; // Cooldown period in milliseconds (30 seconds)
+
+// Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
 
@@ -177,6 +181,7 @@ function shootLaser(targetX, targetY) {
     if (currentTime - lastLaserShot < laserCooldown) {
         return; // Laser is still on cooldown
     } else {
+
         isShooting = true;
 
         // Calculate the angle and distance to the canvas edge
@@ -245,6 +250,7 @@ function shootLaser(targetX, targetY) {
         lastLaserShot = currentTime;
     }
 }
+
 
 
 // Function to check if a line intersects with a rectangle
