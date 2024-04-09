@@ -166,7 +166,8 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
-const laserCooldown = 30 * 1000; // Cooldown period in milliseconds (30 seconds)
+let cooldownProgress = 0; // Current progress of the cooldown bar (in milliseconds)
+const cooldownDuration = 10000; // Duration of the cooldown period in milliseconds
 
 // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
@@ -274,6 +275,19 @@ function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
     return ua >= 0 && ua <= 1;
 }
 
+
+// Main animation loop
+function animate() {
+    // Update cooldown progress
+    cooldownProgress += deltaTime;
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+ draw();
+drawCooldownBar();
+
+    requestAnimationFrame(animate);
+}
     
 // Function to pause the game
 function pauseGame() {
