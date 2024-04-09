@@ -147,7 +147,6 @@ function draw() {
     const scoreDisplay = document.getElementById('scoreDisplay');
     scoreDisplay.textContent = `Score: ${score}`;
 
-    drawLaser();
 }
 
 function drawInvincibilityAura() {
@@ -344,16 +343,8 @@ HaHaNoCollision(50)
             if (score >= maxscore) {
                 declareVictory();
             }
-            if (laser.isShooting) {
-        obstacles.forEach((obstacle, index) => {
-            // Check if the laser intersects with the obstacle
-            if (checkCollision(laser.x1, laser.y1, laser.x2, laser.y2, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
-                // If there's a collision, remove the obstacle from the array
-                obstacles.splice(index, 1);
-            }
-        });
+
     }
-        }
 
         function calculateObstacleSpawnProbability() {
             // Obstacle spawn probability increases with score
