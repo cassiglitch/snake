@@ -731,7 +731,7 @@ if (laser.isShooting) {
             pauseGame()
             restartGame();
         }
-        let particles = [];
+let particles = [];
 const numParticles = 200;
 const explosionForce = 50;
 const holeSize = 20;
@@ -746,68 +746,81 @@ function getSnakeHeadY() {
     return snake[0].y * gridSize + gridSize / 2;
 }
 
-// Modify the Particle constructor to accept head position parameters and an array of colors
-function Particle(x, y, radius, colors, headX, headY) {
-    this.x = x + headX; // Calculate the particle's position relative to the snake's head
-    this.y = y + headY;
-    this.radius = radius;
-    this.colors = colors; // Array of color names
-    this.color = this.colors[Math.floor(Math.random() * this.colors.length)]; // Randomly select a color from the array
-    this.velocity = {
-        x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
-        y: (Math.random() - 0.5) * explosionForce * (Math.random() * 2)
-    };
-    this.alpha = 1;
-    this.update = function() {
+// Particle class definition
+class Particle {
+    constructor(x, y, radius, color, velocity) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.velocity = velocity;
+        this.alpha = 1;
+    }
+
+    // Update method to move and fade the particle
+    updateP() {
         this.x += this.velocity.x;
         this.y += this.velocity.y;
         this.alpha -= 0.01;
-        this.draw();
-    };
-    this.draw = function() {
+    }
+
+    // Draw method to draw the particle
+    drawP() {
         ctx.save();
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color; // Use the selected color
+        ctx.fillStyle = this.color;
         ctx.fill();
         ctx.restore();
-    };
+    }
 }
 
-// Modify the createParticles function to pass head position parameters and an array of color names
+// Function to create particles
 function createParticles(colors) {
     const headX = getSnakeHeadX();
     const headY = getSnakeHeadY();
     for (let i = 0; i < numParticles; i++) {
-        const particle = new Particle(0, 0, 5, colors, headX, headY); // Pass the array of colors directly
+        const radius = 5;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const velocity = {
+            x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
+            y: (Math.random() - 0.5) * explosionForce * (Math.random() * 2)
+        };
+        const particle = new Particle(headX, headY, radius, color, velocity);
         particles.push(particle);
     }
 }
 
-function simulateHoles(color) {
-    ctx.fillStyle = color; // Use the color passed as a parameter
-    particles.forEach(particle => {
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, holeSize, 0, Math.PI * 2);
-        ctx.fill();
+// Function to simulate holes
+function simulateHoles(colors) {
+    colors.forEach(color => {
+        ctx.fillStyle = color;
+        particles.forEach(particle => {
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, holeSize, 0, Math.PI * 2);
+            ctx.fill();
+        });
     });
 }
 
+// Function to animate the explosion
 function animateExplosion() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Update and draw particles
     particles.forEach((particle, index) => {
-        particle.update();
+        particle.updateP();
         if (particle.alpha <= 0) {
             particles.splice(index, 1);
+        } else {
+            particle.drawP();
         }
     });
 
-    // Simulate holes with the color of the particles
-    simulateHoles(particles[0].color); // Pass the color of the first particle
+    // Simulate holes with the colors of the particles
+    simulateHoles(particles.map(particle => particle.color));
 
     // Request animation frame
     if (particles.length > 0) {
@@ -831,7 +844,6 @@ function createShockwave() {
 createParticles(['gold', 'red', 'blue']); // Example with multiple colors
 animateExplosion();
 createShockwave();
-
 
 
 
