@@ -56,6 +56,22 @@
                 opacity: 0; /* Invisible */
             }
         }
+        .cooldown-meter {
+    width: 200px;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.cooldown-progress {
+    width: 100%;
+    height: 100%;
+    background-color: #4CAF50;
+    border-radius: 10px;
+    transition: width 0.1s linear; /* Smooth transition */
+}
+
     </style>
     <title>Snake Game</title>
 </head>
@@ -64,9 +80,50 @@
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
         <div id="victoryMessage"></div>
+    <div class="cooldown-meter">
+    <div class="cooldown-progress"></div>
+</div>
+
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
+
+const cooldownDuration = 30000; // Cooldown duration in milliseconds (7.5 seconds)
+let cooldownStartTime = 0; // Timestamp of the cooldown start
+
+const cooldownMeter = document.querySelector('.cooldown-progress');
+
+function startCooldown() {
+    cooldownStartTime = Date.now();
+
+    // Start the cooldown animation
+    cooldownMeter.style.transition = `width ${cooldownDuration}ms linear`;
+    cooldownMeter.style.width = '0'; // Reset progress bar width
+
+    // Update the cooldown progress
+    updateCooldown();
+}
+
+function updateCooldown() {
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - cooldownStartTime;
+    const remainingTime = cooldownDuration - elapsedTime;
+
+    // Calculate the remaining cooldown percentage
+    const cooldownPercentage = Math.max(0, (remainingTime / cooldownDuration) * 100);
+
+    // Update the progress bar width
+    cooldownMeter.style.width = `${cooldownPercentage}%`;
+
+    if (remainingTime > 0) {
+        // Continue updating the cooldown progress
+        requestAnimationFrame(updateCooldown);
+    } else {
+        // Cooldown has ended, reset progress bar
+        cooldownMeter.style.width = '100%';
+    }
+}
+
 
         let lives = 0.5
         let maxscore = 100;
@@ -210,6 +267,7 @@ function shootLaser(targetX, targetY) {
         // After 5 seconds, reset the shooting state
         setTimeout(() => {
             laser.isShooting = false;
+            startCooldown()
         }, 5000);
 
         // Update the timestamp of the last laser shot
