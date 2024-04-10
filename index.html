@@ -196,7 +196,6 @@ function handleTapEnd(event) {
             const canvasX = tapEndX - canvasRect.left;
             const canvasY = tapEndY - canvasRect.top;
             shootLaser(canvasX, canvasY);
-            startCooldown()
         }
     }
 }
@@ -207,7 +206,7 @@ canvas.addEventListener('touchend', handleTapEnd);
 
 // Drawing function to draw the laser with fade effect
 function drawLaser() {
-    if (laser.isShooting = true) {
+    if (laser.isShooting) {
         // Calculate the alpha value for the fade effect
         const currentTime = Date.now();
         const elapsedTime = currentTime - laserStartTime;
@@ -225,6 +224,9 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
+const laserCooldown = LaserChargeTime * 1000; // Cooldown period in milliseconds (30 seconds)
+
+// Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
 
@@ -242,30 +244,26 @@ function shootLaser(targetX, targetY) {
         const distance = Math.sqrt(dx * dx + dy * dy);
         const angle = Math.atan2(dy, dx);
 
-        // Define laser beam as a parametric equation
-        const laserBeam = (t) => ({
-            x: snakeHeadX + t * Math.cos(angle) * canvas.width,
-            y: snakeHeadY + t * Math.sin(angle) * canvas.height
-        });
+        // Calculate the end point of the laser
+        const endX = snakeHeadX + Math.cos(angle) * canvas.width;
+        const endY = snakeHeadY + Math.sin(angle) * canvas.height;
 
-        // Check for collisions along the laser beam path
-        const laserIntersectsObstacle = obstacles.some((obstacle) => {
-            // Check intersection with obstacle bounding box
-            if (intersectBoundingBox(laserBeam(0), laserBeam(1), obstacle)) {
-                // Perform detailed intersection check
-                return intersectLaserWithObstacle(laserBeam, obstacle);
-            }
-            return false;
-        });
+        // Draw the laser
+        ctx.beginPath();
+        ctx.moveTo(snakeHeadX, snakeHeadY);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'round';
+        ctx.stroke();
 
-        if (laserIntersectsObstacle) {
-            // Update obstacle array by removing collided obstacles
-            obstacles = obstacles.filter((obstacle) => !intersectBoundingBox(laserBeam(0), laserBeam(1), obstacle));
-        }
+        // Check for collision with obstacles
+        checkLaserCollision();
 
-        // After 5 seconds, reset the shooting state
+        // After 5 seconds, reset the shooting state and clear the laser
         setTimeout(() => {
             isShooting = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }, 5000);
 
         // Update the timestamp of the last laser shot
@@ -273,60 +271,129 @@ function shootLaser(targetX, targetY) {
     }
 }
 
-function intersectBoundingBox(pointA, pointB, obstacle) {
-    const rect = {
-        x: obstacle.x * gridSize,
-        y: obstacle.y * gridSize,
-        width: obstacle.width * gridSize,
-        height: obstacle.height * gridSize
-    };
-    return (
-        pointA.x < rect.x + rect.width &&
-        pointB.x > rect.x &&
-        pointA.y < rect.y + rect.height &&
-        pointB.y > rect.y
-    );
+
+// Updated laser collision detection
+function checkLaserCollision() {
+    const snakeHeadX = snake[0].x * gridSize;
+    const snakeHeadY = snake[0].y * gridSize;
+    const dx = targetX - snakeHeadX;
+    const dy = targetY - snakeHeadY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+
+    // Define laser beam parameters
+    const laserWidth = 20; // Width of the laser beam
+    const laserLength = distance; // Length of the laser beam
+    const laserStartX = snakeHeadX;
+    const laserStartY = snakeHeadY;
+    const laserEndX = targetX;
+    const laserEndY = targetY;
+
+    // Iterate through obstacles for collision detection
+    obstacles.forEach((obstacle, index) => {
+        // Check if the bounding boxes of the laser and obstacle intersect
+        if (boundingBoxesIntersect(laserStartX, laserStartY, laserEndX, laserEndY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
+            // Perform detailed intersection detection
+            if (laserIntersectsObstacle(laserStartX, laserStartY, laserEndX, laserEndY, obstacle)) {
+                // Remove the obstacle from the array
+                obstacles.splice(index, 1);
+            }
+        }
+    });
 }
 
-function intersectLaserWithObstacle(laserBeam, obstacle) {
-    const numSegments = Math.ceil(obstacle.width + obstacle.height); // Maximum number of segments
-    const segmentLength = 1 / numSegments;
+// Function to check if the bounding boxes of two objects intersect
+function boundingBoxesIntersect(x1, y1, x2, y2, rx, ry, rw, rh) {
+    return x1 < rx + rw &&
+        x1 + laserWidth > rx &&
+        y1 < ry + rh &&
+        y1 + laserWidth > ry;
+}
 
-    // Iterate through segments of the laser beam
-    for (let i = 0; i <= numSegments; i++) {
-        const t = i * segmentLength;
-        const pointA = laserBeam(t);
-        const pointB = laserBeam(t + segmentLength);
+// Function to check if the laser intersects with an obstacle
+function laserIntersectsObstacle(laserStartX, laserStartY, laserEndX, laserEndY, obstacle) {
+    // Vector representing the laser beam
+    const laserVector = { x: laserEndX - laserStartX, y: laserEndY - laserStartY };
 
-        // Check intersection with obstacle edges
-        if (intersectLineWithRect(pointA, pointB, obstacle)) {
-            return true; // Intersection detected
+    // Iterate through each edge of the obstacle
+    for (let i = 0; i < obstacle.edges.length; i++) {
+        const edge = obstacle.edges[i];
+        const edgeStartX = edge[0].x * gridSize;
+        const edgeStartY = edge[0].y * gridSize;
+        const edgeEndX = edge[1].x * gridSize;
+        const edgeEndY = edge[1].y * gridSize;
+
+        // Vector representing the obstacle edge
+        const obstacleVector = { x: edgeEndX - edgeStartX, y: edgeEndY - edgeStartY };
+
+        // Calculate the intersection point between the laser beam and the obstacle edge
+        const intersectionPoint = calculateIntersectionPoint(laserStartX, laserStartY, laserVector, edgeStartX, edgeStartY, obstacleVector);
+
+        // Check if the intersection point is within the bounds of the obstacle edge
+        if (intersectionPoint && isPointOnLineSegment(intersectionPoint.x, intersectionPoint.y, edgeStartX, edgeStartY, edgeEndX, edgeEndY)) {
+            // Collision detected, remove the obstacle
+            return true;
         }
     }
-    return false; // No intersection found
+
+    return false;
 }
 
-function intersectLineWithRect(pointA, pointB, obstacle) {
-    // Define obstacle edges
-    const edges = [
-        [{ x: obstacle.x, y: obstacle.y }, { x: obstacle.x + obstacle.width, y: obstacle.y }],
-        [{ x: obstacle.x + obstacle.width, y: obstacle.y }, { x: obstacle.x + obstacle.width, y: obstacle.y + obstacle.height }],
-        [{ x: obstacle.x + obstacle.width, y: obstacle.y + obstacle.height }, { x: obstacle.x, y: obstacle.y + obstacle.height }],
-        [{ x: obstacle.x, y: obstacle.y + obstacle.height }, { x: obstacle.x, y: obstacle.y }]
-    ];
-
-    // Check intersection between line segment and each edge
-    return edges.some((edge) => lineIntersectsLine(pointA, pointB, edge[0], edge[1]));
-}
-
-function lineIntersectsLine(a, b, c, d) {
-    const denominator = (b.y - a.y) * (d.x - c.x) - (a.x - b.x) * (c.y - d.y);
-    if (denominator === 0) {
-        return false; // Parallel lines, no intersection
+// Function to calculate the intersection point between two vectors
+function calculateIntersectionPoint(start1X, start1Y, vector1, start2X, start2Y, vector2) {
+    const den = vector1.x * vector2.y - vector1.y * vector2.x;
+    if (den === 0) {
+        return null; // Vectors are parallel
     }
 
-    const ua = ((a.x - c.x) * (d.y - c.y) - (a.y - c.y) * (d.x - c.x)) / denominator;
-    const ub = ((b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x)) / denominator;
+    const t = ((start2X - start1X) * vector2.y - (start2Y - start1Y) * vector2.x) / den;
+    const u = -((start1X - start2X) * vector1.y - (start1Y - start2Y) * vector1.x) / den;
+
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+        // Calculate intersection point coordinates
+        const intersectionX = start1X + t * vector1.x;
+        const intersectionY = start1Y + t * vector1.y;
+        return { x: intersectionX, y: intersectionY };
+    } else {
+        return null; // Intersection point lies outside the vectors
+    }
+}
+
+// Function to check if a point lies on a line segment
+function isPointOnLineSegment(pointX, pointY, lineStartX, lineStartY, lineEndX, lineEndY) {
+    const minX = Math.min(lineStartX, lineEndX);
+    const maxX = Math.max(lineStartX, lineEndX);
+    const minY = Math.min(lineStartY, lineEndY);
+    const maxY = Math.max(lineStartY, lineEndY);
+
+    return pointX >= minX && pointX <= maxX && pointY >= minY && pointY <= maxY;
+}
+// Function to check if a line segment intersects with a rectangle
+function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
+    // Check if any of the line segment end points are inside the rectangle
+    if ((x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh) ||
+        (x2 >= rx && x2 <= rx + rw && y2 >= ry && y2 <= ry + rh)) {
+        return true;
+    }
+
+    // Check if any of the rectangle's edges intersect with the line segment
+    const topIntersects = lineIntersectsLine(x1, y1, x2, y2, rx, ry, rx + rw, ry);
+    const bottomIntersects = lineIntersectsLine(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh);
+    const leftIntersects = lineIntersectsLine(x1, y1, x2, y2, rx, ry, rx, ry + rh);
+    const rightIntersects = lineIntersectsLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh);
+
+    return topIntersects || bottomIntersects || leftIntersects || rightIntersects;
+}
+
+// Function to check if two line segments intersect
+function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
+    const den = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+    if (den === 0) {
+        return false;
+    }
+
+    const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / den;
+    const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / den;
 
     return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
 }
