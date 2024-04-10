@@ -231,7 +231,7 @@ function shootLaser(targetX, targetY) {
     if (currentTime - lastLaserShot < laserCooldown) {
         return; // Laser is still on cooldown
     } else {
-        laser.isShooting = true;
+        isShooting = true;
 
         // Calculate the angle and distance to the canvas edge
         const snakeHeadX = snake[0].x * gridSize;
@@ -264,7 +264,7 @@ function shootLaser(targetX, targetY) {
 
         // After 5 seconds, reset the shooting state
         setTimeout(() => {
-            laser.isShooting = false;
+            isShooting = false;
             startCooldown()
         }, 5000);
 
