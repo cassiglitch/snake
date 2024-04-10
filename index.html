@@ -67,42 +67,7 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');function drawEatingAnimation() {
-    function LaserCharged{
-            var deviceWidth, landscape = Math.abs(window.orientation) == 90
-            // workaround for strange screen.height on the iPhone (v3.1.3)
-            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
-            else deviceWidth = window.screen[landscape ? "height" : "width"]
-            var zoomFactor = deviceWidth / window.innerWidth;
-            var antiZoomFactor = 1 / zoomFactor;
-    const animationColor = 'rgba(255, 0, 0, 0.5)'; // Blue color with transparency
-    let segmentSize = gridSize; // Adjust segment size based on anti-zoom factor
-    let waveSize = 5; // Adjust the size of the wave based on anti-zoom factor
-    let maxFrames = 8 * antiZoomFactor; // Number of frames for the eating animation
-
-    let head = snake[0];
-    let eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
-eatenSegments.forEach((segment, index) => {
-    let animationFrame = eatingAnimationFrames - index;
-    const segmentX = segment.x * gridSize;
-    const segmentY = segment.y * gridSize;
-
-    let originalOffset = waveSize * (maxFrames - animationFrame);
-    var scaledOffset = Math.max(0, Math.ceil(originalOffset * antiZoomFactor));
-
-    // Draw the wave-like effect
-    ctx.fillStyle = animationColor;
-    ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
-    ctx.fillRect(segmentX - scaledOffset, segmentY, segmentSize, segmentSize);
-    ctx.fillRect(segmentX + scaledOffset, segmentY, segmentSize, segmentSize);
-    ctx.fillRect(segmentX, segmentY - scaledOffset, segmentSize, segmentSize);
-    ctx.fillRect(segmentX, segmentY + scaledOffset, segmentSize, segmentSize);
-
-    // Draw the original segment
-    ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
-});
-
-originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
-}
+    
         let lives = 0.5
         let maxscore = 100;
         let startingGridSize = 20;
@@ -355,6 +320,49 @@ function checkLaserCollision() {
     }
 }
 
+function LaserCharged() {
+    var deviceWidth, landscape = Math.abs(window.orientation) == 90
+            // workaround for strange screen.height on the iPhone (v3.1.3)
+            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+            else deviceWidth = window.screen[landscape ? "height" : "width"]
+            var zoomFactor = deviceWidth / window.innerWidth;
+            var antiZoomFactor = 1 / zoomFactor;
+    const orangeColor_combined = 'rgba(255, 165, 0, 0.3)';
+    const blueColor_combined = 'rgba(0, 0, 255, 0.5)';
+    const shadowSize_combined = Math.max(0, Math.ceil(10 * antiZoomFactor));
+    const waveSize_combined = 5;
+    const maxFrames_combined = 8;
+    const eatingAnimationFrames_combined = 0; // Assuming eatingAnimationFrames was defined elsewhere
+
+    snake.forEach((segment_combined, index_combined) => {
+        ctx.fillStyle = orangeColor_combined;
+        ctx.fillRect(segment_combined.x * gridSize - shadowSize_combined, segment_combined.y * gridSize - shadowSize_combined, gridSize + shadowSize_combined * 2, gridSize + shadowSize_combined * 2);
+    });
+
+    const head_combined = snake[0];
+    const eatenSegments_combined = snake.slice(1, eatingAnimationFrames_combined + 1);
+    eatenSegments_combined.forEach((segment_combined, index_combined) => {
+        const animationFrame_combined = eatingAnimationFrames_combined - index_combined;
+        const segmentX_combined = segment_combined.x * gridSize;
+        const segmentY_combined = segment_combined.y * gridSize;
+        const originalOffset_combined = waveSize_combined * (maxFrames_combined - animationFrame_combined);
+        const scaledOffset_combined = Math.max(0, Math.ceil(originalOffset_combined * antiZoomFactor_combined));
+
+        // Draw the wave-like effect
+        ctx.fillStyle = blueColor_combined;
+        ctx.fillRect(segmentX_combined, segmentY_combined, gridSize, gridSize);
+        ctx.fillRect(segmentX_combined - scaledOffset_combined, segmentY_combined, gridSize, gridSize);
+        ctx.fillRect(segmentX_combined + scaledOffset_combined, segmentY_combined, gridSize, gridSize);
+        ctx.fillRect(segmentX_combined, segmentY_combined - scaledOffset_combined, gridSize, gridSize);
+        ctx.fillRect(segmentX_combined, segmentY_combined + scaledOffset_combined, gridSize, gridSize);
+
+        // Draw the original segment
+        ctx.fillRect(segmentX_combined, segmentY_combined, gridSize, gridSize);
+    });
+
+    // Reset snake color after eating animation
+    originalSnakeColor = '#00FF00';
+}
 
 
     
