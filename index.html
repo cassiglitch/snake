@@ -327,8 +327,8 @@ function LaserCharged() {
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-    const orangeColor_combined = 'rgba(255, 165, 0, 0.3)';
-    const blueColor_combined = 'rgba(0, 0, 255, 0.5)';
+    const orangeColor_combined = 'rgba(255,0 , 0, 0.3)';
+    const blueColor_combined = 'rgba(255, 0, 0, 0.5)';
     const shadowSize_combined = Math.max(0, Math.ceil(10 * antiZoomFactor));
     const waveSize_combined = 5;
     const maxFrames_combined = 8;
@@ -341,7 +341,7 @@ function LaserCharged() {
 
     const head_combined = snake[0];
     const eatenSegments_combined = snake.slice(1, eatingAnimationFrames_combined + 1);
-    eatenSegments_combined.forEach((segment_combined, index_combined) => {
+    eatenSegments_combined.forEach((segment_combined, inde) => {
         const animationFrame_combined = eatingAnimationFrames_combined - index_combined;
         const segmentX_combined = segment_combined.x * gridSize;
         const segmentY_combined = segment_combined.y * gridSize;
