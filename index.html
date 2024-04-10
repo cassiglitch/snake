@@ -788,10 +788,11 @@ function createParticles(colors) {
             x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
             y: (Math.random() - 0.5) * explosionForce * (Math.random() * 2)
         };
-        const particle = new Particle(headX, headY, radius, color, velocity);
+        const particle = new Particle(0, 0, radius, color, headX, headY);
         particles.push(particle);
     }
 }
+
 
 
 // Function to simulate holes
