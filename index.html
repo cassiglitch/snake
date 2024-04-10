@@ -780,9 +780,10 @@ class Particle {
 function createParticles(colors) {
     const headX = getSnakeHeadX();
     const headY = getSnakeHeadY();
+    const numColors = colors.length;
     for (let i = 0; i < numParticles; i++) {
         const radius = 5;
-        const color = colors[Math.floor(Math.random() * colors.length)];
+        const color = colors[i % numColors]; // Cycle through colors array
         const velocity = {
             x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
             y: (Math.random() - 0.5) * explosionForce * (Math.random() * 2)
@@ -791,6 +792,7 @@ function createParticles(colors) {
         particles.push(particle);
     }
 }
+
 
 // Function to simulate holes
 function simulateHoles(colors) {
@@ -803,6 +805,7 @@ function simulateHoles(colors) {
         });
     });
 }
+
 
 // Function to animate the explosion
 function animateExplosion() {
