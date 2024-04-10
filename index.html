@@ -182,7 +182,7 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
-const laserCooldown = 15 * 1000; // Cooldown period in milliseconds (30 seconds)
+const laserCooldown = 5 * 1000; // Cooldown period in milliseconds (30 seconds)
 
 // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
@@ -254,7 +254,7 @@ function shootLaser(targetX, targetY) {
         setTimeout(() => {
             isShooting = false;
             flashRed();
-        }, 15000);
+        }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
         lastLaserShot = currentTime;
