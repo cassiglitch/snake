@@ -67,7 +67,22 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
+function flashRed() {
+    // Set fill color to red
+    ctx.fillStyle = 'red';
 
+    // Fill the entire canvas with red
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Set a timeout to clear the canvas after a short delay
+    setTimeout(clearCanvas, 10);
+}
+
+// Function to clear the canvas
+function clearCanvas() {
+    // Clear the entire canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
         let lives = 0.5
         let maxscore = 100;
         let startingGridSize = 20;
@@ -238,7 +253,7 @@ function shootLaser(targetX, targetY) {
         // After 5 seconds, reset the shooting state and clear the laser
         setTimeout(() => {
             isShooting = false;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            flashRed();
         }, 15000);
 
         // Update the timestamp of the last laser shot
