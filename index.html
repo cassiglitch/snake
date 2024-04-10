@@ -87,7 +87,7 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-let LaserChargeTime = 2.5
+let LaserChargeTime = 5
 let cooldownDuration = LaserChargeTime * 1000; // Cooldown duration in milliseconds (7.5 seconds)
 let cooldownStartTime = 0; // Timestamp of the cooldown start
 
@@ -709,7 +709,7 @@ if (laser.isShooting) {
 
         function restartGame() {
             pauseGame();
-            createParticles('red');
+            createParticles(['red', orange]);
             animateExplosion();
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
@@ -726,10 +726,9 @@ if (laser.isShooting) {
 
         function declareVictory() {
             pauseGame()
-            createParticles('gold');
+            createParticles(['gold', 'green']);
             animateExplosion();
-            createParticles('green');
-            animateExplosion();
+            createShockwave()
             pauseGame()
             restartGame();
         }
@@ -751,18 +750,20 @@ function getSnakeHeadY() {
     return snake[0].y * gridSize + gridSize / 2;
 }
 
-// Modify the Particle constructor to accept head position parameters
-function Particle(x, y, radius, color, headX, headY) {
-                var deviceWidth, landscape = Math.abs(window.orientation) == 90
-            // workaround for strange screen.height on the iPhone (v3.1.3)
-            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
-            else deviceWidth = window.screen[landscape ? "height" : "width"]
-            var zoomFactor = deviceWidth / window.innerWidth;
-            var antiZoomFactor = 1 / zoomFactor;
+// Modify the Particle constructor to accept head position parameters and an array of colors
+function Particle(x, y, radius, colors, headX, headY) {
+    var deviceWidth, landscape = Math.abs(window.orientation) == 90
+    // workaround for strange screen.height on the iPhone (v3.1.3)
+    if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+    else deviceWidth = window.screen[landscape ? "height" : "width"]
+    var zoomFactor = deviceWidth / window.innerWidth;
+    var antiZoomFactor = 1 / zoomFactor;
+
     this.x = x + headX; // Calculate the particle's position relative to the snake's head
     this.y = y + headY;
     this.radius = ((radius / 2) * antiZoomFactor);
-    this.color = color;
+    this.colors = colors; // Array of colors
+    this.color = this.colors[Math.floor(Math.random() * this.colors.length)]; // Randomly select a color from the array
     this.velocity = {
         x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
         y: (Math.random() - 0.5) * explosionForce * (Math.random() * 2)
@@ -779,23 +780,21 @@ function Particle(x, y, radius, color, headX, headY) {
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = 'gold';
+        ctx.fillStyle = this.color; // Use the selected color
         ctx.fill();
         ctx.restore();
     };
 }
 
-// Modify the createParticles function to pass head position parameters
-        function createParticles(colorName) {
-            const color = tinycolor(colorName).toHexString(); // Convert color name to hexadecimal color code
-            const headX = getSnakeHeadX();
-            const headY = getSnakeHeadY();
-            for (let i = 0; i < numParticles; i++) {
-                const particle = new Particle(0, 0, 5, color, headX, headY);
-                particles.push(particle);
-            }
-        }
-
+// Modify the createParticles function to pass head position parameters and an array of colors
+function createParticles(colors) {
+    const headX = getSnakeHeadX();
+    const headY = getSnakeHeadY();
+    for (let i = 0; i < numParticles; i++) {
+        const particle = new Particle(0, 0, 5, colors, headX, headY);
+        particles.push(particle);
+    }
+}
 
 function simulateHoles(color) {
     ctx.fillStyle = color; // Use the color passed as a parameter
@@ -825,6 +824,18 @@ function animateExplosion() {
     if (particles.length > 0) {
         requestAnimationFrame(animateExplosion);
     }
+}
+
+// Function to create shockwave at the center of the explosion
+function createShockwave() {
+    const headX = getSnakeHeadX();
+    const headY = getSnakeHeadY();
+    
+    ctx.beginPath();
+    ctx.arc(headX, headY, 50, 0, Math.PI * 2);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.stroke();
 }
 
 
