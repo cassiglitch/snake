@@ -776,13 +776,11 @@ function Particle(x, y, radius, colors, headX, headY) {
 }
 
 // Modify the createParticles function to pass head position parameters and an array of color names
-function createParticles(colorNames) {
+function createParticles(colors) {
     const headX = getSnakeHeadX();
     const headY = getSnakeHeadY();
     for (let i = 0; i < numParticles; i++) {
-        const randomColorName = colorNames[Math.floor(Math.random() * colorNames.length)]; // Randomly select a color name from the array
-        const color = tinycolor(randomColorName).toHexString(); // Convert color name to hexadecimal color code
-        const particle = new Particle(0, 0, 5, color, headX, headY);
+        const particle = new Particle(0, 0, 5, colors, headX, headY); // Pass the array of colors directly
         particles.push(particle);
     }
 }
@@ -833,6 +831,7 @@ function createShockwave() {
 createParticles(['gold', 'red', 'blue']); // Example with multiple colors
 animateExplosion();
 createShockwave();
+
 
 
 
