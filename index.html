@@ -207,7 +207,7 @@ canvas.addEventListener('touchend', handleTapEnd);
 
 // Drawing function to draw the laser with fade effect
 function drawLaser() {
-    if (laser.isShooting) {
+    if (laser.isShooting = true) {
         // Calculate the alpha value for the fade effect
         const currentTime = Date.now();
         const elapsedTime = currentTime - laserStartTime;
