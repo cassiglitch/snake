@@ -87,8 +87,8 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-
-const cooldownDuration = 30000; // Cooldown duration in milliseconds (7.5 seconds)
+let LaserChargeTime = 7.5
+const cooldownDuration = LaserChargeTime * 1000; // Cooldown duration in milliseconds (7.5 seconds)
 let cooldownStartTime = 0; // Timestamp of the cooldown start
 
 const cooldownMeter = document.querySelector('.cooldown-progress');
@@ -224,7 +224,7 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
-const laserCooldown = 30 * 1000; // Cooldown period in milliseconds (30 seconds)
+const cooldownDuration = LaserChargeTime * 1000; // Cooldown period in milliseconds (30 seconds)
 
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
