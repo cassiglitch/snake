@@ -709,7 +709,7 @@ if (laser.isShooting) {
 
         function restartGame() {
             pauseGame();
-            createParticles(['red', orange]);
+            createParticles(['red', 'orange']);
             animateExplosion();
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
@@ -728,7 +728,6 @@ if (laser.isShooting) {
             pauseGame()
             createParticles(['gold', 'green']);
             animateExplosion();
-            createShockwave()
             pauseGame()
             restartGame();
         }
