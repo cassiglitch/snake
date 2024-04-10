@@ -196,6 +196,7 @@ function handleTapEnd(event) {
             const canvasX = tapEndX - canvasRect.left;
             const canvasY = tapEndY - canvasRect.top;
             shootLaser(canvasX, canvasY);
+            startCooldown()
         }
     }
 }
