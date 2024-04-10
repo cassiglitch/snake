@@ -56,22 +56,6 @@
                 opacity: 0; /* Invisible */
             }
         }
-        .cooldown-meter {
-    width: 200px;
-    height: 20px;
-    background-color: #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.cooldown-progress {
-    width: 100%;
-    height: 100%;
-    background-color: #4CAF50;
-    border-radius: 10px;
-    transition: width 0.1s linear; /* Smooth transition */
-}
-
     </style>
     <title>Snake Game</title>
 </head>
@@ -80,50 +64,9 @@
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
         <div id="victoryMessage"></div>
-    <div class="cooldown-meter">
-    <div class="cooldown-progress"></div>
-</div>
-
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-let LaserChargeTime = 5
-let cooldownDuration = LaserChargeTime * 1000; // Cooldown duration in milliseconds (7.5 seconds)
-let cooldownStartTime = 0; // Timestamp of the cooldown start
-
-const cooldownMeter = document.querySelector('.cooldown-progress');
-
-function startCooldown() {
-    cooldownStartTime = Date.now();
-
-    // Start the cooldown animation
-    cooldownMeter.style.transition = `width ${cooldownDuration}ms linear`;
-    cooldownMeter.style.width = '0'; // Reset progress bar width
-
-    // Update the cooldown progress
-    updateCooldown();
-}
-
-function updateCooldown() {
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - cooldownStartTime;
-    const remainingTime = cooldownDuration - elapsedTime;
-
-    // Calculate the remaining cooldown percentage
-    const cooldownPercentage = Math.max(0, (remainingTime / cooldownDuration) * 100);
-
-    // Update the progress bar width
-    cooldownMeter.style.width = `${cooldownPercentage}%`;
-
-    if (remainingTime > 0) {
-        // Continue updating the cooldown progress
-        requestAnimationFrame(updateCooldown);
-    } else {
-        // Cooldown has ended, reset progress bar
-        cooldownMeter.style.width = '100%';
-    }
-}
-
 
         let lives = 0.5
         let maxscore = 100;
@@ -224,7 +167,7 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
-const laserCooldown = LaserChargeTime * 1000; // Cooldown period in milliseconds (30 seconds)
+const laserCooldown = 7.5 * 1000; // Cooldown period in milliseconds (30 seconds)
 
 // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
@@ -248,17 +191,49 @@ function shootLaser(targetX, targetY) {
         const endX = snakeHeadX + Math.cos(angle) * canvas.width;
         const endY = snakeHeadY + Math.sin(angle) * canvas.height;
 
+        // Discretize the laser path into segments for more precise collision detection
+        const numSegments = Math.ceil(distance / 10); // Adjust segment length as needed
+        const segmentX = dx / numSegments;
+        const segmentY = dy / numSegments;
+        let currentX = snakeHeadX;
+        let currentY = snakeHeadY;
+
         // Draw the laser
         ctx.beginPath();
         ctx.moveTo(snakeHeadX, snakeHeadY);
+
+        // Iterate through each segment of the laser path
+        for (let i = 0; i < numSegments; i++) {
+            const nextX = currentX + segmentX;
+            const nextY = currentY + segmentY;
+
+            // Check for collision with obstacles
+            obstacles.forEach((obstacle, index) => {
+                if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
+                    // Remove the obstacle from the array
+                    obstacles.splice(index, 1);
+                }
+            });
+
+            // Check for collision with dynamic obstacles
+            dynamicObstacles.forEach((obstacle, index) => {
+                if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2)) {
+                    // Remove the dynamic obstacle from the array
+                    dynamicObstacles.splice(index, 1);
+                }
+            });
+
+            // Update current position for the next segment
+            currentX = nextX;
+            currentY = nextY;
+        }
+
+        // Draw the laser line to the end point
         ctx.lineTo(endX, endY);
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 20;
         ctx.lineCap = 'round';
         ctx.stroke();
-
-        // Check for collision with obstacles
-        checkLaserCollision();
 
         // After 5 seconds, reset the shooting state and clear the laser
         setTimeout(() => {
@@ -272,102 +247,6 @@ function shootLaser(targetX, targetY) {
 }
 
 
-// Updated laser collision detection
-function checkLaserCollision() {
-    const snakeHeadX = snake[0].x * gridSize;
-    const snakeHeadY = snake[0].y * gridSize;
-    const dx = targetX - snakeHeadX;
-    const dy = targetY - snakeHeadY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx);
-
-    // Define laser beam parameters
-    const laserWidth = 20; // Width of the laser beam
-    const laserLength = distance; // Length of the laser beam
-    const laserStartX = snakeHeadX;
-    const laserStartY = snakeHeadY;
-    const laserEndX = targetX;
-    const laserEndY = targetY;
-
-    // Iterate through obstacles for collision detection
-    obstacles.forEach((obstacle, index) => {
-        // Check if the bounding boxes of the laser and obstacle intersect
-        if (boundingBoxesIntersect(laserStartX, laserStartY, laserEndX, laserEndY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
-            // Perform detailed intersection detection
-            if (laserIntersectsObstacle(laserStartX, laserStartY, laserEndX, laserEndY, obstacle)) {
-                // Remove the obstacle from the array
-                obstacles.splice(index, 1);
-            }
-        }
-    });
-}
-
-// Function to check if the bounding boxes of two objects intersect
-function boundingBoxesIntersect(x1, y1, x2, y2, rx, ry, rw, rh) {
-    return x1 < rx + rw &&
-        x1 + laserWidth > rx &&
-        y1 < ry + rh &&
-        y1 + laserWidth > ry;
-}
-
-// Function to check if the laser intersects with an obstacle
-function laserIntersectsObstacle(laserStartX, laserStartY, laserEndX, laserEndY, obstacle) {
-    // Vector representing the laser beam
-    const laserVector = { x: laserEndX - laserStartX, y: laserEndY - laserStartY };
-
-    // Iterate through each edge of the obstacle
-    for (let i = 0; i < obstacle.edges.length; i++) {
-        const edge = obstacle.edges[i];
-        const edgeStartX = edge[0].x * gridSize;
-        const edgeStartY = edge[0].y * gridSize;
-        const edgeEndX = edge[1].x * gridSize;
-        const edgeEndY = edge[1].y * gridSize;
-
-        // Vector representing the obstacle edge
-        const obstacleVector = { x: edgeEndX - edgeStartX, y: edgeEndY - edgeStartY };
-
-        // Calculate the intersection point between the laser beam and the obstacle edge
-        const intersectionPoint = calculateIntersectionPoint(laserStartX, laserStartY, laserVector, edgeStartX, edgeStartY, obstacleVector);
-
-        // Check if the intersection point is within the bounds of the obstacle edge
-        if (intersectionPoint && isPointOnLineSegment(intersectionPoint.x, intersectionPoint.y, edgeStartX, edgeStartY, edgeEndX, edgeEndY)) {
-            // Collision detected, remove the obstacle
-            return true;
-        }
-    }
-
-    return false;
-}
-
-// Function to calculate the intersection point between two vectors
-function calculateIntersectionPoint(start1X, start1Y, vector1, start2X, start2Y, vector2) {
-    const den = vector1.x * vector2.y - vector1.y * vector2.x;
-    if (den === 0) {
-        return null; // Vectors are parallel
-    }
-
-    const t = ((start2X - start1X) * vector2.y - (start2Y - start1Y) * vector2.x) / den;
-    const u = -((start1X - start2X) * vector1.y - (start1Y - start2Y) * vector1.x) / den;
-
-    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-        // Calculate intersection point coordinates
-        const intersectionX = start1X + t * vector1.x;
-        const intersectionY = start1Y + t * vector1.y;
-        return { x: intersectionX, y: intersectionY };
-    } else {
-        return null; // Intersection point lies outside the vectors
-    }
-}
-
-// Function to check if a point lies on a line segment
-function isPointOnLineSegment(pointX, pointY, lineStartX, lineStartY, lineEndX, lineEndY) {
-    const minX = Math.min(lineStartX, lineEndX);
-    const maxX = Math.max(lineStartX, lineEndX);
-    const minY = Math.min(lineStartY, lineEndY);
-    const maxY = Math.max(lineStartY, lineEndY);
-
-    return pointX >= minX && pointX <= maxX && pointY >= minY && pointY <= maxY;
-}
 // Function to check if a line segment intersects with a rectangle
 function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
     // Check if any of the line segment end points are inside the rectangle
@@ -398,6 +277,52 @@ function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
     return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
 }
 
+// Updated laser collision detection
+function checkLaserCollision() {
+    const snakeHeadX = snake[0].x * gridSize;
+    const snakeHeadY = snake[0].y * gridSize;
+    const dx = targetX - snakeHeadX;
+    const dy = targetY - snakeHeadY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const angle = Math.atan2(dy, dx);
+
+    // Discretize the laser path into segments for collision detection
+    const numSegments = Math.ceil(distance / 10);
+    const segmentX = dx / numSegments;
+    const segmentY = dy / numSegments;
+    let currentX = snakeHeadX;
+    let currentY = snakeHeadY;
+
+    // Iterate through each segment of the laser path
+    for (let i = 0; i < numSegments; i++) {
+        const nextX = currentX + segmentX;
+        const nextY = currentY + segmentY;
+
+        // Check for collision with obstacles
+        obstacles.forEach((obstacle, index) => {
+            if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
+                // Remove the obstacle from the array
+                obstacles.splice(index, 1);
+            }
+        });
+
+        // Check for collision with dynamic obstacles
+        dynamicObstacles.forEach((obstacle, index) => {
+            if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2)) {
+                // Remove the dynamic obstacle from the array
+                dynamicObstacles.splice(index, 1);
+            }
+        });
+
+        // Update current position for the next segment
+        currentX = nextX;
+        currentY = nextY;
+    }
+}
+
+
+
+    
 // Function to pause the game
 function pauseGame() {
     isPaused = !isPaused; // Toggle the paused state
@@ -709,7 +634,7 @@ if (laser.isShooting) {
 
         function restartGame() {
             pauseGame();
-            createParticles(['red', 'orange']);
+            createParticles('red');
             animateExplosion();
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
@@ -726,22 +651,41 @@ if (laser.isShooting) {
 
         function declareVictory() {
             pauseGame()
-            createParticles(['gold', 'green']);
+            createParticles('gold');
+            createParticles('green');
             animateExplosion();
             pauseGame()
             restartGame();
         }
+        
+// Set up explosion animation properties
 let particles = [];
 const numParticles = 200;
 const explosionForce = 50;
 const holeSize = 20 * antiZoomFactor;
-const shockwaveRadius = 50;
 
 // Function to create a particle
+// Function to calculate the X position of the snake's head
+function getSnakeHeadX() {
+    return snake[0].x * gridSize + gridSize / 2;
+}
+
+// Function to calculate the Y position of the snake's head
+function getSnakeHeadY() {
+    return snake[0].y * gridSize + gridSize / 2;
+}
+
+// Modify the Particle constructor to accept head position parameters
 function Particle(x, y, radius, color, headX, headY) {
+                var deviceWidth, landscape = Math.abs(window.orientation) == 90
+            // workaround for strange screen.height on the iPhone (v3.1.3)
+            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+            else deviceWidth = window.screen[landscape ? "height" : "width"]
+            var zoomFactor = deviceWidth / window.innerWidth;
+            var antiZoomFactor = 1 / zoomFactor;
     this.x = x + headX; // Calculate the particle's position relative to the snake's head
     this.y = y + headY;
-    this.radius = radius;
+    this.radius = ((radius / 2) * antiZoomFactor);
     this.color = color;
     this.velocity = {
         x: (Math.random() - 0.5) * explosionForce * (Math.random() * 2),
@@ -759,34 +703,26 @@ function Particle(x, y, radius, color, headX, headY) {
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.restore();
     };
 }
 
-// Function to create shockwave
-function createShockwave(x, y, color) {
-    ctx.beginPath();
-    ctx.arc(x, y, shockwaveRadius, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-}
-
-// Function to create particles with multiple colors
-function createParticles(colors) {
-    const headX = getSnakeHeadX();
-    const headY = getSnakeHeadY();
-    colors.forEach(color => {
-        for (let i = 0; i < numParticles; i++) {
-            const particle = new Particle(0, 0, 5, color, headX, headY);
-            particles.push(particle);
+// Modify the createParticles function to pass head position parameters
+        function createParticles(colorName) {
+            const color = tinycolor(colorName).toHexString(); // Convert color name to hexadecimal color code
+            const headX = getSnakeHeadX();
+            const headY = getSnakeHeadY();
+            for (let i = 0; i < numParticles; i++) {
+                const particle = new Particle(0, 0, 5, color, headX, headY);
+                particles.push(particle);
+            }
         }
-    });
-}
 
-// Function to simulate holes
-function simulateHoles() {
+
+function simulateHoles(color) {
+    ctx.fillStyle = color; // Use the color passed as a parameter
     particles.forEach(particle => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, holeSize, 0, Math.PI * 2);
@@ -794,13 +730,9 @@ function simulateHoles() {
     });
 }
 
-// Function to animate explosion
 function animateExplosion() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw shockwave at the center of explosion
-    createShockwave(getSnakeHeadX(), getSnakeHeadY(), 'rgba(255, 255, 255, 0.5)');
 
     // Update and draw particles
     particles.forEach((particle, index) => {
@@ -810,20 +742,14 @@ function animateExplosion() {
         }
     });
 
-    // Simulate holes
-    simulateHoles();
+    // Simulate holes with the color of the particles
+    simulateHoles(particles[0].color); // Pass the color of the first particle
 
     // Request animation frame
     if (particles.length > 0) {
         requestAnimationFrame(animateExplosion);
     }
 }
-
-        // Call the functions to initiate the explosion animation
-createParticles(['gold', 'red', 'blue']); // Example with multiple colors
-animateExplosion();
-createShockwave();
-
 
 
         function gameLoop() {
