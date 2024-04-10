@@ -472,6 +472,7 @@ function HaHaNoCollision(duration) {
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
             lives = (lives * 2);
+            HaHaNoCollision(10)
         } else {
             restartGame(); // End the game if segments (lives) run out
             return;
