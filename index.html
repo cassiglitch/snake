@@ -203,14 +203,16 @@ function shootLaser(targetX, targetY) {
 
             // Check for collision with obstacles
             obstacles.forEach((obstacle, index) => {
-if (checkCollisionWithObstacles(laser, obstacles, dynamicObstacles)) {
+                if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
+                    // Remove the obstacle from the array
                     obstacles.splice(index, 1);
                 }
             });
 
             // Check for collision with dynamic obstacles
             dynamicObstacles.forEach((obstacle, index) => {
-if (checkCollisionWithObstacles(laser, obstacles, dynamicObstacles)) {    // Remove the dynamic obstacle from the array
+                if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2)) {
+                    // Remove the dynamic obstacle from the array
                     dynamicObstacles.splice(index, 1);
                 }
             });
@@ -239,6 +241,7 @@ if (checkCollisionWithObstacles(laser, obstacles, dynamicObstacles)) {    // Rem
 }
 
 
+// Function to check if a line segment intersects with a rectangle
 function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
     // Check if any of the line segment end points are inside the rectangle
     if ((x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh) ||
@@ -268,32 +271,6 @@ function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
     return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
 }
 
-function checkCollisionWithObstacles(laser, obstacles, dynamicObstacles) {
-    // Iterate through each segment of the laser path
-    for (let i = 0; i < numSegments; i++) {
-        const currentX = laser.x1 + (segmentX * i);
-        const currentY = laser.y1 + (segmentY * i);
-
-        // Check for collision with obstacles
-        for (const obstacle of obstacles) {
-            if (lineIntersectsRect(currentX, currentY, laser.x2, laser.y2, obstacle.x, obstacle.y, 1, 1)) {
-                // Collision with a static obstacle, return true
-                return true;
-            }
-        }
-
-        // Check for collision with dynamic obstacles
-        for (const obstacle of dynamicObstacles) {
-            if (lineIntersectsRect(currentX, currentY, laser.x2, laser.y2, obstacle.x, obstacle.y, 2, 2)) {
-                // Collision with a dynamic obstacle, return true
-                return true;
-            }
-        }
-    }
-
-    // No collisions detected
-    return false;
-}
 // Updated laser collision detection
 function checkLaserCollision() {
     const snakeHeadX = snake[0].x * gridSize;
