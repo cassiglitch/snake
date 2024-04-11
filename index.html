@@ -87,6 +87,7 @@
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
+        let isFoodOrange = false;
         let originalSnakeColor = '#00FF00';
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
@@ -160,7 +161,7 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
-const laserCooldown = 5 * 1000; // Cooldown period in milliseconds (30 seconds)
+const laserCooldown = 15 * 1000; // Cooldown period in milliseconds (30 seconds)
 
 // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
@@ -168,12 +169,10 @@ function shootLaser(targetX, targetY) {
 
     // Check if the cooldown period has elapsed
     if (currentTime - lastLaserShot < laserCooldown) {
-        charging = true
-        drawInvincibilityAura()
         return; // Laser is still on cooldown
     } else {
         isShooting = true;
-charging = false
+        charging = false;
         // Calculate the angle and distance to the canvas edge
         const snakeHeadX = snake[0].x * gridSize;
         const snakeHeadY = snake[0].y * gridSize;
@@ -233,6 +232,7 @@ charging = false
         // After 5 seconds, reset the shooting state and clear the laser
         setTimeout(() => {
             isShooting = false;
+            charging = true;
         }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
@@ -326,8 +326,25 @@ function draw() {
 
     // Layer 1: Draw Invincibility Aura
     if (isInvincible) {
-        drawInvincibilityAura();
+        drawInvincibilityAura('orange');
     }
+    const currentTime = new Date().getTime();
+ if (charging === true & !(currentTime - lastLaserShot < laserCooldown)){
+     drawInvincibilityAura('red');
+     setTimeout(() => {
+    charging = false;
+    }, 1000);
+ }
+
+
+
+if (isFoodOrange === true) {
+                    drawInvincibilityAura('green');
+setTimeout(() => {
+    isFoodOrange = false;
+            }, 400);
+
+}
 
     // Layer 2: Draw Snake Body
     snake.forEach((segment, index) => {
@@ -365,20 +382,30 @@ function draw() {
     drawLaser();
 }
 
-function drawInvincibilityAura() {
-    var deviceWidth, landscape = Math.abs(window.orientation) == 90
-            // workaround for strange screen.height on the iPhone (v3.1.3)
-            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
-            else deviceWidth = window.screen[landscape ? "height" : "width"]
-            var zoomFactor = deviceWidth / window.innerWidth;
-            var antiZoomFactor = 1 / zoomFactor;
-        getZoomFactor()
-        snake.forEach((segment, index) => {
+function drawInvincibilityAura(colorName) {
+    // Mapping of color names to RGBA values
+    const colorMap = {
+        'red': 'rgba(255, 0, 0, 0.3)',
+        'green': 'rgba(0, 255, 0, 0.3)',
+        'blue': 'rgba(0, 0, 255, 0.3)',
+        // Add more colors as needed
+    };
+    
+    var deviceWidth, landscape = Math.abs(window.orientation) == 90;
+    // workaround for strange screen.height on the iPhone (v3.1.3)
+    if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320;
+    else deviceWidth = window.screen[landscape ? "height" : "width"];
+    var zoomFactor = deviceWidth / window.innerWidth;
+    var antiZoomFactor = 1 / zoomFactor;
+    getZoomFactor();
+    snake.forEach((segment, index) => {
         const shadowSize = 8 * antiZoomFactor; // Adjust the size of the shadow
-        ctx.fillStyle = 'rgba(255, 100, 0, 0.3)'; // Orange color with transparency
+        // Set color based on the input color name
+        ctx.fillStyle = colorMap[colorName.toLowerCase()] || 'rgba(255, 135, 0, 0.3)'; // Default to orange if color name not found
         ctx.fillRect(segment.x * gridSize - shadowSize, segment.y * gridSize - shadowSize, gridSize + shadowSize * 2, gridSize + shadowSize * 2);
     });
 }
+
 
 function drawEatingAnimation() {
     getZoomFactor()
@@ -510,7 +537,10 @@ function HaHaNoCollision(duration) {
     direction = directions[randomIndex];
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
-HaHaNoCollision(50)
+                isFoodOrange = true; 
+                lives = (lives/2);
+HaHaNoCollision(100)
+// Use a for loop to repeat the action
                 } else {
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
@@ -587,7 +617,7 @@ HaHaNoCollision(50)
         function generateFoodType() {
             // Adjust the probability for different types of food as needed
             const random = Math.random();
-            if (random === 0.1) {
+            if (random <= 0.01) {
                 return 'invincibility';
             } else if (random <= 0.2) {
                 return 'superfood';
@@ -625,6 +655,7 @@ HaHaNoCollision(50)
             score = 0;
             isEating = false;
             eatingAnimationFrames = 0;
+            lives = 0.5
             spawnFood();
         }
 
