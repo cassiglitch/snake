@@ -238,36 +238,6 @@ function shootLaser(targetX, targetY) {
         setTimeout(() => {
             isShooting = false;
             charging = true;
-            let alpha = 1;
-            const fadeInterval = setInterval(() => {
-                alpha -= 0.05; // Reduce alpha by 0.05 every 50 milliseconds
-                if (alpha <= 0) {
-                    clearInterval(fadeInterval); // Stop fading when alpha reaches 0
-                    // Clear the laser line by redrawing with fully transparent color
-                    ctx.strokeStyle = 'rgba(255, 0, 0, 0)';
-                    ctx.beginPath();
-                    laserPixels.forEach((pixel, index) => {
-                        if (index === 0) {
-                            ctx.moveTo(pixel.x, pixel.y);
-                        } else {
-                            ctx.lineTo(pixel.x, pixel.y);
-                        }
-                    });
-                    ctx.stroke();
-                } else {
-                    // Draw the laser line with reduced alpha
-                    ctx.strokeStyle = `rgba(255, 0, 0, ${alpha})`;
-                    ctx.beginPath();
-                    laserPixels.forEach((pixel, index) => {
-                        if (index === 0) {
-                            ctx.moveTo(pixel.x, pixel.y);
-                        } else {
-                            ctx.lineTo(pixel.x, pixel.y);
-                        }
-                    });
-                    ctx.stroke();
-                }
-            }, 50); // Fade every 50 milliseconds
         }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
@@ -275,80 +245,6 @@ function shootLaser(targetX, targetY) {
     }
 }
 
-
-        // Function to check if a line segment intersects with a rectangle
-function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
-    // Check if any of the line segment end points are inside the rectangle
-    if ((x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh) ||
-        (x2 >= rx && x2 <= rx + rw && y2 >= ry && y2 <= ry + rh)) {
-        return true;
-    }
-
-    // Check if any of the rectangle's edges intersect with the line segment
-    const topIntersects = lineIntersectsLine(x1, y1, x2, y2, rx, ry, rx + rw, ry);
-    const bottomIntersects = lineIntersectsLine(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh);
-    const leftIntersects = lineIntersectsLine(x1, y1, x2, y2, rx, ry, rx, ry + rh);
-    const rightIntersects = lineIntersectsLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh);
-
-    return topIntersects || bottomIntersects || leftIntersects || rightIntersects;
-}
-
-// Function to check if two line segments intersect
-function lineIntersectsLine(x1, y1, x2, y2, x3, y3, x4, y4) {
-    const den = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-    if (den === 0) {
-        return false;
-    }
-
-    const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / den;
-    const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / den;
-
-    return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
-}
-
-// Updated laser collision detection
-function checkLaserCollision() {
-    const snakeHeadX = snake[0].x * gridSize;
-    const snakeHeadY = snake[0].y * gridSize;
-    const dx = targetX - snakeHeadX;
-    const dy = targetY - snakeHeadY;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx);
-
-    // Discretize the laser path into segments for collision detection
-    const numSegments = Math.ceil(distance / 10);
-    const segmentX = dx / numSegments;
-    const segmentY = dy / numSegments;
-    let currentX = snakeHeadX;
-    let currentY = snakeHeadY;
-
-    // Iterate through each segment of the laser path
-    for (let i = 0; i < numSegments; i++) {
-        const nextX = currentX + segmentX;
-        const nextY = currentY + segmentY;
-
-        // Check for collision with obstacles
-        obstacles.forEach((obstacle, index) => {
-            if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
-                // Remove the obstacle from the array
-                obstacles.splice(index, 1);
-            }
-        });
-
-        // Check for collision with dynamic obstacles
-        dynamicObstacles.forEach((obstacle, index) => {
-            if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2)) {
-                // Remove the dynamic obstacle from the array
-                dynamicObstacles.splice(index, 1);
-            }
-        });
-
-        // Update current position for the next segment
-        currentX = nextX;
-        currentY = nextY;
-    }
-}
-        
 // Function to pause the game
 function pauseGame() {
     isPaused = !isPaused; // Toggle the paused state
