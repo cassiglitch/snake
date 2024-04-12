@@ -498,6 +498,7 @@ function HaHaNoCollision(duration) {
             livecount = livecount - 1;
             HaHaNoCollision(10)
         } else {
+            livecount = livecount - 1;
             restartGame(); // End the game if segments (lives) run out
             return;
         }              
@@ -650,7 +651,8 @@ HaHaNoCollision(100)
             score = 0;
             isEating = false;
             eatingAnimationFrames = 0;
-            lives = 0.5
+            lives = 0.5;
+            livecount = 2;
             spawnFood();
         }
 
