@@ -197,6 +197,13 @@ function shootLaser(targetX, targetY) {
             const x = snakeHeadX + Math.cos(angle) * i;
             const y = snakeHeadY + Math.sin(angle) * i;
 
+            // Check if the laser touches the edge of the canvas
+            if (x < 0 || x > canvas.width || y < 0 || y > canvas.height) {
+                // Fade out the entire laser line over 5 seconds
+                ctx.globalAlpha = 1 - (currentTime - lastLaserShot) / (5 * 1000);
+                break; // Stop drawing the laser
+            }
+
             // Check for collision with obstacles
             obstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
@@ -217,6 +224,7 @@ function shootLaser(targetX, targetY) {
 
             // Draw the laser pixel with fade effect
             ctx.strokeStyle = gradient;
+            ctx.lineWidth = 10; // Increase the thickness of the laser
             ctx.lineTo(x, y);
             ctx.stroke();
         }
@@ -225,14 +233,13 @@ function shootLaser(targetX, targetY) {
         setTimeout(() => {
             isShooting = false;
             charging = true;
+            ctx.globalAlpha = 1; // Reset global alpha
         }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
         lastLaserShot = currentTime;
     }
 }
-
-
 
 // Function to check if a line segment intersects with a rectangle
 function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
