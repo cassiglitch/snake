@@ -163,7 +163,6 @@ function drawLaser() {
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
 const laserCooldown = 45 * 1000; // Cooldown period in milliseconds (30 seconds)
-
 // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
@@ -223,7 +222,7 @@ function shootLaser(targetX, targetY) {
 
         // Draw the laser line with fade effect
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = gridSize; // Increase the thickness of the laser
+        ctx.lineWidth = 10; // Increase the thickness of the laser
         laserPixels.forEach((pixel, index) => {
             if (index === 0) {
                 ctx.moveTo(pixel.x, pixel.y);
@@ -254,6 +253,7 @@ function shootLaser(targetX, targetY) {
         lastLaserShot = currentTime;
     }
 }
+
 
 // Function to check if a line segment intersects with a rectangle
 function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
