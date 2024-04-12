@@ -379,7 +379,7 @@ setTimeout(() => {
 
     // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay');
-    scoreDisplay.textContent = `Score: ${score}\nLives: ${livecount}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
 }
 
