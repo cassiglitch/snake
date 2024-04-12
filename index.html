@@ -164,7 +164,7 @@ function drawLaser() {
 let lastLaserShot = 0; // Timestamp of the last laser shot
 const laserCooldown = 45 * 1000; // Cooldown period in milliseconds (30 seconds)
 
-/// Function to handle shooting the laser
+// Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
 
@@ -184,25 +184,25 @@ function shootLaser(targetX, targetY) {
 
         // Draw the laser with fade effect
         const gradient = ctx.createLinearGradient(snakeHeadX, snakeHeadY, snakeHeadX + Math.cos(angle) * distance, snakeHeadY + Math.sin(angle) * distance);
-        gradient.addColorStop(1, 'rgba(255, 0, 0, 1)'); // Fade out to fully transparent
+        gradient.addColorStop(0, 'rgba(255, 0, 0, 1)'); // Start with full opacity
+        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)'); // Fade out to fully transparent
 
         // Draw the laser line
         ctx.beginPath();
         ctx.moveTo(snakeHeadX, snakeHeadY);
+
+        // Store the pixels of the laser line
+        const laserPixels = [];
 
         // Check for collision for every pixel along the line
         for (let i = 0; i <= distance; i++) {
             const x = snakeHeadX + Math.cos(angle) * i;
             const y = snakeHeadY + Math.sin(angle) * i;
 
-            // Create a clone for every pixel
-            const clone = this.createClone();
+            // Add the pixel coordinates to the laserPixels array
+            laserPixels.push({ x: x, y: y });
 
-            // Move the clone to the current position
-            clone.x = x;
-            clone.y = y;
-
-            // Check for collision with obstacles for the clone
+            // Check for collision with obstacles for the laser pixel
             obstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
                     y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
@@ -211,7 +211,7 @@ function shootLaser(targetX, targetY) {
                 }
             });
 
-            // Check for collision with dynamic obstacles for the clone
+            // Check for collision with dynamic obstacles for the laser pixel
             dynamicObstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 2) * gridSize &&
                     y >= obstacle.y * gridSize && y <= (obstacle.y + 2) * gridSize) {
@@ -219,18 +219,35 @@ function shootLaser(targetX, targetY) {
                     dynamicObstacles.splice(index, 1);
                 }
             });
-
-            // Draw the laser pixel with fade effect
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = gridSize; // Increase the thickness of the laser
-            ctx.lineTo(x, y);
-            ctx.stroke();
         }
+
+        // Draw the laser line with fade effect
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = gridSize; // Increase the thickness of the laser
+        laserPixels.forEach((pixel, index) => {
+            if (index === 0) {
+                ctx.moveTo(pixel.x, pixel.y);
+            } else {
+                ctx.lineTo(pixel.x, pixel.y);
+            }
+        });
+        ctx.stroke();
 
         // After 5 seconds, reset the shooting state and clear the laser
         setTimeout(() => {
             isShooting = false;
             charging = true;
+            // Clear the laser line by redrawing with fully transparent color
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0)';
+            ctx.beginPath();
+            laserPixels.forEach((pixel, index) => {
+                if (index === 0) {
+                    ctx.moveTo(pixel.x, pixel.y);
+                } else {
+                    ctx.lineTo(pixel.x, pixel.y);
+                }
+            });
+            ctx.stroke();
         }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
