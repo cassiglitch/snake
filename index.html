@@ -162,8 +162,9 @@ function drawLaser() {
 }
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
-const laserCooldown = 15 * 1000; // Cooldown period in milliseconds (30 seconds)
+const laserCooldown = 45 * 1000; // Cooldown period in milliseconds (30 seconds)
 
+// Function to handle shooting the laser
 // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
@@ -182,29 +183,24 @@ function shootLaser(targetX, targetY) {
         const distance = Math.sqrt(dx * dx + dy * dy);
         const angle = Math.atan2(dy, dx);
 
-        // Calculate the end point of the laser
-        const endX = snakeHeadX + Math.cos(angle) * canvas.width;
-        const endY = snakeHeadY + Math.sin(angle) * canvas.height;
+        // Draw the laser with fade effect
+        const gradient = ctx.createLinearGradient(snakeHeadX, snakeHeadY, snakeHeadX + Math.cos(angle) * distance, snakeHeadY + Math.sin(angle) * distance);
+        gradient.addColorStop(0, 'rgba(255, 0, 0, 1)'); // Start with full opacity
+        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)'); // Fade out to fully transparent
 
-        // Discretize the laser path into segments for more precise collision detection
-        const numSegments = Math.ceil(distance / 10); // Adjust segment length as needed
-        const segmentX = dx / numSegments;
-        const segmentY = dy / numSegments;
-        let currentX = snakeHeadX;
-        let currentY = snakeHeadY;
-
-        // Draw the laser
+        // Draw the laser line
         ctx.beginPath();
         ctx.moveTo(snakeHeadX, snakeHeadY);
 
-        // Iterate through each segment of the laser path
-        for (let i = 0; i < numSegments; i++) {
-            const nextX = currentX + segmentX;
-            const nextY = currentY + segmentY;
+        // Check for collision for every pixel along the line
+        for (let i = 0; i <= distance; i++) {
+            const x = snakeHeadX + Math.cos(angle) * i;
+            const y = snakeHeadY + Math.sin(angle) * i;
 
             // Check for collision with obstacles
             obstacles.forEach((obstacle, index) => {
-                if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize)) {
+                if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
+                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
                     // Remove the obstacle from the array
                     obstacles.splice(index, 1);
                 }
@@ -212,23 +208,18 @@ function shootLaser(targetX, targetY) {
 
             // Check for collision with dynamic obstacles
             dynamicObstacles.forEach((obstacle, index) => {
-                if (lineIntersectsRect(currentX, currentY, nextX, nextY, obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2)) {
+                if (x >= obstacle.x * gridSize && x <= (obstacle.x + 2) * gridSize &&
+                    y >= obstacle.y * gridSize && y <= (obstacle.y + 2) * gridSize) {
                     // Remove the dynamic obstacle from the array
                     dynamicObstacles.splice(index, 1);
                 }
             });
 
-            // Update current position for the next segment
-            currentX = nextX;
-            currentY = nextY;
+            // Draw the laser pixel with fade effect
+            ctx.strokeStyle = gradient;
+            ctx.lineTo(x, y);
+            ctx.stroke();
         }
-
-        // Draw the laser line to the end point
-        ctx.lineTo(endX, endY);
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 20;
-        ctx.lineCap = 'round';
-        ctx.stroke();
 
         // After 5 seconds, reset the shooting state and clear the laser
         setTimeout(() => {
@@ -240,6 +231,7 @@ function shootLaser(targetX, targetY) {
         lastLaserShot = currentTime;
     }
 }
+
 
 
 // Function to check if a line segment intersects with a rectangle
