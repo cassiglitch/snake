@@ -163,7 +163,9 @@ function drawLaser() {
 
 let lastLaserShot = 0; // Timestamp of the last laser shot
 const laserCooldown = 45 * 1000; // Cooldown period in milliseconds (30 seconds)
-// Function to handle shooting the laser
+
+
+        // Function to handle shooting the laser
 function shootLaser(targetX, targetY) {
     const currentTime = new Date().getTime();
 
@@ -222,7 +224,7 @@ function shootLaser(targetX, targetY) {
 
         // Draw the laser line with fade effect
         ctx.strokeStyle = gradient;
-        ctx.lineWidth = 10; // Increase the thickness of the laser
+        ctx.lineWidth = gridSize; // Increase the thickness of the laser
         laserPixels.forEach((pixel, index) => {
             if (index === 0) {
                 ctx.moveTo(pixel.x, pixel.y);
@@ -232,21 +234,40 @@ function shootLaser(targetX, targetY) {
         });
         ctx.stroke();
 
-        // After 5 seconds, reset the shooting state and clear the laser
+        // After 5 seconds, reset the shooting state and fade out the laser
         setTimeout(() => {
             isShooting = false;
             charging = true;
-            // Clear the laser line by redrawing with fully transparent color
-            ctx.strokeStyle = 'rgba(255, 0, 0, 0)';
-            ctx.beginPath();
-            laserPixels.forEach((pixel, index) => {
-                if (index === 0) {
-                    ctx.moveTo(pixel.x, pixel.y);
+            let alpha = 1;
+            const fadeInterval = setInterval(() => {
+                alpha -= 0.05; // Reduce alpha by 0.05 every 50 milliseconds
+                if (alpha <= 0) {
+                    clearInterval(fadeInterval); // Stop fading when alpha reaches 0
+                    // Clear the laser line by redrawing with fully transparent color
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0)';
+                    ctx.beginPath();
+                    laserPixels.forEach((pixel, index) => {
+                        if (index === 0) {
+                            ctx.moveTo(pixel.x, pixel.y);
+                        } else {
+                            ctx.lineTo(pixel.x, pixel.y);
+                        }
+                    });
+                    ctx.stroke();
                 } else {
-                    ctx.lineTo(pixel.x, pixel.y);
+                    // Draw the laser line with reduced alpha
+                    ctx.strokeStyle = `rgba(255, 0, 0, ${alpha})`;
+                    ctx.beginPath();
+                    laserPixels.forEach((pixel, index) => {
+                        if (index === 0) {
+                            ctx.moveTo(pixel.x, pixel.y);
+                        } else {
+                            ctx.lineTo(pixel.x, pixel.y);
+                        }
+                    });
+                    ctx.stroke();
                 }
-            });
-            ctx.stroke();
+            }, 50); // Fade every 50 milliseconds
         }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
@@ -255,7 +276,7 @@ function shootLaser(targetX, targetY) {
 }
 
 
-// Function to check if a line segment intersects with a rectangle
+        // Function to check if a line segment intersects with a rectangle
 function lineIntersectsRect(x1, y1, x2, y2, rx, ry, rw, rh) {
     // Check if any of the line segment end points are inside the rectangle
     if ((x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh) ||
