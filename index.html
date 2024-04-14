@@ -830,158 +830,184 @@ function animateExplosion() {
                 }
             }
         }
+const CanvasModule = (function() {
+    // Private variables
+    let canvas;
+    let context;
+    let gridSize = 20; // Default gridSize, adjust as needed
+    let food = { x: 0, y: 0 }; // Placeholder for food position
+    let isPaused = false; // Placeholder for game pause state
+    let direction = 'right'; // Placeholder for snake direction
 
-function closestNumber(n, m) {
-    // Find the quotient
-    let q = Math.floor(n / m);
+    // Private functions
+    function closestNumber(n, m) {
+        // Find the quotient
+        let q = Math.floor(n / m);
 
-    // 1st possible closest number
-    let n1 = m * q;
+        // 1st possible closest number
+        let n1 = m * q;
 
-    // 2nd possible closest number
-    let n2 = m * (q + 1);
+        // 2nd possible closest number
+        let n2 = m * (q + 1);
 
-    // Ensure that n1 does not exceed n
-    if (n1 > n) {
-        return n;
-    }
-
-    // Ensure that n2 does not exceed n
-    if (n2 > n) {
-        return n1;
-    }
-
-    // Return the closest multiple of m to n
-    return Math.abs(n - n1) < Math.abs(n - n2) ? n1 : n2;
-}
-
-function resizeCanvas() {
-    const canvasWidth = closestNumber(window.innerWidth, gridSize);
-    const canvasHeight = closestNumber(window.innerHeight, gridSize);
-
-    // Set canvas width and height
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-
-    // Adjust food position if it's out of bounds
-    if (food.x >= canvasWidth / gridSize) {
-        food.x = canvasWidth / gridSize - 1;
-    }
-    if (food.y >= canvasHeight / gridSize) {
-        food.y = canvasHeight / gridSize - 1;
-    }
-}
-
-
-// Handle arrow key presses
-document.addEventListener('keydown', event => {
-    // Prevent default arrow key behavior (scrolling)
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault();
-    }
-
-    if (!isPaused) {
-        switch (event.key) {
-            case 'ArrowUp':
-                direction = 'up';
-                break;
-            case 'ArrowDown':
-                direction = 'down';
-                break;
-            case 'ArrowLeft':
-                direction = 'left';
-                break;
-            case 'ArrowRight':
-                direction = 'right';
-                break;
-        }
-    }
-});
-
-// Handle touch events for mobile controls
-let touchStartX = 0;
-let touchStartY = 0;
-
-function handleTouchStart(event) {
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
-}
-
-function handleTouchEnd(event) {
-    const touchEndX = event.changedTouches[0].clientX;
-    const touchEndY = event.changedTouches[0].clientY;
-
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe
-        direction = deltaX > 0 ? 'right' : 'left';
-    } else {
-        // Vertical swipe
-        if (Math.abs(deltaY) > 10) {
-            direction = deltaY > 0 ? 'down' : 'up';
-        } 
-    }
-
-    // Perform actions based on direction if needed
-}
-
-canvas.addEventListener('touchstart', handleTouchStart);
-canvas.addEventListener('touchend', handleTouchEnd);
-
-
-        // Start the game loop
-        const gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
-
-        function getZoomFactor() {
-            var deviceWidth, landscape = Math.abs(window.orientation) == 90
-            // workaround for strange screen.height on the iPhone (v3.1.3)
-            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
-            else deviceWidth = window.screen[landscape ? "height" : "width"]
-            var zoomFactor = deviceWidth / window.innerWidth;
-            var antiZoomFactor = 1 / zoomFactor;
-          
-            // Apply zoom and anti-zoom factors to grid size
-            gridSize = Math.max(0, Math.ceil(startingGridSize * antiZoomFactor));
-            document.getElementById('scoreDisplay').style.top = (20 * antiZoomFactor) + 'px';
-            document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
+        // Ensure that n1 does not exceed n
+        if (n1 > n) {
+            return n;
         }
 
-        setInterval(getZoomFactor, 1); // Adjust the interval as needed
-
-        // Clean up the interval when the window is closed
-        window.addEventListener('beforeunload', () => {
-            clearInterval(gameInterval);
-        });
-// Function to resize the canvas height based on viewport height
-function resizeCanvasHeight() {
-    const windowHeight = window.innerHeight; // Get the viewport height
-    const canvasHeight = closestNumber(window.innerHeight, gridSize);; // Adjust the canvas height to be a multiple of gridSize
-    canvas.height = canvasHeight; // Set the canvas height
-}
-
-// Call the resizeCanvasHeight function initially to set the canvas height
-resizeCanvasHeight();
-
-// Call the resizeCanvasHeight function whenever the window is resized
-window.addEventListener('resize', resizeCanvasHeight);
-
-                function adjustForZoom() {
-            // Calculate the zoom factor
-            const zoomFactor = window.innerWidth / window.screen.availWidth;
-            // Adjust the grid size based on the zoom factor
-            document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
-            // Adjust the position of the score display
-            const scoreDisplay = document.getElementById('scoreDisplay');
-            scoreDisplay.style.marginTop = `calc(var(--grid-size) * antiZoomFactor)`;
-            scoreDisplay.style.fontSize = `var(--grid-size)`;
+        // Ensure that n2 does not exceed n
+        if (n2 > n) {
+            return n1;
         }
-window.addEventListener('resize', getZoomFactor);
-        // Call the adjustForZoom function initially and on window resize
+
+        // Return the closest multiple of m to n
+        return Math.abs(n - n1) < Math.abs(n - n2) ? n1 : n2;
+    }
+
+    function resizeCanvas() {
+        const canvasWidth = closestNumber(window.innerWidth, gridSize);
+        const canvasHeight = closestNumber(window.innerHeight, gridSize);
+
+        // Set canvas width and height
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // Adjust food position if it's out of bounds
+        if (food.x >= canvasWidth / gridSize) {
+            food.x = canvasWidth / gridSize - 1;
+        }
+        if (food.y >= canvasHeight / gridSize) {
+            food.y = canvasHeight / gridSize - 1;
+        }
+    }
+
+    function handleKeyDown(event) {
+        // Prevent default arrow key behavior (scrolling)
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            event.preventDefault();
+        }
+
+        if (!isPaused) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    direction = 'up';
+                    break;
+                case 'ArrowDown':
+                    direction = 'down';
+                    break;
+                case 'ArrowLeft':
+                    direction = 'left';
+                    break;
+                case 'ArrowRight':
+                    direction = 'right';
+                    break;
+            }
+        }
+    }
+
+    function handleTouchStart(event) {
+        touchStartX = event.touches[0].clientX;
+        touchStartY = event.touches[0].clientY;
+    }
+
+    function handleTouchEnd(event) {
+        const touchEndX = event.changedTouches[0].clientX;
+        const touchEndY = event.changedTouches[0].clientY;
+
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            direction = deltaX > 0 ? 'right' : 'left';
+        } else {
+            // Vertical swipe
+            if (Math.abs(deltaY) > 10) {
+                direction = deltaY > 0 ? 'down' : 'up';
+            } 
+        }
+
+        // Perform actions based on direction if needed
+    }
+
+    function getZoomFactor() {
+        var deviceWidth, landscape = Math.abs(window.orientation) == 90
+        // workaround for strange screen.height on the iPhone (v3.1.3)
+        if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+        else deviceWidth = window.screen[landscape ? "height" : "width"]
+        var zoomFactor = deviceWidth / window.innerWidth;
+        var antiZoomFactor = 1 / zoomFactor;
+
+        // Apply zoom and anti-zoom factors to grid size
+        gridSize = Math.max(0, Math.ceil(gridSize * antiZoomFactor));
+        document.getElementById('scoreDisplay').style.top = (20 * antiZoomFactor) + 'px';
+        document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
+    }
+
+    function resizeCanvasHeight() {
+        const windowHeight = window.innerHeight; // Get the viewport height
+        const canvasHeight = closestNumber(window.innerHeight, gridSize);; // Adjust the canvas height to be a multiple of gridSize
+        canvas.height = canvasHeight; // Set the canvas height
+    }
+
+    function adjustForZoom() {
+        // Calculate the zoom factor
+        const zoomFactor = window.innerWidth / window.screen.availWidth;
+        // Adjust the grid size based on the zoom factor
+        document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
+        // Adjust the position of the score display
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        scoreDisplay.style.marginTop = `calc(var(--grid-size) * antiZoomFactor)`;
+        scoreDisplay.style.fontSize = `var(--grid-size)`;
+    }
+
+    // Public function to initialize canvas
+    function initCanvas(canvasId) {
+        canvas = document.getElementById(canvasId);
+        context = canvas.getContext('2d');
+
+        // Add event listeners
+        document.addEventListener('keydown', handleKeyDown);
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchend', handleTouchEnd);
+        window.addEventListener('resize', getZoomFactor);
         window.addEventListener('resize', adjustForZoom);
+
+        // Call resize functions initially
+        resizeCanvas();
+        resizeCanvasHeight();
+        getZoomFactor();
         adjustForZoom();
-        
+    }
+
+    // Public function to start the game loop
+    function startGameLoop(gameLoop, interval = 100) {
+        setInterval(gameLoop, interval); // Adjust the interval as needed
+    }
+
+    // Public function to clean up the canvas and event listeners
+    function cleanup() {
+        // Clean up event listeners
+        document.removeEventListener('keydown', handleKeyDown);
+        canvas.removeEventListener('touchstart', handleTouchStart);
+        canvas.removeEventListener('touchend', handleTouchEnd);
+        window.removeEventListener('resize', getZoomFactor);
+        window.removeEventListener('resize', adjustForZoom);
+    }
+
+    // Return public functions
+    return {
+        initCanvas,
+        startGameLoop,
+        cleanup
+    };
+})();
+
+// Example usage:
+CanvasModule.initCanvas('myCanvas');
+CanvasModule.startGameLoop(gameLoop); // Provide your game loop function here
+
+
     </script>
 </body>
 </html>
