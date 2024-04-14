@@ -963,6 +963,37 @@ window.addEventListener('resize', getZoomFactor);
         window.addEventListener('resize', adjustForZoom);
         adjustForZoom();
        scoreDisplay.addEventListener('touchstart', pauseGame); 
+        // Get the scoreDisplay element
+const scoreDisplay = document.getElementById('scoreDisplay');
+
+// Get the position and dimensions of the scoreDisplay element
+const scoreDisplayRect = scoreDisplay.getBoundingClientRect();
+
+// Define the hitbox using the position and dimensions
+const hitbox = {
+    top: scoreDisplayRect.top,
+    bottom: scoreDisplayRect.bottom,
+    left: scoreDisplayRect.left,
+    right: scoreDisplayRect.right
+};
+
+// Now you can use the hitbox to check for interactions or events within its boundaries
+// For example, checking if a mouse click occurred within the hitbox:
+document.addEventListener('click', (event) => {
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+
+    if (
+        mouseX >= hitbox.left &&
+        mouseX <= hitbox.right &&
+        mouseY >= hitbox.top &&
+        mouseY <= hitbox.bottom
+    ) {
+        // Mouse click occurred within the hitbox
+        pauseGame()
+    }
+});
+
     </script>
 </body>
 </html>
