@@ -143,12 +143,26 @@ function shockwaveAnimation(x, y) {
 }
 
 
+// Function to shuffle array using Fisher-Yates Shuffle algorithm
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+
+// Original array of coordinates
+
+// Shuffle the coordinates to randomize their order
+const shuffledCoordinates = shuffleArray(array);
+
+// Create new pairs from the shuffled data
+const newCoordinates = shuffledCoordinates.map(([x, y]) => {
+  // Generate new random coordinates
+  const newX = Math.floor(Math.random() * 100);
+  const newY = Math.floor(Math.random() * 100);
+});
+array.push({ x: newX, y: newY })
 }
 
 
@@ -420,7 +434,7 @@ function drawInvincibilityAura(colorName) {
         ctx.fillRect(segment.x * gridSize - shadowSize, segment.y * gridSize - shadowSize, gridSize + shadowSize * 2, gridSize + shadowSize * 2);
     });
 }
-
+array.push
 
 function drawEatingAnimation() {
     getZoomFactor()
