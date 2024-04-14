@@ -12,6 +12,7 @@
             margin: 0;
             overflow: hidden; /* No more scrolling for you! */
             background-color: #f0f0f0; /* Set a background color */
+            user-select: none;
         }
 
         :root {
@@ -19,9 +20,10 @@
         }
 
         #scoreDisplay {
-            margin-top: calc(var(--grid-size) * 1.5); /* Adjust margin based on grid size */
+            margin-top: calc(var(--grid-size) * 1); /* Adjust margin based on grid size */
             position: fixed;
             font-size: var(--grid-size); /* Set font size equal to grid size */
+            user-select: none;
         }
 
         canvas {
@@ -30,32 +32,13 @@
             bottom: 0px; /* Adjust the bottom position as needed */
             border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the canvas */
+            user-select: none;
         }
         body {
             overflow: hidden; /* Disable scrolling */
             touch-action: none; /* Disable touch actions on the canvas */
+            user-select: none;
 }
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background-color: #ff00ff; /* Purple color for confetti */
-            opacity: 1; /* Fully visible */
-            animation: confetti-fall 2s ease-out infinite; /* Confetti falling animation */
-        }
-
-        @keyframes confetti-fall {
-            0% {
-                top: -10px; /* Start above the canvas */
-                transform: rotateZ(0deg); /* No rotation initially */
-                opacity: 1; /* Fully visible */
-            }
-            100% {
-                top: 100%; /* End below the canvas */
-                transform: rotateZ(720deg); /* Rotation during fall */
-                opacity: 0; /* Invisible */
-            }
-        }
     </style>
     <title>Snake Game</title>
 </head>
@@ -98,42 +81,6 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-
-function detectLongPress(elementId) {
-    let presstime = 1
-    let pressed = false;
-    let timeout;
-
-    const element = document.getElementById(elementId);
-
-    element.addEventListener('mousedown', function(event) {
-        pressed = true;
-        timeout = setTimeout(function() {
-            if (pressed) {
-                pauseGame();
-            }
-        }, presstime);
-    });
-
-    element.addEventListener('mouseup', function(event) {
-        clearTimeout(timeout);
-        pressed = false;
-    });
-
-    element.addEventListener('touchstart', function(event) {
-        pressed = true;
-        timeout = setTimeout(function() {
-            if (pressed) {
-                pauseGame();
-            }
-        }, presstime);
-    });
-
-    element.addEventListener('touchend', function(event) {
-        clearTimeout(timeout);
-        pressed = false;
-    });
-}
 
 
 
@@ -423,7 +370,41 @@ setTimeout(() => {
     const scoreDisplay = document.getElementById('scoreDisplay');
     scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
-    detectLongPress(scoreDisplay)
+    
+    let presstime = 1;
+    let pressed = false;
+    let timeout;
+
+    const element = document.getElementById('scoreDisplay');
+
+    element.addEventListener('mousedown', function(event) {
+        pressed = true;
+        timeout = setTimeout(function() {
+            if (pressed) {
+pauseGame()
+            }
+        }, presstime);
+    });
+
+    element.addEventListener('mouseup', function(event) {
+        clearTimeout(timeout);
+        pressed = false;
+    });
+
+    element.addEventListener('touchstart', function(event) {
+        pressed = true;
+        timeout = setTimeout(function() {
+            if (pressed) {
+                pauseGame();
+            }
+        }, presstime);
+    });
+
+    element.addEventListener('touchend', function(event) {
+        clearTimeout(timeout);
+        pressed = false;
+    });
+
 }
 
 function drawInvincibilityAura(colorName) {
