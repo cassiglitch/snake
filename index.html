@@ -970,7 +970,7 @@ canvas.addEventListener('touchstart', handleTouchStart); // Listen for touchstar
 // Function to handle touchstart event
 function handleTouchStart(event) {
     touchStartTime = new Date().getTime(); // Record the time when touch starts
-    setTimeout(checkHold, 1500); // Check after 1.5 seconds if the touch is still held
+    setTimeout(checkHold, 500); // Check after 1.5 seconds if the touch is still held
 }
 
 // Function to check if touch is still held after 1.5 seconds
