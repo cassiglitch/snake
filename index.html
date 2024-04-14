@@ -99,7 +99,7 @@
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
 
-function detectLongPress(elementId, callback) {
+function detectLongPress(elementId) {
     let presstime = 1
     let pressed = false;
     let timeout;
@@ -110,7 +110,7 @@ function detectLongPress(elementId, callback) {
         pressed = true;
         timeout = setTimeout(function() {
             if (pressed) {
-                callback();
+                pauseGame();
             }
         }, presstime);
     });
@@ -124,7 +124,7 @@ function detectLongPress(elementId, callback) {
         pressed = true;
         timeout = setTimeout(function() {
             if (pressed) {
-                callback();
+                pauseGame();
             }
         }, presstime);
     });
