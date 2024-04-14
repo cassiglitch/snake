@@ -87,6 +87,8 @@
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
+        let freeze = false;
+        let freezetimer = 5;
         let isFoodOrange = false;
         let livecount = 2; 
         let originalSnakeColor = '#00FF00';
@@ -96,6 +98,72 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
+
+
+function shockwaveAnimation(x, y) {
+    // Get the canvas element
+    // Set up animation parameters
+    const radiusMax = Math.max(canvas.width, canvas.height);
+    let radius = 0;
+    const maxOpacity = 0.6;
+    let opacity = maxOpacity;
+
+    // Animation loop
+    function animate() {
+        // Decrease opacity
+        opacity -= 0.005;
+
+        // Draw the shockwave
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(165, 42, 42, ${opacity})`;
+        ctx.fill();
+
+        // Increase radius
+        radius += 5;
+
+        // Check if animation is complete
+        if (opacity <= 0) {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Reset parameters for next animation
+            radius = 0;
+            opacity = maxOpacity;
+            cancelAnimationFrame(animationId);
+            applyEarthquake(obstacles)
+            return;
+        }
+
+        // Request next frame
+        animationId = requestAnimationFrame(animate);
+    }
+
+    // Start the animation
+    let animationId = requestAnimationFrame(animate);
+}
+
+
+
+
+// Define a function to apply the earthquake (without visual effects)
+function applyEarthquake(obstacles) {
+    // Iterate through obstacles
+    obstacles.forEach(obstacle => {
+        // Randomly decide whether to shift or collapse the obstacle
+        if (Math.random() <= 0.99) {
+            // Shift the obstacle by a random amount
+            obstacle.x += Math.floor(Math.random() * 3) - 1; // Shift left or right by 1 grid
+            obstacle.y += Math.floor(Math.random() * 3) - 1; // Shift up or down by 1 grid
+        } else {
+            // Collapse the obstacle by removing it from the array
+            let index = obstacles.indexOf(obstacle);
+            obstacles.splice(index, 1);
+            let index2 = dynamicObstacles.indexOf(dynamicObstacle);
+            dynamicObstacles.splice(index2, 1);
+        }
+    });
+}
+
 
 const laser = {
     isShooting: false,
@@ -277,6 +345,13 @@ setTimeout(() => {
 
 }
 
+if (freeze === true) {
+                    drawInvincibilityAura('blue');
+setTimeout(() => {
+    freeze = false;
+            },freezetimer * 1000);
+
+}
     // Layer 2: Draw Snake Body
     snake.forEach((segment, index) => {
         ctx.fillStyle = segment.color;
@@ -379,6 +454,10 @@ originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 
         function getFoodColor(foodType) {
             switch (foodType) {
+                case 'earth':
+                    return 'brown';
+                case 'ice':
+                    return 'lightblue';
                 case 'normal':
                     return 'red';
                 case 'superfood':
@@ -470,12 +549,20 @@ function HaHaNoCollision(duration) {
     direction = directions[randomIndex];
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
-                isFoodOrange = true; 
+          isFoodOrange = true;
                 lives = (lives/2);
                 livecount = livecount + 1;
 HaHaNoCollision(100)
 // Use a for loop to repeat the action
-                } else {
+                } else if (food.type === 'ice') {
+                    freeze = true;
+                    } else if (food.type === 'earth'){
+                    let x = getSnakeHeadX()
+                    let y = getSnakeHeadY()
+                    pauseGame()
+                    shockwaveAnimation(x, y)
+                    setTimeout(pauseGame, 2900)
+                }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
                 }
@@ -494,6 +581,7 @@ HaHaNoCollision(100)
         snake.pop();
         snake.unshift(head);
 
+if (!freeze) {
         // Move Dynamic Obstacles
         dynamicObstacles.forEach(obstacle => {
             if (obstacle.id === 1) {
@@ -510,6 +598,7 @@ HaHaNoCollision(100)
                 }
             }
         });
+}
     }
 
             // Check for victory
@@ -559,6 +648,10 @@ HaHaNoCollision(100)
                 return 'poison';
             } else if (random <= 0.3) {
                 return 'teleport';
+            } else if (random <= 0.1){
+                return 'ice';
+                 } else if (random <= 0.7){
+                return 'earth';
             } else {
                 return 'normal';
             }
