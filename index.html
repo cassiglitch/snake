@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        hitbox2 {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+                width: 100px; /* Same width as the scoreDisplay */
+    height: 50px; /* Same height as the scoreDisplay */
+    background-color: gray; /* Make it transparent */
+        }
         body {
             display: flex;
             flex-direction: column;
@@ -61,6 +70,7 @@
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.4.2/dist/tinycolor-min.js"></script>
+    <div class="hitbox2">
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
         <div id="victoryMessage"></div>
@@ -964,7 +974,7 @@ window.addEventListener('resize', getZoomFactor);
         adjustForZoom();
        scoreDisplay.addEventListener('touchstart', pauseGame); 
         // Get the scoreDisplay element
-const scoreDisplay = document.getElementById('scoreDisplay');
+const scoreDisplay = document.getElementById('hitbox2');
 
 // Get the position and dimensions of the scoreDisplay element
 const scoreDisplayRect = scoreDisplay.getBoundingClientRect();
