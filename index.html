@@ -100,23 +100,38 @@
             var antiZoomFactor = 1 / zoomFactor;
 
 function detectLongPress(elementId, callback) {
+    let presstime = 1
+    let pressed = false;
     let timeout;
+
     const element = document.getElementById(elementId);
 
     element.addEventListener('mousedown', function(event) {
-        timeout = setTimeout(callback, 100);
+        pressed = true;
+        timeout = setTimeout(function() {
+            if (pressed) {
+                callback();
+            }
+        }, presstime);
     });
 
     element.addEventListener('mouseup', function(event) {
         clearTimeout(timeout);
+        pressed = false;
     });
 
     element.addEventListener('touchstart', function(event) {
-        timeout = setTimeout(callback, 100);
+        pressed = true;
+        timeout = setTimeout(function() {
+            if (pressed) {
+                callback();
+            }
+        }, presstime);
     });
 
     element.addEventListener('touchend', function(event) {
         clearTimeout(timeout);
+        pressed = false;
     });
 }
 
