@@ -99,6 +99,28 @@
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
 
+function detectLongPress(elementId, callback) {
+    let timeout;
+    const element = document.getElementById(elementId);
+
+    element.addEventListener('mousedown', function(event) {
+        timeout = setTimeout(callback, 100);
+    });
+
+    element.addEventListener('mouseup', function(event) {
+        clearTimeout(timeout);
+    });
+
+    element.addEventListener('touchstart', function(event) {
+        timeout = setTimeout(callback, 100);
+    });
+
+    element.addEventListener('touchend', function(event) {
+        clearTimeout(timeout);
+    });
+}
+
+
 
 function shockwaveAnimation(x, y) {
     // Get the canvas element
@@ -790,26 +812,9 @@ function animateExplosion() {
         function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
+            detectLongPress('scoreDisplay', pauseGame);
             update();
             draw();
-
-            // Handle eating animation
-            if (isEating) {
-                eatingAnimationFrames--;
-
-                // Apply the wavelike animation
-                for (let i = 1; i < snake.length; i++) {
-                    if (i <= eatingAnimationFrames) {
-                        snake[i].color = 'blue';
-                    } else {
-                        snake[i].color = 'green';
-                    }
-                }
-
-                if (eatingAnimationFrames === 0) {
-                    isEating = false;
-                }
-            }
         }
 
 function closestNumber(n, m) {
