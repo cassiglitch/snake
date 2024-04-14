@@ -377,21 +377,7 @@ setTimeout(() => {
 
     const element = document.getElementById('scoreDisplay');
 
-    element.addEventListener('mousedown', function(event) {
-        pressed = true;
-        timeout = setTimeout(function() {
-            if (pressed) {
-pauseGame()
-            }
-        }, presstime);
-    });
-
-    element.addEventListener('mouseup', function(event) {
-        clearTimeout(timeout);
-        pressed = false;
-    });
-
-    element.addEventListener('touchstart', function(event) {
+    scoreDisplay.addEventListener('touchstart', function(event) {
         pressed = true;
         timeout = setTimeout(function() {
             if (pressed) {
@@ -400,7 +386,7 @@ pauseGame()
         }, presstime);
     });
 
-    element.addEventListener('touchend', function(event) {
+    scoreDisplay.addEventListener('touchend', function(event) {
         clearTimeout(timeout);
         pressed = false;
     });
