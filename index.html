@@ -145,25 +145,36 @@ function shockwaveAnimation(x, y) {
 
 // Function to shuffle array using Fisher-Yates Shuffle algorithm
 function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+  // Create a flat list of all values in the array
+  const flattened = array.flat();
+  
+  // Create an array to store new coordinate pairs
+  const newCoordinates = [];
+  
+  // Loop until all values are used
+  while (flattened.length > 1) {
+    // Randomly choose two values
+    const index1 = Math.floor(Math.random() * flattened.length);
+    const value1 = flattened[index1];
+    flattened.splice(index1, 1); // Remove the chosen value from the list
+    
+    const index2 = Math.floor(Math.random() * flattened.length);
+    const value2 = flattened[index2];
+    flattened.splice(index2, 1); // Remove the chosen value from the list
+    
+    // Create a new coordinate pair
+    newCoordinates.push({ x: value1, y: value2 });
   }
-  return array;
-
-// Original array of coordinates
-
-// Shuffle the coordinates to randomize their order
-const shuffledCoordinates = shuffleArray(array);
-
-// Create new pairs from the shuffled data
-const newCoordinates = shuffledCoordinates.map(([x, y]) => {
-  // Generate new random coordinates
-  const newX = Math.floor(Math.random() * 100);
-  const newY = Math.floor(Math.random() * 100);
-});
-array.push({ x: newX, y: newY })
+  
+  // Clear the original array
+  array.length = 0;
+  
+  // Push new data into the array
+  newCoordinates.forEach(pair => {
+    array.push(pair);
+  });
 }
+
 
 
 // Define a function to apply the earthquake (without visual effects)
@@ -173,8 +184,6 @@ function applyEarthquake(obstacles) {
         // Randomly decide whether to shift or collapse the obstacle
         if (Math.random() <= 0.99) {
             // Shift the obstacle by a random amount
-            obstacle.x += Math.floor(Math.random() * 3) - 1; // Shift left or right by 1 grid
-            obstacle.y += Math.floor(Math.random() * 3) - 1; // Shift up or down by 1 grid
             obstacles = shuffleArray(obstacles)
             dynamicObstacles = shuffleArray(dynamicObstacles)
         } else {
