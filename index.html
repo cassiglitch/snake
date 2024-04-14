@@ -423,6 +423,7 @@ setTimeout(() => {
     const scoreDisplay = document.getElementById('scoreDisplay');
     scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
+    detectLongPress(scoreDisplay)
 }
 
 function drawInvincibilityAura(colorName) {
@@ -827,7 +828,7 @@ function animateExplosion() {
         function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
-            detectLongPress('scoreDisplay', pauseGame);
+            detectLongPress('scoreDisplay');
             update();
             draw();
         }
