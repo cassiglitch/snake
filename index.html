@@ -167,7 +167,7 @@ function shuffleArray(array) {
   }
   
   // Clear the original array
-  array.length = 0;
+  array = [];
   
   // Push new data into the array
   newCoordinates.forEach(pair => {
@@ -185,7 +185,6 @@ function applyEarthquake(obstacles) {
         if (Math.random() <= 0.99) {
             // Shift the obstacle by a random amount
             obstacles = shuffleArray(obstacles)
-            dynamicObstacles = shuffleArray(dynamicObstacles)
         } else {
             // Collapse the obstacle by removing it from the array
             let index = obstacles.indexOf(obstacle);
