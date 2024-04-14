@@ -561,7 +561,7 @@ HaHaNoCollision(100)
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
-                    setTimeout(pauseGame, 2900)
+                    setTimeout(pauseGame, 3100)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
@@ -650,7 +650,7 @@ if (!freeze) {
                 return 'teleport';
             } else if (random <= 0.1){
                 return 'ice';
-                 } else if (random <= 0.7){
+                 } else if (random <= 0.15){
                 return 'earth';
             } else {
                 return 'normal';
