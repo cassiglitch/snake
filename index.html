@@ -965,10 +965,10 @@ window.addEventListener('resize', getZoomFactor);
         adjustForZoom();
 let touchStartTime; // Variable to store the time when touch starts
 
-canvas.addEventListener('touchstart', handleTouchStart); // Listen for touchstart event
+canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart event
 
 // Function to handle touchstart event
-function handleTouchStart(event) {
+function PauseHoldStart(event) {
     touchStartTime = new Date().getTime(); // Record the time when touch starts
     setTimeout(checkHold, 500); // Check after 1.5 seconds if the touch is still held
 }
@@ -982,10 +982,10 @@ function checkHold() {
 }
 
 // Listen for touchend event to reset the timer if touch is released before 1.5 seconds
-canvas.addEventListener('touchend', handleTouchEnd);
+canvas.addEventListener('touchend', PauseHoldEnd);
 
 // Function to handle touchend event
-function handleTouchEnd() {
+function PauseHoldEnd() {
     touchStartTime = null; // Reset the touch start time
 }
 
