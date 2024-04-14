@@ -4,15 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        hitbox2 {
-            align-items: center;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-                width: 100px; /* Same width as the scoreDisplay */
-    height: 50px; /* Same height as the scoreDisplay */
-    background-color: gray; /* Make it transparent */
-        }
+
         body {
             display: flex;
             flex-direction: column;
@@ -70,7 +62,6 @@
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.4.2/dist/tinycolor-min.js"></script>
-    <div id="hitbox2">
     <div id="scoreDisplay">Score: 0</div>
     <canvas id="snakeCanvas"></canvas>
         <div id="victoryMessage"></div>
@@ -972,37 +963,31 @@ window.addEventListener('resize', getZoomFactor);
         // Call the adjustForZoom function initially and on window resize
         window.addEventListener('resize', adjustForZoom);
         adjustForZoom();
-       scoreDisplay.addEventListener('touchstart', pauseGame); 
-        // Get the scoreDisplay element
-const scoreDisplay = document.getElementById('hitbox2');
+let touchStartTime; // Variable to store the time when touch starts
 
-// Get the position and dimensions of the scoreDisplay element
-const scoreDisplayRect = scoreDisplay.getBoundingClientRect();
+canvas.addEventListener('touchstart', handleTouchStart); // Listen for touchstart event
 
-// Define the hitbox using the position and dimensions
-const hitbox = {
-    top: scoreDisplayRect.top,
-    bottom: scoreDisplayRect.bottom,
-    left: scoreDisplayRect.left,
-    right: scoreDisplayRect.right
-};
+// Function to handle touchstart event
+function handleTouchStart(event) {
+    touchStartTime = new Date().getTime(); // Record the time when touch starts
+    setTimeout(checkHold, 1500); // Check after 1.5 seconds if the touch is still held
+}
 
-// Now you can use the hitbox to check for interactions or events within its boundaries
-// For example, checking if a mouse click occurred within the hitbox:
-document.addEventListener('click', (event) => {
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-
-    if (
-        mouseX >= hitbox.left &&
-        mouseX <= hitbox.right &&
-        mouseY >= hitbox.top &&
-        mouseY <= hitbox.bottom
-    ) {
-        // Mouse click occurred within the hitbox
-        pauseGame()
+// Function to check if touch is still held after 1.5 seconds
+function checkHold() {
+    // Check if touch is still active and hasn't moved for 1.5 seconds
+    if (touchStartTime && (new Date().getTime() - touchStartTime >= 1500)) {
+        pauseGame(); // Trigger the action if touch is held for 1.5 seconds
     }
-});
+}
+
+// Listen for touchend event to reset the timer if touch is released before 1.5 seconds
+canvas.addEventListener('touchend', handleTouchEnd);
+
+// Function to handle touchend event
+function handleTouchEnd() {
+    touchStartTime = null; // Reset the touch start time
+}
 
     </script>
 </body>
