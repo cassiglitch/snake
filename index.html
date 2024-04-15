@@ -101,7 +101,7 @@
     const projectileSpeed = 5; // Speed of the projectiles
     const projectileColor = 'orange'; // Color of the projectiles
 
-function shootWaveOfProjectiles(canvas, startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
+function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
     // Get the canvas con
 
     // Calculate the angle between projectiles
@@ -657,7 +657,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire')
                     const startX = getSnakeHeadX();// Starting X coordinate
                     const startY = getSnakeHeadY(); // Starting Y coordinate
-                shootWaveOfProjectiles(ctx, startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor)
+                shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
@@ -748,6 +748,8 @@ if (!freeze) {
                 return 'ice';
                  } else if (random <= 0.15){
                 return 'earth';
+            } else if (random <= 0.8){
+                return 'fire';
             } else {
                 return 'normal';
             }
