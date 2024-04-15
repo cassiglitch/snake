@@ -953,11 +953,13 @@ window.addEventListener('resize', getZoomFactor);
         let touchStartTime; // Variable to store the time when touch starts
 let touchStartPosition; // Variable to store the initial touch position
 
-canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart event
+canvas.addEventListener('touchstart', function(event) {
+    event.preventDefault();
+    PauseHoldStart(); // Call your function here if needed
+}); 
 
 // Function to handle touchstart event
 function PauseHoldStart(event) {
-    event.preventDefault();
     touchStartPosition = {
         x: event.touches[0].clientX,
         y: event.touches[0].clientY
