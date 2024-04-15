@@ -90,12 +90,12 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-        let pX = 0
-let pY = 0
-        let numberOfProjectiles = 1; // Number of projectiles in the wave
+        let pX = getSnakeHeadX()
+         let pY = getSnakeHeadY()
+        let numberOfProjectiles = 5; // Number of projectiles in the wave
             const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
-            const projectileSpeed = 1; // Speed of the projectiles
-            const projectileColor = 'orange'; // Color of the projectiles
+            const projectileSpeed = 5; // Speed of the projectiles
+            const projectileColor = darkred'; // Color of the projectiles
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
     // Get the canvas con
