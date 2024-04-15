@@ -90,12 +90,10 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-        let pX = snake[0].x * gridSize + gridSize / 2;
-         let pY = snake[0].y * gridSize + gridSize / 2;
         let numberOfProjectiles = 5; // Number of projectiles in the wave
             const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
             const projectileSpeed = 5; // Speed of the projectiles
-            const projectileColor = darkred'; // Color of the projectiles
+            const projectileColor = 'darkred'; // Color of the projectiles
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
     // Get the canvas con
@@ -650,6 +648,8 @@ HaHaNoCollision(100)
                     shockwaveAnimation(x, y)
                     setTimeout(pauseGame, 2900)
                 } else if (food.type === 'fire'){
+                let pX = snake[0].x * gridSize + gridSize / 2;
+                let pY = snake[0].y * gridSize + gridSize / 2;
                 snake.unshift({ ...snake[0], color: 'red' });
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize)
                 }else{
