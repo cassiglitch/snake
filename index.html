@@ -95,11 +95,6 @@
             const projectileSpeed = 5; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-let numberOfProjectiles = 5; // Number of projectiles in the wave
-const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
-const projectileSpeed = 5; // Speed of the projectiles
-const projectileColor = 'red'; // Color of the projectiles
-
 function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
     // Get the canvas con
 
@@ -117,8 +112,8 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
 
         // Create the projectile object
         const projectile = {
-            x: startX,
-            y: startY,
+            x: pX,
+            y: pY,
             velocityX: velocityX,
             velocityY: velocityY,
             color: projectileColor
@@ -656,7 +651,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire'){
                 let pX = snake[0].x * gridSize + gridSize / 2;
                 let pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
