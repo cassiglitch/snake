@@ -98,7 +98,7 @@
 function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, snakeDirection) {
     // Calculate the angle increment based on the snake direction
     let baseAngle;
-    switch (snakeDirection) {
+    switch (direction) {
         case 'up':
             baseAngle = -Math.PI / 2; // Point upwards
             break;
