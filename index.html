@@ -95,7 +95,7 @@
             const projectileSpeed = 5; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, snakeDirection) {
+function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
     // Calculate the angle increment based on the snake direction
     let baseAngle;
     switch (direction) {
