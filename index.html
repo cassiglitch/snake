@@ -946,21 +946,47 @@ window.addEventListener('resize', getZoomFactor);
         // Call the adjustForZoom function initially and on window resize
         window.addEventListener('resize', adjustForZoom);
         adjustForZoom();
-let touchStartTime; // Variable to store the time when touch starts
+
+        let touchStartTime; // Variable to store the time when touch starts
+let touchStartPosition; // Variable to store the initial touch position
+
 canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart event
 
 // Function to handle touchstart event
 function PauseHoldStart(event) {
+    touchStartPosition = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY
+    };
     touchStartTime = new Date().getTime(); // Record the time when touch starts
-    setTimeout(checkHold, 1500); // Check after 1.5 seconds if the touch is still held
+    setTimeout(checkHold, 500); // Check after 1.5 seconds if the touch is still held
 }
 
 // Function to check if touch is still held after 1.5 seconds
 function checkHold() {
     // Check if touch is still active and hasn't moved for 1.5 seconds
-    if (touchStartTime && (new Date().getTime() - touchStartTime >= 900)) {
-        pauseGame(); // Trigger the action if touch is held for 1.5 seconds
+    if (touchStartTime && touchStartPosition && (new Date().getTime() - touchStartTime >= 500)) {
+        if (!hasTouchMoved()) {
+            pauseGame(); // Trigger the action if touch is held for 1.5 seconds without movement
+        }
     }
+}
+
+// Function to check if the touch has moved
+function hasTouchMoved() {
+    const currentTouchPosition = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY
+    };
+
+    // Calculate the distance between the initial touch position and the current touch position
+    const distance = Math.sqrt(
+        Math.pow(currentTouchPosition.x - touchStartPosition.x, 2) +
+        Math.pow(currentTouchPosition.y - touchStartPosition.y, 2)
+    );
+
+    // If the distance is greater than 1 pixel, consider it as movement
+    return distance > 1;
 }
 
 // Listen for touchend event to reset the timer if touch is released before 1.5 seconds
@@ -969,7 +995,9 @@ canvas.addEventListener('touchend', PauseHoldEnd);
 // Function to handle touchend event
 function PauseHoldEnd() {
     touchStartTime = null; // Reset the touch start time
+    touchStartPosition = null; // Reset the touch start position
 }
+        
 
     </script>
 </body>
