@@ -100,12 +100,22 @@
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
     // Calculate the angle between projectiles
+    const directionRadians = {
+        'up': -Math.PI / 2,
+        'down': Math.PI / 2,
+        'left': Math.PI,
+        'right': 0
+    };
+
+    // Convert direction string to radians
+    const directionRad = directionRadians[direction.toLowerCase()] || 0;
+
     const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
 
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
         // Calculate the angle for this projectile
-        const angle = angleIncrement * i + direction;
+        const angle = angleIncrement * i + directionRad;
 
         // Calculate the projectile's velocity components
         const velocityX = Math.cos(angle) * projectileSpeed;
