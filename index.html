@@ -61,6 +61,7 @@
 
         let lives = 0.5;
         let maxscore = 50;
+        let psize = 20;
         let startingGridSize = 20;
         let gridSize = 20;
         let startingLength = 5;
@@ -97,16 +98,14 @@
             const projectileSpeed = 5; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
-    // Get the canvas con
-
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
     // Calculate the angle between projectiles
     const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
 
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
         // Calculate the angle for this projectile
-        const angle = angleIncrement * i;
+        const angle = angleIncrement * i + direction;
 
         // Calculate the projectile's velocity components
         const velocityX = Math.cos(angle) * projectileSpeed;
@@ -124,7 +123,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
         // Draw the projectile
         ctx.beginPath();
         ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
+        ctx.arc(projectile.x, projectile.y, psize, 0, Math.PI * 2);
         ctx.fill();
 
         // Update the projectile's position and redraw
@@ -142,7 +141,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
                     // Remove the obstacle from the array
                     obstacles.splice(index, 1);
-
+projectile.splice(index, 1);
                     // Create an explosion shockwave
                     createExplosion(ctx, projectile.x, projectile.y, projectileColor);
                 }
@@ -154,7 +153,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 2) * gridSize) {
                     // Remove the dynamic obstacle from the array
                     dynamicObstacles.splice(index, 1);
-
+projectile.splice(index, 1);
                     // Create an explosion shockwave
                     createExplosion(projectile.x, projectile.y, projectileColor);
                 }
@@ -163,7 +162,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
+            ctx.arc(projectile.x, projectile.y, psize, 0, Math.PI * 2);
             ctx.fill();
 
             // Check if the projectile is out of bounds
@@ -175,8 +174,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
     }
 }
 
-
-function createExplosion(x, y, color) {
+function createExplosion(ctx, x, y, color) {
     // Draw the explosion shockwave
     ctx.beginPath();
     ctx.arc(x, y, 50, 0, Math.PI * 2);
@@ -653,7 +651,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire'){
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
@@ -1021,6 +1019,7 @@ canvas.addEventListener('touchend', handleTouchEnd);
             gridSize = Math.max(0, Math.ceil(startingGridSize * antiZoomFactor));
             document.getElementById('scoreDisplay').style.top = (20 * antiZoomFactor) + 'px';
             document.documentElement.style.setProperty('--grid-size', (20 * antiZoomFactor) + 'px');
+            psize = gridSize;
         }
 
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
