@@ -98,8 +98,11 @@
             const projectileSpeed = 10; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
-    // Calculate the angle between projectiles
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
+    // Get the canvas context
+    const ctx = canvas.getContext('2d');
+
+    // Mapping of directions to radians
     const directionRadians = {
         'up': -Math.PI / 2,
         'down': Math.PI / 2,
@@ -110,7 +113,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
     // Convert direction string to radians
     const directionRad = directionRadians[direction.toLowerCase()] || 0;
 
-    const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
+    // Calculate the angle between projectiles to cover a full circle
+    const angleIncrement = (2 * Math.PI) / numberOfProjectiles;
 
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
@@ -133,7 +137,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
         // Draw the projectile
         ctx.beginPath();
         ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, psize, 0, Math.PI * 2);
+        ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
         ctx.fill();
 
         // Update the projectile's position and redraw
@@ -151,7 +155,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
                     // Remove the obstacle from the array
                     obstacles.splice(index, 1);
-projectile.splice(index, 1);
+                    projectile.splice(index, 1)
+
                     // Create an explosion shockwave
                     createExplosion(ctx, projectile.x, projectile.y, projectileColor);
                 }
@@ -163,7 +168,8 @@ projectile.splice(index, 1);
                     projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 2) * gridSize) {
                     // Remove the dynamic obstacle from the array
                     dynamicObstacles.splice(index, 1);
-projectile.splice(index, 1);
+                    projectile.splice(index, 1)
+
                     // Create an explosion shockwave
                     createExplosion(projectile.x, projectile.y, projectileColor);
                 }
@@ -172,7 +178,7 @@ projectile.splice(index, 1);
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, psize, 0, Math.PI * 2);
+            ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
             ctx.fill();
 
             // Check if the projectile is out of bounds
@@ -183,6 +189,7 @@ projectile.splice(index, 1);
         }, 20); // Update every 20 milliseconds
     }
 }
+
 
 function createExplosion(ctx, x, y, color) {
     // Draw the explosion shockwave
