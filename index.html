@@ -90,8 +90,8 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-        let pX = getSnakeHeadX()
-         let pY = getSnakeHeadY()
+        let pX = snake[0].x * gridSize + gridSize / 2;
+         let pY = snake[0].y * gridSize + gridSize / 2;
         let numberOfProjectiles = 5; // Number of projectiles in the wave
             const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
             const projectileSpeed = 5; // Speed of the projectiles
