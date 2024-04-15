@@ -92,9 +92,9 @@
             var antiZoomFactor = 1 / zoomFactor;
         let pX = 0
 let pY = 0
-        let numberOfProjectiles = 10; // Number of projectiles in the wave
+        let numberOfProjectiles = 1; // Number of projectiles in the wave
             const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
-            const projectileSpeed = 5; // Speed of the projectiles
+            const projectileSpeed = 1; // Speed of the projectiles
             const projectileColor = 'orange'; // Color of the projectiles
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
@@ -124,7 +124,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
         // Draw the projectile
         ctx.beginPath();
         ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, 5, 0, Math.PI * 2);
+        ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
         ctx.fill();
 
         // Update the projectile's position and redraw
