@@ -95,8 +95,16 @@
             const projectileSpeed = 5; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
-    // Calculate the angle increment based on the snake direction
+let numberOfProjectiles = 5; // Number of projectiles in the wave
+const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
+const projectileSpeed = 5; // Speed of the projectiles
+const projectileColor = 'red'; // Color of the projectiles
+
+function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, direction, obstacles, dynamicObstacles, gridSize) {
+    // Calculate the angle increment based on the spread angle
+    const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
+
+    // Calculate the base angle for the projectiles based on the direction
     let baseAngle;
     switch (direction) {
         case 'up':
@@ -111,11 +119,10 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
         case 'right':
             baseAngle = 0; // Point rightwards
             break;
+        default:
+            baseAngle = 0; // Default to pointing rightwards
     }
     
-    // Calculate the angle between projectiles based on the spread angle and snake direction
-    const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
-
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
         // Calculate the angle for this projectile
@@ -125,11 +132,10 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
         const velocityX = Math.cos(angle) * projectileSpeed;
         const velocityY = Math.sin(angle) * projectileSpeed;
 
-
         // Create the projectile object
         const projectile = {
-            x: pX,
-            y: pY,
+            x: startX,
+            y: startY,
             velocityX: velocityX,
             velocityY: velocityY,
             color: projectileColor
@@ -149,6 +155,8 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
             // Update the projectile's position
             projectile.x += projectile.velocityX;
             projectile.y += projectile.velocityY;
+
+            // Check for collision with obstacles (code for collision detection omitted for brevity)
 
             // Check for collision with obstacles
             obstacles.forEach((obstacle, index) => {
@@ -174,7 +182,7 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
                 }
             });
 
-            // Draw the projectile at its new position
+               // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
             ctx.arc(projectile.x, projectile.y, 5, 0, Math.PI * 2);
