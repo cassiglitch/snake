@@ -73,6 +73,7 @@
         let charging = false;
         let freeze = false;
         let freezetimer = 5;
+        let pausetimer = 900;
         let isFoodOrange = false;
         let livecount = 2; 
         let originalSnakeColor = '#00FF00';
@@ -959,13 +960,13 @@ function PauseHoldStart(event) {
         y: event.touches[0].clientY
     };
     touchStartTime = new Date().getTime(); // Record the time when touch starts
-    setTimeout(checkHold, 500); // Check after 1.5 seconds if the touch is still held
+    setTimeout(checkHold, pausetimer); // Check after 1.5 seconds if the touch is still held
 }
 
 // Function to check if touch is still held after 1.5 seconds
 function checkHold() {
     // Check if touch is still active and hasn't moved for 1.5 seconds
-    if (touchStartTime && touchStartPosition && (new Date().getTime() - touchStartTime >= 500)) {
+    if (touchStartTime && touchStartPosition && (new Date().getTime() - touchStartTime >= pausetimer)) {
         if (!hasTouchMoved()) {
             pauseGame(); // Trigger the action if touch is held for 1.5 seconds without movement
         }
