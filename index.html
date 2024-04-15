@@ -14,6 +14,9 @@
             overflow: hidden; /* No more scrolling for you! */
             background-color: #f0f0f0; /* Set a background color */
             user-select: none;
+                -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
+    -ms-user-select: none; /* For Internet Explorer/Edge */
         }
 
         :root {
@@ -36,11 +39,17 @@
             border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the canvas */
              user-select: none;
+                -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
+    -ms-user-select: none; /* For Internet Explorer/Edge */
         }
         body {
             overflow: hidden; /* Disable scrolling */
             touch-action: none; /* Disable touch actions on the canvas */
-             user-select: none;
+            user-select: none;
+                -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
+    -ms-user-select: none; /* For Internet Explorer/Edge */
 }
     </style>
     <title>Snake Game</title>
