@@ -94,12 +94,12 @@
         let pX = 0;
         let pY = 0;
         let numberOfProjectiles = 10; // Number of projectiles in the wave
-            const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
+            const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
             const projectileSpeed = 10; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
-
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
+    // Get the canvas context
     // Mapping of directions to radians
     const directionRadians = {
         'up': -Math.PI / 2,
@@ -111,8 +111,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, projectileSpeed, pr
     // Convert direction string to radians
     const directionRad = directionRadians[direction.toLowerCase()] || 0;
 
-    // Calculate the angle between projectiles to cover a full circle
-    const angleIncrement = (2 * Math.PI) / numberOfProjectiles;
+    // Calculate the angle between projectiles
+    const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
 
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
@@ -153,7 +153,6 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, projectileSpeed, pr
                     projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
                     // Remove the obstacle from the array
                     obstacles.splice(index, 1);
-                    projectile.splice(index, 1)
 
                     // Create an explosion shockwave
                     createExplosion(ctx, projectile.x, projectile.y, projectileColor);
@@ -166,7 +165,6 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, projectileSpeed, pr
                     projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 2) * gridSize) {
                     // Remove the dynamic obstacle from the array
                     dynamicObstacles.splice(index, 1);
-                    projectile.splice(index, 1)
 
                     // Create an explosion shockwave
                     createExplosion(projectile.x, projectile.y, projectileColor);
@@ -187,7 +185,6 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, projectileSpeed, pr
         }, 20); // Update every 20 milliseconds
     }
 }
-
 
 function createExplosion(ctx, x, y, color) {
     // Draw the explosion shockwave
