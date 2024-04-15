@@ -95,7 +95,7 @@
             const projectileSpeed = 5; // Speed of the projectiles
             const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
+function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
     // Calculate the angle increment based on the snake direction
     let baseAngle;
     switch (direction) {
@@ -666,7 +666,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire'){
                 let pX = snake[0].x * gridSize + gridSize / 2;
                 let pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
