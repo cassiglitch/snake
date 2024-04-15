@@ -100,55 +100,54 @@ const waveSpreadAngle = 90; // Spread angle of the wave (in degrees)
 const projectileSpeed = 5; // Speed of the projectiles
 const projectileColor = 'red'; // Color of the projectiles
 
-function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, direction, obstacles, dynamicObstacles, gridSize) {
-    // Calculate the angle increment based on the spread angle
-    const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
-
-    // Calculate the base angle for the projectiles based on the direction
-    let baseAngle;
-    switch (direction) {
+function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, snakeDirection) {
+    // Calculate the angle based on the snake's current direction
+    let angle;
+    switch (snakeDirection) {
         case 'up':
-            baseAngle = -Math.PI / 2; // Point upwards
+            angle = -Math.PI / 2; // Facing upwards
             break;
         case 'down':
-            baseAngle = Math.PI / 2; // Point downwards
+            angle = Math.PI / 2; // Facing downwards
             break;
         case 'left':
-            baseAngle = Math.PI; // Point leftwards
+            angle = Math.PI; // Facing left
             break;
         case 'right':
-            baseAngle = 0; // Point rightwards
+            angle = 0; // Facing right
             break;
         default:
-            baseAngle = 0; // Default to pointing rightwards
+            angle = 0; // Default to facing right
     }
-    
+
+    // Calculate the angle between projectiles
+    const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
+
+    // Create an array to store projectile objects
+    const projectiles = [];
+
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
-        // Calculate the angle for this projectile
-        const angle = baseAngle + (angleIncrement * i);
+        // Calculate the angle for this projectile based on the snake's direction
+        const projectileAngle = angle + angleIncrement * i;
 
         // Calculate the projectile's velocity components
-        const velocityX = Math.cos(angle) * projectileSpeed;
-        const velocityY = Math.sin(angle) * projectileSpeed;
+        const velocityX = Math.cos(projectileAngle) * projectileSpeed;
+        const velocityY = Math.sin(projectileAngle) * projectileSpeed;
 
-        // Create the projectile object
-        const projectile = {
+        // Create the projectile object and add it to the array
+        projectiles.push({
             x: startX,
             y: startY,
             velocityX: velocityX,
             velocityY: velocityY,
             color: projectileColor
-        };
+        });
+    }
 
-        // Draw the projectile
-        ctx.beginPath();
-        ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Update the projectile's position and redraw
-        const updateInterval = setInterval(() => {
+    // Function to update and draw projectiles
+    function updateProjectiles() {
+        projectiles.forEach((projectile, index) => {
             // Clear the previous projectile
             ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
 
@@ -156,7 +155,11 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
             projectile.x += projectile.velocityX;
             projectile.y += projectile.velocityY;
 
-            // Check for collision with obstacles (code for collision detection omitted for brevity)
+            // Draw the projectile at its new position
+            ctx.beginPath();
+            ctx.fillStyle = projectile.color;
+            ctx.arc(projectile.x, projectile.y, 5, 0, Math.PI * 2);
+            ctx.fill();
 
             // Check for collision with obstacles
             obstacles.forEach((obstacle, index) => {
@@ -182,18 +185,20 @@ function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadA
                 }
             });
 
-               // Draw the projectile at its new position
-            ctx.beginPath();
-            ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
-                // Clear the interval and stop updating this projectile
-                clearInterval(updateInterval);
+                // Remove the projectile from the array
+                projectiles.splice(index, 1);
             }
-        }, 20); // Update every 20 milliseconds
+        });
+    }
+
+    // Call updateProjectiles function every 20 milliseconds
+    const updateInterval = setInterval(updateProjectiles, 20);
+
+    // Stop updating projectiles when they're all out of bounds
+    if (projectiles.length === 0) {
+        clearInterval(updateInterval);
     }
 }
 
@@ -674,7 +679,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire'){
                 let pX = snake[0].x * gridSize + gridSize / 2;
                 let pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
