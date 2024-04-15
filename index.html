@@ -950,10 +950,7 @@ window.addEventListener('resize', getZoomFactor);
         window.addEventListener('resize', adjustForZoom);
         adjustForZoom();
 
-canvas.addEventListener('touchstart', function(event) {
-    event.preventDefault();
-    PauseHoldStart(); // Call your function here if needed
-}); 
+canvas.addEventListener('touchstart', PauseHoldStart) 
 let touchStartTime; // Variable to store the time when touch starts
 canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart event
 
