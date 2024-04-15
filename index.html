@@ -101,7 +101,8 @@
     const projectileSpeed = 5; // Speed of the projectiles
     const projectileColor = 'orange'; // Color of the projectiles
 
-function shootWaveOfProjectiles(canvas, startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor) {
+function shootWaveOfProjectiles(canvas, startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
+    // Get the canvas con
 
     // Calculate the angle between projectiles
     const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
@@ -139,6 +140,30 @@ function shootWaveOfProjectiles(canvas, startX, startY, numberOfProjectiles, wav
             projectile.x += projectile.velocityX;
             projectile.y += projectile.velocityY;
 
+            // Check for collision with obstacles
+            obstacles.forEach((obstacle, index) => {
+                if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
+                    projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
+                    // Remove the obstacle from the array
+                    obstacles.splice(index, 1);
+
+                    // Create an explosion shockwave
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                }
+            });
+
+            // Check for collision with dynamic obstacles
+            dynamicObstacles.forEach((obstacle, index) => {
+                if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 2) * gridSize &&
+                    projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 2) * gridSize) {
+                    // Remove the dynamic obstacle from the array
+                    dynamicObstacles.splice(index, 1);
+
+                    // Create an explosion shockwave
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                }
+            });
+
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
@@ -153,6 +178,17 @@ function shootWaveOfProjectiles(canvas, startX, startY, numberOfProjectiles, wav
         }, 20); // Update every 20 milliseconds
     }
 }
+
+function createExplosion(ctx, x, y, color) {
+    // Draw the explosion shockwave
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.5; // Adjust the transparency for effect
+    ctx.fill();
+    ctx.globalAlpha = 1; // Reset the transparency
+}
+
 
 function shockwaveAnimation(x, y) {
     // Get the canvas element
@@ -621,7 +657,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire')
                     const startX = getSnakeHeadX();// Starting X coordinate
                     const startY = getSnakeHeadY(); // Starting Y coordinate
-                shootWaveOfProjectiles(canvas, startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor)
+                shootWaveOfProjectiles(ctx, startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
