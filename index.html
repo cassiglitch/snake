@@ -14,6 +14,7 @@
             overflow: hidden; /* No more scrolling for you! */
             background-color: #f0f0f0; /* Set a background color */
             user-select: none;
+                pointer-events: none;
         }
 
         :root {
@@ -25,6 +26,8 @@
             position: fixed;
             font-size: var(--grid-size); /* Set font size equal to grid size */
              user-select: none;
+                pointer-events: none;
+            touch-action: none;
         }
 
         canvas {
@@ -34,6 +37,7 @@
             border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the canvas */
              user-select: none;
+            pointer-events: none;
         }
         body {
             overflow: hidden; /* Disable scrolling */
