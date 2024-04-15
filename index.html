@@ -95,20 +95,36 @@
             const projectileSpeed = 5; // Speed of the projectiles
             const projectileColor = 'darkred'; // Color of the projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize) {
-    // Get the canvas con
-
-    // Calculate the angle between projectiles
+function shootWaveOfProjectiles(startX, startY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, snakeDirection) {
+    // Calculate the angle increment based on the snake direction
+    let baseAngle;
+    switch (snakeDirection) {
+        case 'up':
+            baseAngle = -Math.PI / 2; // Point upwards
+            break;
+        case 'down':
+            baseAngle = Math.PI / 2; // Point downwards
+            break;
+        case 'left':
+            baseAngle = Math.PI; // Point leftwards
+            break;
+        case 'right':
+            baseAngle = 0; // Point rightwards
+            break;
+    }
+    
+    // Calculate the angle between projectiles based on the spread angle and snake direction
     const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
 
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
         // Calculate the angle for this projectile
-        const angle = angleIncrement * i;
+        const angle = baseAngle + (angleIncrement * i);
 
         // Calculate the projectile's velocity components
         const velocityX = Math.cos(angle) * projectileSpeed;
         const velocityY = Math.sin(angle) * projectileSpeed;
+
 
         // Create the projectile object
         const projectile = {
@@ -122,7 +138,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
         // Draw the projectile
         ctx.beginPath();
         ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
+        ctx.arc(projectile.x, projectile.y, gridSize, 0, Math.PI * 2);
         ctx.fill();
 
         // Update the projectile's position and redraw
@@ -650,8 +666,7 @@ HaHaNoCollision(100)
                 } else if (food.type === 'fire'){
                 let pX = snake[0].x * gridSize + gridSize / 2;
                 let pY = snake[0].y * gridSize + gridSize / 2;
-                snake.unshift({ ...snake[0], color: 'red' });
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
                 }else{
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
