@@ -37,12 +37,12 @@
             border: 1px solid #ddd;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the canvas */
              user-select: none;
-            pointer-events: none;
         }
         body {
             overflow: hidden; /* Disable scrolling */
             touch-action: none; /* Disable touch actions on the canvas */
              user-select: none;
+            pointer-events: none;
 }
     </style>
     <title>Snake Game</title>
@@ -959,6 +959,7 @@ canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart 
 
 // Function to handle touchstart event
 function PauseHoldStart(event) {
+    event.preventDefault();
     touchStartPosition = {
         x: event.touches[0].clientX,
         y: event.touches[0].clientY
