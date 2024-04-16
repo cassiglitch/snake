@@ -59,8 +59,9 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
+
         let lives = 0.5;
-        let maxscore = 50;
+        let maxscore = 100;
         let psize = 20;
         let startingGridSize = 20;
         let gridSize = 20;
@@ -70,6 +71,7 @@
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
+        let previousDirection = 'direction';
         let score = 0;
         let isEating = false;
         let eatingAnimationFrames = 0;
@@ -82,7 +84,7 @@
         let freeze = false;
         let freezetimer = 5;
         let isFoodOrange = false;
-        let livecount = 2; 
+        let livecount = 2;
         let pausetimer = 900;
         let originalSnakeColor = '#00FF00';
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
@@ -96,7 +98,7 @@
         let numberOfProjectiles = 10; // Number of projectiles in the wave
             const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
             const projectileSpeed = 10; // Speed of the projectiles
-            const projectileColor = 'red'; // Color of the projectiles
+            const projectileColor = 'orange'; // Color of the projectiles
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
     // Get the canvas context
@@ -135,7 +137,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
         // Draw the projectile
         ctx.beginPath();
         ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
+        ctx.arc(projectile.x, projectile.y, 10, 0, Math.PI * 2);
         ctx.fill();
 
         // Update the projectile's position and redraw
@@ -174,7 +176,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, 20, 0, Math.PI * 2);
+            ctx.arc(projectile.x, projectile.y, 10, 0, Math.PI * 2);
             ctx.fill();
 
             // Check if the projectile is out of bounds
@@ -189,7 +191,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
 function createExplosion(ctx, x, y, color) {
     // Draw the explosion shockwave
     ctx.beginPath();
-    ctx.arc(x, y, 50, 0, Math.PI * 2);
+    ctx.arc(x, y, 70, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.globalAlpha = 0.5; // Adjust the transparency for effect
     ctx.fill();
@@ -238,7 +240,11 @@ function shockwaveAnimation(x, y) {
     let animationId = requestAnimationFrame(animate);
 }
 
-
+function checkIfPaused() {
+    if (isPaused && !Object.is(direction, previousDirection))
+        direction = previousDirection;
+}
+setInterval(checkIfPaused, 1);
 
 
 // Define a function to apply the earthquake (without visual effects)
@@ -270,7 +276,7 @@ const laser = {
     width: gridSize// Width of the laser (in pixels)
 };
 
-
+if (!isPaused) {
 // Handle tap events for shooting the laser
 let tapStartX = 0;
 let tapStartY = 0;
@@ -281,7 +287,7 @@ function handleTapStart(event) {
     tapStartX = event.touches[0].clientX;
     tapStartY = event.touches[0].clientY;
 }
-
+}
 function handleTapEnd(event) {
     tapEndX = event.changedTouches[0].clientX;
     tapEndY = event.changedTouches[0].clientY;
@@ -408,7 +414,6 @@ function shootLaser(targetX, targetY) {
         lastLaserShot = currentTime;
     }
 }
-
 // Function to pause the game
 function pauseGame() {
     isPaused = !isPaused; // Toggle the paused state
@@ -548,26 +553,28 @@ originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
 
 
-        function getFoodColor(foodType) {
-            switch (foodType) {
-                case 'earth':
-                    return 'brown';
-                case 'ice':
-                    return 'lightblue';
-                case 'normal':
-                    return 'red';
-                case 'superfood':
-                    return 'gold';
-                case 'poison':
-                    return 'purple';
-                case 'teleport':
-                    return 'blue';
-                case 'invincibility':
-                    return 'orange';
-                case 'fire':
-                    return 'darkred';
-            }
-        }
+function getFoodColor(foodType) {
+
+    switch (foodType) {
+        case 'earth':
+            return 'brown';
+        case 'ice':
+            return 'lightblue';
+        case 'normal':
+            return 'red';
+        case 'superfood':
+            return 'gold';
+        case 'poison':
+            return 'purple';
+        case 'teleport':
+            return 'blue';
+        case 'invincibility':
+            return 'turquoise';
+        case 'fire':
+            return 'orange';
+    }
+}
+
 
 // Function to trigger invincibility
 function HaHaNoCollision(duration) {
@@ -587,20 +594,28 @@ function HaHaNoCollision(duration) {
 
             // Update Snake position
             const head = { ...snake[0] };
-            switch (direction) {
-                case 'up':
-                    head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
-                    break;
-                case 'down':
-                    head.y = (head.y + 1) % (canvas.height / gridSize);
-                    break;
-                case 'left':
-                    head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
-                    break;
-                case 'right':
-                    head.x = (head.x + 1) % (canvas.width / gridSize);
-                    break;
-            }
+// Define a variable to store the previous direction
+
+// Store the current direction as the previous direction
+previousDirection = direction;
+
+// Update the direction based on user input or logic
+switch (direction) {
+    case 'up':
+        head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+        break;
+    case 'down':
+        head.y = (head.y + 1) % (canvas.height / gridSize);
+        break;
+    case 'left':
+        head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
+        break;
+    case 'right':
+        head.x = (head.x + 1) % (canvas.width / gridSize);
+        break;
+}
+
+
 
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
@@ -743,21 +758,17 @@ if (!freeze) {
             // Adjust the probability for different types of food as needed
             const random = Math.random();
             if (random <= 0.01) {
-                return 'invincibility';
-            } else if (random <= 0.2) {
-                return 'superfood';
-            } else if (random <= 0.21) {
-                return 'poison';
-            } else if (random <= 0.3) {
-                return 'teleport';
-            } else if (random <= 0.1){
-                return 'ice';
-                 } else if (random <= 0.15){
-                return 'earth';
-            } else if (random <= 0.12){
-                return 'fire';
-            } else {
-                return 'normal';
+const rare = ['invincibility']; // Possible directions
+    const randomIndex2 = Math.floor(Math.random() * rare.length);
+    return rare[randomIndex2];
+            } else if (random <= 0.4) {
+    const Special = ['teleport', 'earth', 'ice', 'fire', 'poison']; // Possible directions
+    const randomIndex2 = Math.floor(Math.random() * Special.length);
+    return Special[randomIndex2];
+} else {
+                const common = ['normal', 'superfood']; // Possible directions
+    const randomIndex2 = Math.floor(Math.random() * common.length);
+    return common[randomIndex2];
             }
         }
 
@@ -982,7 +993,7 @@ document.addEventListener('keydown', event => {
         }
     }
 });
-
+if (!isPaused) {
 // Handle touch events for mobile controls
 let touchStartX = 0;
 let touchStartY = 0;
@@ -1014,7 +1025,7 @@ function handleTouchEnd(event) {
 
 canvas.addEventListener('touchstart', handleTouchStart);
 canvas.addEventListener('touchend', handleTouchEnd);
-
+}
 
         // Start the game loop
         const gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
