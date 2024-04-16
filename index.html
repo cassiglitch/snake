@@ -158,6 +158,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
 
                     // Create an explosion shockwave
                     createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                    projectile.splice(index, 1);
                 }
             });
 
@@ -170,6 +171,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
 
                     // Create an explosion shockwave
                     createExplosion(projectile.x, projectile.y, projectileColor);
+                    projectile.splice(index, 1);
                 }
             });
 
