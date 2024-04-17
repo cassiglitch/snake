@@ -93,10 +93,6 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-        const radiusMax = Math.max(canvas.width, canvas.height);
-    let radius = 0;
-    const maxOpacity = 0.6;
-    let opacity = maxOpacity;
         let pX = 0;
         let pY = 0;
         let numberOfProjectiles = 10; // Number of projectiles in the wave
@@ -215,7 +211,10 @@ function createExplosion(ctx, x, y, color) {
 function shockwaveAnimation(x, y) {
     // Get the canvas element
     // Set up animation parameters
-
+    const radiusMax = Math.max(canvas.width, canvas.height);
+    let radius = 0;
+    const maxOpacity = 0.6;
+    let opacity = maxOpacity;
 
     // Animation loop
     function animate() {
@@ -240,6 +239,7 @@ function shockwaveAnimation(x, y) {
             opacity = maxOpacity;
             cancelAnimationFrame(animationId);
             applyEarthquake(obstacles)
+            pauseGame()
             return;
         }
 
@@ -685,10 +685,6 @@ HaHaNoCollision(100)
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
-                    while (opacity > 0) {
-  yield; // This will pause execution until the next iteration
-}
-                   pauseGame()
                 } else if (food.type === 'fire'){
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
