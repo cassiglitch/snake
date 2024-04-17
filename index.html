@@ -158,9 +158,11 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
 
                     // Create an explosion shockwave
                     createExplosion(ctx, projectile.x, projectile.y, projectileColor);
-                    projectile.splice(index, 1);
+
+                    // Remove the projectile from the canvas
                     clearInterval(updateInterval);
                     ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
+                    return; // Exit the collision check loop
                 }
             });
 
@@ -173,9 +175,11 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
 
                     // Create an explosion shockwave
                     createExplosion(projectile.x, projectile.y, projectileColor);
-                    projectile.splice(index, 1);
+
+                    // Remove the projectile from the canvas
                     clearInterval(updateInterval);
                     ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
+                    return; // Exit the collision check loop
                 }
             });
 
