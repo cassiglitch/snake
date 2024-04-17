@@ -267,8 +267,7 @@ function applyEarthquake(obstacles) {
             // Shift the obstacle by a random amount
             obstacle.x += Math.floor(Math.random() * 3) - 1; // Shift left or right by 1 grid
             obstacle.y += Math.floor(Math.random() * 3) - 1; // Shift up or down by 1 grid
-               dynamicObstacle.x += (Math.floor(Math.random() * 3) - 1) * 2; // Shift left or right by 1 grid
-            dynamicObstacle.y += (Math.floor(Math.random() * 3) - 1) * 2; // Shift up or down by 1 grid
+             
         } else {
             // Collapse the obstacle by removing it from the array
             let index = obstacles.indexOf(obstacle);
@@ -681,8 +680,11 @@ switch (direction) {
 HaHaNoCollision(100)
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
-                    freeze = true;
-                    } else if (food.type === 'earth'){
+ if (freeze === false){                    
+     freeze = true;
+ } else {
+     return;         
+                } else if (food.type === 'earth'){
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
                     pauseGame()
