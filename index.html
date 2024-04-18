@@ -189,71 +189,73 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                           
             
             
-            projectiles.forEach((projectile, projectileIndex)if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
-                    projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) {
-            if (food.type === 'superfood') {
-                    gamefoods.push('superfood')
-                    score += 2;
-                    snake.unshift({ ...snake[0], color: 'blue' });
-                    snake.unshift({ ...snake[0], color: 'blue' });
-                } else if (food.type === 'poison') {
-                    gamefoods.push('poison')
-                    if (snake.length < 4) {
-                        restartGame();
-                        return;
-                    }
-                    snake.pop();
-                    snake.pop();
-                    snake.pop();
-                    score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
-                } else if (food.type === 'teleport') {
-                    gamefoods.push('teleport')
-    // Teleport the snake to a random location
-    const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
-    const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
-    head.x = randomX;
-    head.y = randomY;
+            projectiles.forEach((projectile, projectileIndex) => {
+    if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
+        projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) {
+        if (food.type === 'superfood') {
+            gamefoods.push('superfood');
+            score += 2;
+            snake.unshift({ ...snake[0], color: 'blue' });
+            snake.unshift({ ...snake[0], color: 'blue' });
+        } else if (food.type === 'poison') {
+            gamefoods.push('poison');
+            if (snake.length < 4) {
+                restartGame();
+                return;
+            }
+            snake.pop();
+            snake.pop();
+            snake.pop();
+            score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
+        } else if (food.type === 'teleport') {
+            gamefoods.push('teleport');
+            // Teleport the snake to a random location
+            const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
+            const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
+            head.x = randomX;
+            head.y = randomY;
 
-    // Randomize the direction
-    const directions = ['up', 'down', 'left', 'right']; // Possible directions
-    const randomIndex = Math.floor(Math.random() * directions.length);
-    direction = directions[randomIndex];
-    HaHaNoCollision(10)
-                } else if (food.type === 'invincibility') {
-                    gamefoods.push('invincibility')
-          isFoodOrange = true;
-                lives = (lives/2);
-                livecount = livecount + 1;
-HaHaNoCollision(100)
-// Use a for loop to repeat the action
-                } else if (food.type === 'ice') {
-                    gamefoods.push('ice')
- if (freeze === false){                    
-     freeze = true;
- } else {
-     return;         
- }
-                } else if (food.type === 'earth'){
-                    gamefoods.push('earth')
-                    let x = getSnakeHeadX()
-                    let y = getSnakeHeadY()
-                    pauseGame()
-                    shockwaveAnimation(x, y)
-                } else if (food.type === 'fire'){
-                    gamefoods.push('fire')
-                pX = projectile.x * gridSize + gridSize / 2;
-                pY = projectile.y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
-                }else{
-                    gamefoods.push('normal')
-                    score += 1;
-                    snake.unshift({ ...snake[0], color: 'blue' });
-                }
-                spawnFood();
-                createExplosion(ctx, projectile.x, projectile.y, projectileColor);
-                projectiles.splice(index, 1);
-                }
-            )}
+            // Randomize the direction
+            const directions = ['up', 'down', 'left', 'right']; // Possible directions
+            const randomIndex = Math.floor(Math.random() * directions.length);
+            direction = directions[randomIndex];
+            HaHaNoCollision(10);
+        } else if (food.type === 'invincibility') {
+            gamefoods.push('invincibility');
+            isFoodOrange = true;
+            lives = (lives/2);
+            livecount = livecount + 1;
+            HaHaNoCollision(100);
+            // Use a for loop to repeat the action
+        } else if (food.type === 'ice') {
+            gamefoods.push('ice');
+            if (freeze === false) {                    
+                freeze = true;
+            } else {
+                return;         
+            }
+        } else if (food.type === 'earth') {
+            gamefoods.push('earth');
+            let x = getSnakeHeadX();
+            let y = getSnakeHeadY();
+            pauseGame();
+            shockwaveAnimation(x, y);
+        } else if (food.type === 'fire') {
+            gamefoods.push('fire');
+            pX = projectile.x * gridSize + gridSize / 2;
+            pY = projectile.y * gridSize + gridSize / 2;
+            shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction);
+        } else {
+            gamefoods.push('normal');
+            score += 1;
+            snake.unshift({ ...snake[0], color: 'blue' });
+        }
+        spawnFood();
+        createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+        projectiles.splice(index, 1);
+    }
+});
+
     
 
 
@@ -263,7 +265,7 @@ HaHaNoCollision(100)
                 createExplosion(ctx, projectile.x, projectile.y, projectileColor);
                 projectiles.splice(index, 1);
             }
-        });
+        );
 
         // If all projectiles are removed, stop the interval
         if (projectiles.length === 0) {
