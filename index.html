@@ -185,11 +185,11 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
                 }
-            });
-                          
-            
-            
-            projectiles.forEach((projectile, projectileIndex) => {
+            });            
+  
+
+    
+projectiles.forEach((projectile, projectileIndex) => {
     if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
         projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) {
         if (food.type === 'superfood') {
@@ -209,30 +209,29 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
         } else if (food.type === 'teleport') {
             gamefoods.push('teleport');
-            // Teleport the snake to a random location
-            const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
-            const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
-            head.x = randomX;
-            head.y = randomY;
-
             // Randomize the direction
             const directions = ['up', 'down', 'left', 'right']; // Possible directions
             const randomIndex = Math.floor(Math.random() * directions.length);
             direction = directions[randomIndex];
             HaHaNoCollision(10);
+            // Teleport the snake to a random location after ensuring no collision
+            const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
+            const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
+            head.x = randomX;
+            head.y = randomY;
         } else if (food.type === 'invincibility') {
             gamefoods.push('invincibility');
             isFoodOrange = true;
-            lives = (lives/2);
-            livecount = livecount + 1;
+            lives /= 2; // Reduce lives by half
+            livecount += 1; // Increase the count of lives
             HaHaNoCollision(100);
             // Use a for loop to repeat the action
         } else if (food.type === 'ice') {
             gamefoods.push('ice');
-            if (freeze === false) {                    
+            if (!freeze) { // Check if game is not already frozen
                 freeze = true;
             } else {
-                return;         
+                return; // Do nothing if game is already frozen
             }
         } else if (food.type === 'earth') {
             gamefoods.push('earth');
@@ -250,13 +249,13 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             score += 1;
             snake.unshift({ ...snake[0], color: 'blue' });
         }
+        isEating = true;
+        eatingAnimationFrames = 8; // Set the number of frames for the eating animation
         spawnFood();
         createExplosion(ctx, projectile.x, projectile.y, projectileColor);
-        projectiles.splice(index, 1);
+        projectiles.splice(projectileIndex, 1); // Remove the projectile using the correct index
     }
 });
-
-    
 
 
             // Check if the projectile is out of bounds
