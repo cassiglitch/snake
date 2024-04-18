@@ -190,6 +190,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
                 // Remove the projectile from the array
+                createExplosion(ctx, projectile.x, projectile.y, projectileColor);
                 projectiles.splice(index, 1);
             }
         });
