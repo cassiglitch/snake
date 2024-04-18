@@ -464,8 +464,7 @@ if (freeze === true) {
                     drawInvincibilityAura('blue');
     pX = snake[0].x * gridSize + gridSize / 2;
     pY = snake[0].y * gridSize + gridSize / 2;
-    shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, 1, 'lightblue', obstacles, dynamicObstacles, gridSize, direction)
-    shootWaveOfProjectiles(pX, pY, numberOfProjectiles, (waveSpreadAngle) * 2, 1, 'turquoise', obstacles, dynamicObstacles, gridSize, direction)
+    shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, 'lightblue', obstacles, dynamicObstacles, gridSize, direction)
 setTimeout(() => {
     freeze = false;
             },freezetimer * 1000);
