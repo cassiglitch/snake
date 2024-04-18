@@ -685,11 +685,8 @@ switch (direction) {
 HaHaNoCollision(100)
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
-                    if (!freeze = false){
+                    if (freeze = false){
                     freeze = true;
-                    }else {
-                    return;
-                    }
                     } else if (food.type === 'earth'){
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
