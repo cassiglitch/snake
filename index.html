@@ -462,6 +462,10 @@ setTimeout(() => {
 
 if (freeze === true) {
                     drawInvincibilityAura('blue');
+    pX = snake[0].x * gridSize + gridSize / 2;
+    pY = snake[0].y * gridSize + gridSize / 2;
+    shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, 1, 'lightblue', obstacles, dynamicObstacles, gridSize, direction)
+    shootWaveOfProjectiles(pX, pY, numberOfProjectiles, (waveSpreadAngle) * 2, 1, 'turquoise', obstacles, dynamicObstacles, gridSize, direction)
 setTimeout(() => {
     freeze = false;
             },freezetimer * 1000);
@@ -682,7 +686,11 @@ switch (direction) {
 HaHaNoCollision(100)
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
+                    if (!freeze = false){
                     freeze = true;
+                    }else {
+                    return;
+                    }
                     } else if (food.type === 'earth'){
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
