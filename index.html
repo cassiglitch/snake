@@ -186,7 +186,10 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     projectiles.splice(index, 1);
                 }
             });
-                           if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
+                          
+            
+            
+            projectiles.forEach((projectile, projectileIndex)if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
                     projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) {
             if (food.type === 'superfood') {
                     gamefoods.push('superfood')
@@ -247,10 +250,10 @@ HaHaNoCollision(100)
                     snake.unshift({ ...snake[0], color: 'blue' });
                 }
                 spawnFood();
-                }
-            }
-createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                createExplosion(ctx, projectile.x, projectile.y, projectileColor);
                 projectiles.splice(index, 1);
+                }
+            )}
     
 
 
