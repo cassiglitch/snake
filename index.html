@@ -61,6 +61,7 @@
 
 
         let lives = 0.5;
+        let gamefoods = [];
         let maxscore = 100;
         let psize = 20;
         let startingGridSize = 20;
@@ -93,12 +94,13 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-        let pX = 0;
-        let pY = 0;
-        let numberOfProjectiles = 10; // Number of projectiles in the wave
-            const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
-            const projectileSpeed = 10; // Speed of the projectiles
-            const projectileColor = 'orange'; // Color of the projectiles
+  let pX = 0;
+let pY = 0;
+let numberOfProjectiles = 10; // Number of projectiles in the wave
+const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
+const projectileSpeed = 10; // Speed of the projectiles
+const projectileColor = 'orange'; // Color of the projectiles
+let projectiles = []; // Array to store projectiles
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
     // Get the canvas context
@@ -134,14 +136,14 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             color: projectileColor
         };
 
-        // Draw the projectile
-        ctx.beginPath();
-        ctx.fillStyle = projectile.color;
-        ctx.arc(projectile.x, projectile.y, 10, 0, Math.PI * 2);
-        ctx.fill();
+        // Push the projectile into the array
+        projectiles.push(projectile);
+    }
 
-        // Update the projectile's position and redraw
-        const updateInterval = setInterval(() => {
+    // Update and draw projectiles
+    const updateInterval = setInterval(() => {
+        // Loop through each projectile
+        projectiles.forEach((projectile, index) => {
             // Clear the previous projectile
             ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
 
@@ -149,53 +151,54 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             projectile.x += projectile.velocityX;
             projectile.y += projectile.velocityY;
 
-            // Check for collision with obstacles
-            obstacles.forEach((obstacle, index) => {
-                if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
-                    projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
-                    // Remove the obstacle from the array
-                    obstacles.splice(index, 1);
-
-                    // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
-
-                    // Remove the projectile from the canvas
-                    clearInterval(updateInterval);
-                    ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
-                    return; // Exit the collision check loop
-                }
-            });
-
-            // Check for collision with dynamic obstacles
-            dynamicObstacles.forEach((obstacle, index) => {
-                if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 2) * gridSize &&
-                    projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 2) * gridSize) {
-                    // Remove the dynamic obstacle from the array
-                    dynamicObstacles.splice(index, 1);
-
-                    // Create an explosion shockwave
-                    createExplosion(projectile.x, projectile.y, projectileColor);
-
-                    // Remove the projectile from the canvas
-                    clearInterval(updateInterval);
-                    ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
-                    return; // Exit the collision check loop
-                }
-            });
-
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
             ctx.arc(projectile.x, projectile.y, 10, 0, Math.PI * 2);
             ctx.fill();
 
+            // Check for collision with obstacles
+            obstacles.forEach((obstacle, obstacleIndex) => {
+                if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
+                    projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
+                    // Remove the obstacle from the array
+                    obstacles.splice(obstacleIndex, 1);
+
+                    // Create an explosion shockwave
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+
+                    // Remove the projectile from the array
+                    projectiles.splice(index, 1);
+                }
+            });
+
+            // Check for collision with dynamic obstacles
+            dynamicObstacles.forEach((dynamicObstacle, dynamicObstacleIndex) => {
+                if (projectile.x >= dynamicObstacle.x * gridSize && projectile.x <= (dynamicObstacle.x + 2) * gridSize &&
+                    projectile.y >= dynamicObstacle.y * gridSize && projectile.y <= (dynamicObstacle.y + 2) * gridSize) {
+                    // Remove the dynamic obstacle from the array
+                    dynamicObstacles.splice(dynamicObstacleIndex, 1);
+
+                    // Create an explosion shockwave
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+
+                    // Remove the projectile from the array
+                    projectiles.splice(index, 1);
+                }
+            });
+
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
-                // Clear the interval and stop updating this projectile
-                clearInterval(updateInterval);
+                // Remove the projectile from the array
+                projectiles.splice(index, 1);
             }
-        }, 20); // Update every 20 milliseconds
-    }
+        });
+
+        // If all projectiles are removed, stop the interval
+        if (projectiles.length === 0) {
+            clearInterval(updateInterval);
+        }
+    }, 20); // Update every 20 milliseconds
 }
 
 function createExplosion(ctx, x, y, color) {
@@ -207,6 +210,7 @@ function createExplosion(ctx, x, y, color) {
     ctx.fill();
     ctx.globalAlpha = 1; // Reset the transparency
 }
+
 
 function shockwaveAnimation(x, y) {
     // Get the canvas element
@@ -649,10 +653,12 @@ switch (direction) {
             // Check if Snake eats Food
             if (head.x === food.x && head.y === food.y) {
                 if (food.type === 'superfood') {
+                    gamefoods.push('superfood')
                     score += 2;
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                 } else if (food.type === 'poison') {
+                    gamefoods.push('poison')
                     if (snake.length < 4) {
                         restartGame();
                         return;
@@ -662,6 +668,7 @@ switch (direction) {
                     snake.pop();
                     score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
                 } else if (food.type === 'teleport') {
+                    gamefoods.push('teleport')
     // Teleport the snake to a random location
     const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
     const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
@@ -674,27 +681,32 @@ switch (direction) {
     direction = directions[randomIndex];
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
+                    gamefoods.push('invincibility')
           isFoodOrange = true;
                 lives = (lives/2);
                 livecount = livecount + 1;
 HaHaNoCollision(100)
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
+                    gamefoods.push('ice')
  if (freeze === false){                    
      freeze = true;
  } else {
      return;         
  }
                 } else if (food.type === 'earth'){
+                    gamefoods.push('earth')
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
                 } else if (food.type === 'fire'){
+                    gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
                 }else{
+                    gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
                 }
@@ -810,6 +822,7 @@ const rare = ['invincibility']; // Possible directions
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
+            gamefoods = [];
             dynamicObstacles = [];
             score = 0;
             isEating = false;
