@@ -93,7 +93,8 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-  let pX = 0;
+
+let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -184,8 +185,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
                 }
-            });            
-  
+            });
 
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
@@ -193,7 +193,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                 createExplosion(ctx, projectile.x, projectile.y, projectileColor);
                 projectiles.splice(index, 1);
             }
-        );
+        });
 
         // If all projectiles are removed, stop the interval
         if (projectiles.length === 0) {
