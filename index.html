@@ -187,7 +187,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                 }
             });
                            if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
-                    projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) 
+                    projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) {
             if (food.type === 'superfood') {
                     gamefoods.push('superfood')
                     score += 2;
