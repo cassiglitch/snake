@@ -186,8 +186,9 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     projectiles.splice(index, 1);
                 }
             });
-            if (projectile.x === food.x && projectile.y === food.y) {
-                if (food.type === 'superfood') {
+                           if (projectile.x >= food.x * gridSize && projectile.x <= (food.x + 1) * gridSize &&
+                    projectile.y >= food.y * gridSize && projectile.y <= (food.y + 1) * gridSize) 
+            if (food.type === 'superfood') {
                     gamefoods.push('superfood')
                     score += 2;
                     snake.unshift({ ...snake[0], color: 'blue' });
