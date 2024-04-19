@@ -796,14 +796,9 @@ if (!freeze) {
             // Adjust the probability for different types of food as needed
             const random = Math.random();
             if (random <= 0.01) {
-                if (!gamefood.includes('invincibility')){
 const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
-                }}else{
-                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
-    const randomIndex2 = Math.floor(Math.random() * common.length);
-    return common[randomIndex2];
             } else if (random <= 0.4) {
     const Special = ['teleport', 'earth', 'ice', 'fire',]; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
