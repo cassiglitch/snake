@@ -588,7 +588,7 @@ function getFoodColor(foodType) {
         case 'fire':
             return 'orange';
         case 'ultrafood':
-            return 'rebeccapurple'
+            return 'purple';
     }
 }
 
@@ -711,7 +711,7 @@ HaHaNoCollision(100)
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
                 }else if (food.type === 'ultrafood'){
-                                    gamefoods.push('ultrafood')
+                    gamefoods.push('ultrafood')
                     score += 3;
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
@@ -801,7 +801,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
                 }else{
-                const common = ['normal', 'superfood']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             } else if (random <= 0.4) {
