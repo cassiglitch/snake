@@ -590,7 +590,7 @@ function getFoodColor(foodType) {
         case 'ultrafood':
             return 'darkblue';
         case 'bigfire':
-            return 'darkred';
+            return 'darkyellow';
     }
 }
 
@@ -811,7 +811,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood', 'bigfire']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             }
