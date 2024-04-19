@@ -690,11 +690,12 @@ HaHaNoCollision(100)
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
                     gamefoods.push('ice')
+                    let pcolor = 'lightblue';
  if (freeze === false){                    
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 360, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction)
  } else {
      return;         
  }
