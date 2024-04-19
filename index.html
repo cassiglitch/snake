@@ -807,11 +807,9 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
             } else if (random <= 0.4) {
-    const Special = ['teleport', 'earth', 'ice', 'fire',]; // Possible directions
+    const Special = ['teleport', 'earth', 'ice', 'fire', 'bigfire', 'poison']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
-} else if (random <= 0.2) {
-                return 'poison';
             } else{
                 const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
