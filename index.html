@@ -102,7 +102,7 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction) {
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, proectileSizw) {
     // Get the canvas context
     // Mapping of directions to radians
     const directionRadians = {
@@ -154,7 +154,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, 10, 0, Math.PI * 2);
+            ctx.arc(projectile.x, projectile.y, proectileSizw, 0, Math.PI * 2);
             ctx.fill();
 
             // Check for collision with obstacles
@@ -589,6 +589,8 @@ function getFoodColor(foodType) {
             return 'orange';
         case 'ultrafood':
             return 'darkblue';
+        case 'bigfire':
+            return 'darkred';
     }
 }
 
@@ -695,7 +697,7 @@ HaHaNoCollision(100)
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction, 10)
  } else {
      return;         
  }
@@ -709,14 +711,19 @@ HaHaNoCollision(100)
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10)
                 }else if (food.type === 'ultrafood'){
                     gamefoods.push('ultrafood')
                     score += 3;
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
-                } else {
+                } else if (food.type === 'bigfire'){
+                    let pcolourr = 'red'
+                pX = snake[0].x * gridSize + gridSize / 2;
+                pY = snake[0].y * gridSize + gridSize / 2;
+                shootWaveOfProjectiles(pX, pY, 1, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 30)
+                }else{
                     gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
