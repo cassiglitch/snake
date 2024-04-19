@@ -61,6 +61,7 @@
 
 
         let lives = 0.5;
+        let gamefoods = [];
         let maxscore = 100;
         let psize = 20;
         let startingGridSize = 20;
@@ -93,8 +94,7 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-
-let pX = 0;
+  let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -212,6 +212,114 @@ function createExplosion(ctx, x, y, color) {
     ctx.globalAlpha = 1; // Reset the transparency
 }
 
+// enemySnakeModule.js
+
+const EnemySnakeModule = (function() {
+    var deviceWidth, landscape = Math.abs(window.orientation) == 90
+            // workaround for strange screen.height on the iPhone (v3.1.3)
+            if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+            else deviceWidth = window.screen[landscape ? "height" : "width"]
+            var zoomFactor = deviceWidth / window.innerWidth;
+            var antiZoomFactor = 1 / zoomFactor;
+  // Private variables
+  let canvas;
+  let ctx;
+  let gridSize = 20 * antiZoomFactor;
+  let enemySnake = [];
+  let enemyColor = 'red';
+
+  // Public functions
+  function init(canvasId) {
+    canvas = document.getElementById(canvasId);
+    ctx = canvas.getContext('2d');
+    spawnEnemy();
+  }
+
+  function spawnEnemy() {
+    // Spawn enemy at random position
+    const x = Math.floor(Math.random() * canvas.width / gridSize) * gridSize;
+    const y = Math.floor(Math.random() * canvas.height / gridSize) * gridSize;
+    enemySnake = [{ x: x, y: y }];
+  }
+
+  function moveEnemy(snake) {
+    // Move enemy towards the position of the player snake[0]
+    if (snake.length > 0) {
+      const targetX = snake[0].x;
+      const targetY = snake[0].y;
+
+      const head = enemySnake[0];
+      let dx = 0;
+      let dy = 0;
+
+      if (head.x < targetX) {
+        dx = gridSize;
+      } else if (head.x > targetX) {
+        dx = -gridSize;
+      } else if (head.y < targetY) {
+        dy = gridSize;
+      } else if (head.y > targetY) {
+        dy = -gridSize;
+      }
+
+      // Check for collision with walls
+      if (head.x + dx >= canvas.width || head.x + dx < 0 || head.y + dy >= canvas.height || head.y + dy < 0) {
+        // If enemy hits the wall, respawn at random position
+        spawnEnemy();
+      } else {
+        // Move enemy
+        enemySnake.unshift({ x: head.x + dx, y: head.y + dy });
+        enemySnake.pop();
+      }
+    }
+  }
+
+  function renderEnemy() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Render enemy snake
+    ctx.fillStyle = enemyColor;
+    enemySnake.forEach(segment => {
+      ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
+    });
+  }
+
+  function checkCollisionWithPlayer(playerSnake) {
+    // Check if enemy snake collides with player snake
+    const head = enemySnake[0];
+    for (let i = 1; i < snake.length; i++) {
+      if (head.x === snake[i].x && head.y === snake[i].y) {
+        // Enemy snake collides with player snake, handle death
+        spawnEnemy();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Public API
+  return {
+    init: init,
+    moveEnemy: moveEnemy,
+    renderEnemy: renderEnemy,
+    checkCollisionWithPlayer: checkCollisionWithPlayer
+  };
+})();
+
+// Usage example:
+EnemySnakeModule.init('snakeCanvas'); // Initialize with canvas id
+setInterval(() => {
+  // Assuming playerSnake is the array representing the player's snake
+  EnemySnakeModule.moveEnemy(snake);
+  if (EnemySnakeModule.checkCollisionWithPlayer(snake)) {
+    // Handle player collision with enemy
+    // For example: decrease player's lives, update score, etc.
+  }
+  EnemySnakeModule.renderEnemy();
+}, 100); // Adjust the interval as needed
+
+
 function shockwaveAnimation(x, y) {
     // Get the canvas element
     // Set up animation parameters
@@ -243,6 +351,7 @@ function shockwaveAnimation(x, y) {
             opacity = maxOpacity;
             cancelAnimationFrame(animationId);
             applyEarthquake(obstacles)
+            pauseGame()
             return;
         }
 
@@ -270,6 +379,7 @@ function applyEarthquake(obstacles) {
             // Shift the obstacle by a random amount
             obstacle.x += Math.floor(Math.random() * 3) - 1; // Shift left or right by 1 grid
             obstacle.y += Math.floor(Math.random() * 3) - 1; // Shift up or down by 1 grid
+             
         } else {
             // Collapse the obstacle by removing it from the array
             let index = obstacles.indexOf(obstacle);
@@ -462,7 +572,7 @@ setTimeout(() => {
 
 if (freeze === true) {
                     drawInvincibilityAura('blue');
-    setTimeout(() => {
+setTimeout(() => {
     freeze = false;
             },freezetimer * 1000);
 
@@ -651,10 +761,12 @@ switch (direction) {
             // Check if Snake eats Food
             if (head.x === food.x && head.y === food.y) {
                 if (food.type === 'superfood') {
+                    gamefoods.push('superfood')
                     score += 2;
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                 } else if (food.type === 'poison') {
+                    gamefoods.push('poison')
                     if (snake.length < 4) {
                         restartGame();
                         return;
@@ -664,6 +776,7 @@ switch (direction) {
                     snake.pop();
                     score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
                 } else if (food.type === 'teleport') {
+                    gamefoods.push('teleport')
     // Teleport the snake to a random location
     const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
     const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
@@ -676,25 +789,32 @@ switch (direction) {
     direction = directions[randomIndex];
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
+                    gamefoods.push('invincibility')
           isFoodOrange = true;
                 lives = (lives/2);
                 livecount = livecount + 1;
 HaHaNoCollision(100)
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
-                    if (freeze = false){
-                    freeze = true;
-                    } else if (food.type === 'earth'){
+                    gamefoods.push('ice')
+ if (freeze === false){                    
+     freeze = true;
+ } else {
+     return;         
+ }
+                } else if (food.type === 'earth'){
+                    gamefoods.push('earth')
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
-                    setTimeout(pauseGame, 2900)
                 } else if (food.type === 'fire'){
+                    gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction)
                 }else{
+                    gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
                 }
@@ -810,6 +930,7 @@ const rare = ['invincibility']; // Possible directions
             pauseGame();
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
+            gamefoods = [];
             dynamicObstacles = [];
             score = 0;
             isEating = false;
@@ -924,7 +1045,8 @@ function animateExplosion() {
             resizeCanvasHeight();
             update();
             draw();
-                        // Handle eating animation
+
+            // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
 
@@ -942,7 +1064,6 @@ function animateExplosion() {
                 }
             }
         }
-
 
 function closestNumber(n, m) {
     // Find the quotient
