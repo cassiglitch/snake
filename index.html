@@ -293,7 +293,6 @@ const laser = {
     width: gridSize// Width of the laser (in pixels)
 };
 
-if (!isPaused) {
 // Handle tap events for shooting the laser
 let tapStartX = 0;
 let tapStartY = 0;
@@ -303,7 +302,6 @@ let tapEndY = 0;
 function handleTapStart(event) {
     tapStartX = event.touches[0].clientX;
     tapStartY = event.touches[0].clientY;
-}
 }
 function handleTapEnd(event) {
     tapEndX = event.changedTouches[0].clientX;
