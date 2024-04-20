@@ -59,7 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-
+let pdirection = direction;
         let lives = 0.5;
         let gamefoods = [];
         let maxscore = 100;
@@ -622,15 +622,19 @@ previousDirection = direction;
 switch (direction) {
     case 'up':
         head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+        pdirection = 'left';
         break;
     case 'down':
         head.y = (head.y + 1) % (canvas.height / gridSize);
+        pdirection = 'right';
         break;
     case 'left':
         head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
+        pdirection = 'up';
         break;
     case 'right':
         head.x = (head.x + 1) % (canvas.width / gridSize);
+        pdirection = 'down';
         break;
 }
 
@@ -719,7 +723,7 @@ HaHaNoCollision(100)
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                 } else if (food.type === 'bigfire'){
-                let pdirection;
+
                 if (direction = 'right'){
                     pdirection = 'down';
                 }else if (direction = 'left'){
