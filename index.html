@@ -679,9 +679,9 @@ switch (direction) {
     head.y = randomY;
 
     // Randomize the direction
-    const directions = ['up', 'down', 'left', 'right']; // Possible directions
+    const directionarray = ['up', 'down', 'left', 'right']; // Possible directions
     const randomIndex = Math.floor(Math.random() * directions.length);
-    direction = directions[randomIndex];
+    direction = directionarray[randomIndex];
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
                     gamefoods.push('invincibility')
@@ -719,7 +719,7 @@ HaHaNoCollision(100)
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                 } else if (food.type === 'bigfire'){
-                let pdirection = 'right';
+                let pdirection;
                 if (direction = 'right'){
                     pdirection = 'down';
                 }else if (direction = 'left'){
