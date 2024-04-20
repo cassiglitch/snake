@@ -679,9 +679,9 @@ switch (direction) {
     head.y = randomY;
 
     // Randomize the direction
-    const directionarray = ['up', 'down', 'left', 'right']; // Possible directions
+    const directions = ['up', 'down', 'left', 'right']; // Possible directions
     const randomIndex = Math.floor(Math.random() * directions.length);
-    direction = directionarray[randomIndex];
+    direction = directions[randomIndex];
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
                     gamefoods.push('invincibility')
