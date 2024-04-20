@@ -102,7 +102,7 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, proectileSizw) {
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, directions, proectileSizw) {
     // Get the canvas context
     // Mapping of directions to radians
     const directionRadians = {
@@ -113,7 +113,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
     };
 
     // Convert direction string to radians
-    const directionRad = directionRadians[direction.toLowerCase()] || 0;
+    const directionRad = directionRadians[directions.toLowerCase()] || 0;
 
     // Calculate the angle between projectiles
     const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
