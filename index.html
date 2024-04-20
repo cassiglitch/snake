@@ -102,7 +102,7 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, proectileSizw) {
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, proectileSizw, explode) {
     // Get the canvas context
     // Mapping of directions to radians
     const directionRadians = {
@@ -165,7 +165,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     obstacles.splice(obstacleIndex, 1);
 
                     // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode)
 
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
@@ -180,7 +180,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     dynamicObstacles.splice(dynamicObstacleIndex, 1);
 
                     // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode)
 
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
@@ -190,7 +190,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
                 // Remove the projectile from the array
-                createExplosion(ctx, projectile.x, projectile.y, projectileColor);
+                                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
                 projectiles.splice(index, 1);
             }
         });
@@ -202,14 +202,40 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
     }, 20); // Update every 20 milliseconds
 }
 
-function createExplosion(ctx, x, y, color) {
+function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
     // Draw the explosion shockwave
     ctx.beginPath();
-    ctx.arc(x, y, 70, 0, Math.PI * 2);
+    ctx.arc(x, y, explode, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.globalAlpha = 0.5; // Adjust the transparency for effect
     ctx.fill();
     ctx.globalAlpha = 1; // Reset the transparency
+    
+    // Loop through obstacles and check for destruction
+    obstacles.forEach((obstacle, obstacleIndex) => {
+        const obstacleCenterX = (obstacle.x + 0.5) * gridSize;
+        const obstacleCenterY = (obstacle.y + 0.5) * gridSize;
+        
+        const distance = Math.sqrt((obstacleCenterX - x) ** 2 + (obstacleCenterY - y) ** 2);
+        
+        // If the obstacle is within the explosion radius, destroy it
+        if (distance <= explode) {
+            obstacles.splice(obstacleIndex, 1);
+        }
+    });
+    
+    // Loop through dynamic obstacles and check for destruction
+    dynamicObstacles.forEach((dynamicObstacle, dynamicObstacleIndex) => {
+        const dynamicObstacleCenterX = (dynamicObstacle.x + 1) * gridSize;
+        const dynamicObstacleCenterY = (dynamicObstacle.y + 1) * gridSize;
+        
+        const distance = Math.sqrt((dynamicObstacleCenterX - x) ** 2 + (dynamicObstacleCenterY - y) ** 2);
+        
+        // If the dynamic obstacle is within the explosion radius, destroy it
+        if (distance <= explode) {
+            dynamicObstacles.splice(dynamicObstacleIndex, 1);
+        }
+    });
 }
 
 
@@ -697,7 +723,7 @@ HaHaNoCollision(100)
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction, 10)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction, 10, 70)
  } else {
      return;         
  }
@@ -711,7 +737,7 @@ HaHaNoCollision(100)
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70)
                 }else if (food.type === 'ultrafood'){
                     gamefoods.push('ultrafood')
                     score += 3;
@@ -722,7 +748,7 @@ HaHaNoCollision(100)
                 let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60)
                 }else{
                     gamefoods.push('normal')
                     score += 1;
