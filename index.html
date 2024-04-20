@@ -59,7 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-let pdirection = direction;
+        
         let lives = 0.5;
         let gamefoods = [];
         let maxscore = 100;
@@ -589,7 +589,7 @@ function getFoodColor(foodType) {
             return 'orange';
         case 'ultrafood':
             return 'darkblue';
-        case 'bigfire':
+        case 'air':
             return 'lightgrey';
     }
 }
@@ -622,19 +622,15 @@ previousDirection = direction;
 switch (direction) {
     case 'up':
         head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
-        pdirection = 'left';
         break;
     case 'down':
         head.y = (head.y + 1) % (canvas.height / gridSize);
-        pdirection = 'right';
         break;
     case 'left':
         head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
-        pdirection = 'up';
         break;
     case 'right':
         head.x = (head.x + 1) % (canvas.width / gridSize);
-        pdirection = 'down';
         break;
 }
 
@@ -722,21 +718,11 @@ HaHaNoCollision(100)
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
-                } else if (food.type === 'bigfire'){
-
-                if (direction = 'right'){
-                    pdirection = 'down';
-                }else if (direction = 'left'){
-                    pdirection = 'up';
-                }else if (direction = 'up'){
-                    pdirection = 'left';
-                }else if (direction = 'down'){
-                    pdirection = 'right';
-                }
-                let pcolourr = 'red'
+             } else if (food.type === 'air'){
+                    gamefoods.push(air')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, 1, 90, 2, pcolourr, obstacles, dynamicObstacles, gridSize, pdirection, 30)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, 'grey', obstacles, dynamicObstacles, gridSize, direction, 10)
                 }else{
                     gamefoods.push('normal')
                     score += 1;
