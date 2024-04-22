@@ -94,6 +94,7 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
+            
   let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
@@ -102,26 +103,32 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, proectileSizw, explode) {
+    function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode) {
     // Get the canvas context
     // Mapping of directions to radians
-    const directionRadians = {
-        'right': -Math.PI / 2,
-        'left': Math.PI / 2,
-        'up': Math.PI,
-        'down': 0
-    };
+    // Mapping of directions to radians
+const directionRadians = {
+    'right': 0,
+    'left': Math.PI,
+    'up': -Math.PI / 2,
+    'down': Math.PI / 2
+};
 
-    // Convert direction string to radians
-    const directionRad = directionRadians[direction.toLowerCase()] || 0;
+// Convert direction string to radians
+const directionRad = directionRadians[direction.toLowerCase()] || 0;
+
 
     // Calculate the angle between projectiles
+    const halfSpread = waveSpreadAngle / 2;
+    const adjustedAngle = directionRad - (halfSpread * (Math.PI / 180));
+
+    // Calculate the angle increment based on the adjusted angle
     const angleIncrement = (waveSpreadAngle / numberOfProjectiles) * (Math.PI / 180);
 
     // Loop through each projectile
     for (let i = 0; i < numberOfProjectiles; i++) {
         // Calculate the angle for this projectile
-        const angle = angleIncrement * i + directionRad;
+        const angle = angleIncrement * i + adjustedAngle;
 
         // Calculate the projectile's velocity components
         const velocityX = Math.cos(angle) * projectileSpeed;
@@ -154,7 +161,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Draw the projectile at its new position
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, proectileSizw, 0, Math.PI * 2);
+            ctx.arc(projectile.x, projectile.y, projectileSize, 0, Math.PI * 2);
             ctx.fill();
 
             // Check for collision with obstacles
@@ -165,7 +172,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     obstacles.splice(obstacleIndex, 1);
 
                     // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode)
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
 
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
@@ -180,7 +187,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     dynamicObstacles.splice(dynamicObstacleIndex, 1);
 
                     // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode)
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
 
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
@@ -190,7 +197,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
                 // Remove the projectile from the array
-                                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+                createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
                 projectiles.splice(index, 1);
             }
         });
@@ -201,8 +208,9 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
         }
     }, 20); // Update every 20 milliseconds
 }
-
-function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
+    
+        
+    function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
     // Draw the explosion shockwave
     ctx.beginPath();
     ctx.arc(x, y, explode, 0, Math.PI * 2);
@@ -461,6 +469,7 @@ function pauseGame() {
 }
 
 
+
 function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -615,7 +624,7 @@ function getFoodColor(foodType) {
             return 'orange';
         case 'ultrafood':
             return 'darkblue';
-        case 'bigfire':
+        case 'air':
             return 'lightgrey';
     }
 }
@@ -737,14 +746,14 @@ HaHaNoCollision(100)
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70)
                 }else if (food.type === 'ultrafood'){
                     gamefoods.push('ultrafood')
                     score += 3;
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
                     snake.unshift({ ...snake[0], color: 'blue' });
-                } else if (food.type === 'bigfire'){
+                } else if (food.type === 'air'){
                 let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
@@ -1168,6 +1177,7 @@ function checkHold() {
         pauseGame(); // Trigger the action if touch is held for 1.5 seconds
     }
 }
+
 
 // Listen for touchend event to reset the timer if touch is released before 1.5 seconds
 canvas.addEventListener('touchend', PauseHoldEnd);
