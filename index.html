@@ -647,6 +647,8 @@ function getFoodColor(foodType) {
             return 'darkblue';
         case 'air':
             return 'lightgrey';
+        default:
+            return 'red';
     }
 }
 
@@ -755,7 +757,7 @@ HaHaNoCollision(100);
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, 30, 360, (projectileSpeed/2), pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, (projectileSpeed * 2), pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3)
  } else {
      return;         
  }
@@ -894,12 +896,14 @@ const rare = ['invincibility']; // Possible directions
             createParticles('red');
             animateExplosion();
             pauseGame();
+            gotextralife = false;
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
             gamefoods = [];
             dynamicObstacles = [];
             score = 0;
             isEating = false;
+            isInvincible = false;
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
