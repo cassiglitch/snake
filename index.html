@@ -60,6 +60,7 @@
         const ctx = canvas.getContext('2d');
 
 
+        let gotextralife = false;
         let lives = 0.5;
         let gamefoods = [];
         let maxscore = 100;
@@ -720,10 +721,14 @@ switch (direction) {
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
                     gamefoods.push('invincibility')
-          isFoodOrange = true;
+ if (gotextralife === false){
+                isFoodOrange = true;
                 lives = (lives/2);
                 livecount = livecount + 1;
+                HaHaNoCollision(100)
+ }else if (gotextralife === true)    
 HaHaNoCollision(100)
+ }
 // Use a for loop to repeat the action
                 } else if (food.type === 'ice') {
                     gamefoods.push('ice')
