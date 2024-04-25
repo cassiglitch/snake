@@ -115,7 +115,7 @@ function drawPolygon(x, y, length, sides, color) {
         ctx.fill();
     }
 
-    function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides) {
+    function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase) {
     // Get the canvas context
     // Mapping of directions to radians
     // Mapping of directions to radians
@@ -152,7 +152,8 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             y: pY,
             velocityX: velocityX,
             velocityY: velocityY,
-            color: projectileColor
+            color: projectileColor,
+            side: sides
         };
 
         // Push the projectile into the array
@@ -178,7 +179,7 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             ctx.arc(projectile.x, projectile.y, projectileSize, 0, Math.PI * 2);
             ctx.fill();
             } else{
-            drawPolygon(projectile.x, projectile.y, projectileSize, sides, projectile.color)
+            drawPolygon(projectile.x, projectile.y, projectileSize, projectile.side, projectile.color)
             }
 
             // Check for collision with obstacles
@@ -227,6 +228,9 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
         else{
             return
         }
+if (increase === true){
+    projectile.sides += 1;
+}
     }, 20); // Update every 20 milliseconds
 }
     
@@ -757,7 +761,7 @@ HaHaNoCollision(100);
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, 30, 360, (projectileSpeed * 2), pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, (projectileSpeed * 2), pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3, true)
  } else {
      return;         
  }
@@ -771,7 +775,7 @@ HaHaNoCollision(100);
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false)
                 }else if (food.type === 'ultrafood'){
                     gamefoods.push('ultrafood')
                     score += 3;
@@ -782,7 +786,7 @@ HaHaNoCollision(100);
                 let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false)
                 }else{
                     gamefoods.push('normal')
                     score += 1;
