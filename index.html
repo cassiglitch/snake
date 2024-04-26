@@ -153,7 +153,8 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             velocityX: velocityX,
             velocityY: velocityY,
             color: projectileColor,
-            side: sides
+            side: sides,
+            size: projectileSize
         };
 
         // Push the projectile into the array
@@ -172,14 +173,20 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             projectile.x += projectile.velocityX;
             projectile.y += projectile.velocityY;
 
+                      if (increase) {
+                    projectile.side += 1;
+                    projectile.size += 1;
+                }
+
+
             // Draw the projectile at its new position
             if (circle === true){
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
-            ctx.arc(projectile.x, projectile.y, projectileSize, 0, Math.PI * 2);
+            ctx.arc(projectile.x, projectile.y, projectile.size, 0, Math.PI * 2);
             ctx.fill();
             } else{
-            drawPolygon(projectile.x, projectile.y, projectileSize, projectile.side, projectile.color)
+            drawPolygon(projectile.x, projectile.y, projectile.size, projectile.side, projectile.color)
             }
 
             // Check for collision with obstacles
