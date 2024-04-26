@@ -89,6 +89,7 @@
         let livecount = 2;
         let pausetimer = 900;
         let originalSnakeColor = '#00FF00';
+        let neoncolor = '#39ff14';
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -96,13 +97,15 @@
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
             
-  let pX = 0;
+let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
 const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
+
+
 
 function drawPolygon(x, y, length, sides, color) {
         ctx.beginPath();
@@ -115,7 +118,7 @@ function drawPolygon(x, y, length, sides, color) {
         ctx.fill();
     }
 
-    function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase) {
+ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed) {
     // Get the canvas context
     // Mapping of directions to radians
     // Mapping of directions to radians
@@ -152,15 +155,14 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             y: pY,
             velocityX: velocityX,
             velocityY: velocityY,
-            color: projectileColor,
-            side: sides,
+            color: projectileColor, 
+            sides: sides,
             size: projectileSize
         };
 
         // Push the projectile into the array
         projectiles.push(projectile);
     }
-
     // Update and draw projectiles
     const updateInterval = setInterval(() => {
         // Loop through each projectile
@@ -172,12 +174,11 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             // Update the projectile's position
             projectile.x += projectile.velocityX;
             projectile.y += projectile.velocityY;
-
-                      if (increase) {
-                    projectile.side += 1;
-                    projectile.size += 1;
+if (increase === true) {
+                    projectile.size += 10;
+                }else if (increase === false){
+    projectile.size = projectileSize
                 }
-
 
             // Draw the projectile at its new position
             if (circle === true){
@@ -186,7 +187,7 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             ctx.arc(projectile.x, projectile.y, projectile.size, 0, Math.PI * 2);
             ctx.fill();
             } else{
-            drawPolygon(projectile.x, projectile.y, projectile.size, projectile.side, projectile.color)
+            drawPolygon(projectile.x, projectile.y, projectile.size, projectile.sides, projectile.color)
             }
 
             // Check for collision with obstacles
@@ -197,7 +198,7 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
                     obstacles.splice(obstacleIndex, 1);
 
                     // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, projectile.size * 2);
 
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
@@ -212,7 +213,7 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
                     dynamicObstacles.splice(dynamicObstacleIndex, 1);
 
                     // Create an explosion shockwave
-                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, projectile.size * 2);
 
                     // Remove the projectile from the array
                     projectiles.splice(index, 1);
@@ -222,11 +223,13 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
                 // Remove the projectile from the array
-                createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+                createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, projectile.size * 2);
                 projectiles.splice(index, 1);
             }
         });
-
+            if (increase === true){
+    projectile.sides += 1;
+}
         // If all projectiles are removed, stop the interval
         if (projectiles.length === 0) {
             clearInterval(updateInterval);
@@ -235,13 +238,9 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
         else{
             return
         }
-if (increase === true){
-    projectile.side += 1;
-}
-    }, 20); // Update every 20 milliseconds
-}
-    
-        
+    }, updatespeed); // Update every 20 milliseconds
+}  
+
     function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
     // Draw the explosion shockwave
     ctx.beginPath();
@@ -660,6 +659,8 @@ function getFoodColor(foodType) {
             return 'lightgrey';
         default:
             return 'red';
+        case 'morph':
+            return neoncolor;
     }
 }
 
@@ -758,6 +759,7 @@ switch (direction) {
     isFoodOrange = true;
     lives = (lives / 2);
     livecount = livecount + 1;
+    gotextralife = true;
 }
 HaHaNoCollision(100);
 
@@ -768,7 +770,7 @@ HaHaNoCollision(100);
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, 30, 360, (projectileSpeed * 2), pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3, true)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3, false, 20)
  } else {
      return;         
  }
@@ -782,7 +784,7 @@ HaHaNoCollision(100);
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false, 20)
                 }else if (food.type === 'ultrafood'){
                     gamefoods.push('ultrafood')
                     score += 3;
@@ -793,8 +795,13 @@ HaHaNoCollision(100);
                 let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false)
-                }else{
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false, 20)
+                }else if (food.type === 'morph'){
+                pX = snake[0].x * gridSize + gridSize / 2;
+                pY = snake[0].y * gridSize + gridSize / 2;
+                shootWaveOfProjectiles(pX, pY, 1, 1, 30, neoncolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, true, 3, true, 100)
+                }
+                else{
                     gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'blue' });
@@ -878,11 +885,11 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
             } else if (random <= 0.4) {
-    const Special = ['teleport', 'earth', 'ice', 'fire', 'bigfire', 'poison']; // Possible directions
+    const Special = ['teleport', 'earth', 'ice', 'fire', 'bigfire', 'poison', 'morph']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood', 'morph']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             }
