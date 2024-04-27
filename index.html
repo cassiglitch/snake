@@ -96,7 +96,7 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-            
+            let currentInterval = 1
 let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
@@ -889,7 +889,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood', 'morph']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             }
@@ -914,6 +914,7 @@ const rare = ['invincibility']; // Possible directions
             createParticles('red');
             animateExplosion();
             pauseGame();
+            changeInterval(100)
             gotextralife = false;
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
@@ -1154,7 +1155,17 @@ canvas.addEventListener('touchend', handleTouchEnd);
 }
 
         // Start the game loop
-        const gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
+                let gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
+
+
+function changeInterval(interval) {
+    clearInterval(gameInterval);
+    gameInterval = setInterval(gameLoop, interval);
+
+
+    currentInterval = interval/100
+
+}
 
         function getZoomFactor() {
             var deviceWidth, landscape = Math.abs(window.orientation) == 90
