@@ -96,7 +96,8 @@
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
-            let currentInterval = 1
+       let currentInterval = 1;
+            
 let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
@@ -238,7 +239,7 @@ if (increase === true) {
         else{
             return
         }
-    }, updatespeed); // Update every 20 milliseconds
+    }, updatespeed * currentInterval); // Update every 20 milliseconds
 }  
 
     function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
@@ -661,6 +662,8 @@ function getFoodColor(foodType) {
             return 'red';
         case 'morph':
             return neoncolor;
+        case 'slow':
+            return 'grey';
     }
 }
 
@@ -728,8 +731,8 @@ switch (direction) {
                 if (food.type === 'superfood') {
                     gamefoods.push('superfood')
                     score += 2;
-                    snake.unshift({ ...snake[0], color: 'blue' });
-                    snake.unshift({ ...snake[0], color: 'blue' });
+                    snake.unshift({ ...snake[0], color: 'green' });
+                    snake.unshift({ ...snake[0], color: 'green' });
                 } else if (food.type === 'poison') {
                     gamefoods.push('poison')
                     if (snake.length < 4) {
@@ -788,9 +791,10 @@ HaHaNoCollision(100);
                 }else if (food.type === 'ultrafood'){
                     gamefoods.push('ultrafood')
                     score += 3;
-                    snake.unshift({ ...snake[0], color: 'blue' });
-                    snake.unshift({ ...snake[0], color: 'blue' });
-                    snake.unshift({ ...snake[0], color: 'blue' });
+                    snake.unshift({ ...snake[0], color: 'green' });
+                    snake.unshift({ ...snake[0], color: 'green' });
+                    snake.unshift({ ...snake[0], color: 'green' });
+                    
                 } else if (food.type === 'air'){
                 let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
@@ -800,11 +804,13 @@ HaHaNoCollision(100);
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, 1, 1, 30, neoncolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, true, 3, true, 100)
+                }else if (food.type === 'slow'){
+                 changeInterval(150)   
                 }
                 else{
                     gamefoods.push('normal')
                     score += 1;
-                    snake.unshift({ ...snake[0], color: 'blue' });
+                    snake.unshift({ ...snake[0], color: 'green' });
                 }
                 isEating = true;
                 eatingAnimationFrames = 8; // Set the number of frames for the eating animation
@@ -889,7 +895,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood', 'slow']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             }
@@ -914,7 +920,6 @@ const rare = ['invincibility']; // Possible directions
             createParticles('red');
             animateExplosion();
             pauseGame();
-            changeInterval(100)
             gotextralife = false;
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
@@ -927,6 +932,7 @@ const rare = ['invincibility']; // Possible directions
             lives = 0.5;
             livecount = 2;
             spawnFood();
+changeInterval(100)
         }
 
  
@@ -1155,16 +1161,12 @@ canvas.addEventListener('touchend', handleTouchEnd);
 }
 
         // Start the game loop
-                let gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
-
+        let gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
 
 function changeInterval(interval) {
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, interval);
-
-
     currentInterval = interval/100
-
 }
 
         function getZoomFactor() {
