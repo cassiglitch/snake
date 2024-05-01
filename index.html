@@ -666,6 +666,33 @@ function getFoodColor(foodType) {
     }
 }
 
+function isFoodNearby() {
+    // Define the distance threshold for attraction
+    const attractionDistance = 5;
+    
+    // Calculate the distance between the snake's head and the food
+    const distanceX = Math.abs(snake[0].x - food.x);
+    const distanceY = Math.abs(snake[0].y - food.y);
+    const totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    
+    // Check if the food is within the attraction distance
+    return totalDistance <= attractionDistance;
+}
+
+// Define a function to handle the magnetic attraction power-up
+function activateMagneticAttraction() {
+    // Check if the food is nearby
+    if (isFoodNearby()) {
+        // Calculate the direction towards the food
+        const directionX = food.x - snake[0].x;
+        const directionY = food.y - snake[0].y;
+        
+        // Move the food towards the snake's head
+        food.x -= Math.sign(directionX);
+        food.y -= Math.sign(directionY);
+        
+            }
+}
 
 // Function to trigger invincibility
 function HaHaNoCollision(duration) {
@@ -839,6 +866,7 @@ HaHaNoCollision(100);
                     gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'green' });
+                    activateMagneticAttraction()
                 }
                 isEating = true;
                 eatingAnimationFrames = 8; // Set the number of frames for the eating animation
