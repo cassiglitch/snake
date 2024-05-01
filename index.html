@@ -668,7 +668,7 @@ function getFoodColor(foodType) {
 
 function isFoodNearby() {
     // Define the distance threshold for attraction
-    const attractionDistance = 5;
+    const attractionDistance = 200000;
     
     // Calculate the distance between the snake's head and the food
     const distanceX = Math.abs(snake[0].x - food.x);
