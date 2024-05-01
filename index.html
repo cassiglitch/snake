@@ -59,7 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-
+        let gravitywell = false;
         let gotextralife = false;
         let lives = 0.5;
         let gamefoods = [];
@@ -108,7 +108,93 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
+let range = 10
+let well = { x: 0, y: 0};
 
+function isSnakeHeadNearPoint(pointX, pointY, gridSize) {
+    // Calculate the distance between the snake's head and the point
+    let snakex = snake[0].x * gridSize + gridSize / 2;
+    let snakey = snake[0].y * gridSize + gridSize / 2;
+    var distance = Math.hypot(pointX - snakex, pointY - snakey);
+    
+    // Check if the distance is less than or equal to 5 times the grid size
+    if (distance <= range * gridSize) {
+        return true;
+    } else {
+        return false;
+    }
+}
+// Define pulse variables
+var pulseRadius = gridSize;
+var pulseMaxRadius = (gridSize + (gridSize/2));
+var pulseMinRadius = (gridSize / 2);
+var pulseSpeed = 0.1;
+var increasing = true;
+
+// Function to draw pulsating circle
+function drawPulsatingCircle() {
+
+
+    // Draw pulsating circle
+    ctx.beginPath();
+    ctx.arc(well.x, well.y, pulseRadius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+    ctx.fill();
+    ctx.closePath();
+
+    // Update pulse radius
+    if (increasing) {
+        pulseRadius += pulseSpeed;
+        if (pulseRadius >= pulseMaxRadius) {
+            increasing = false;
+        }
+    } else {
+        pulseRadius -= pulseSpeed;
+        if (pulseRadius <= pulseMinRadius) {
+            increasing = true;
+        }
+    }
+
+    // Request animation frame
+    requestAnimationFrame(drawPulsatingCircle);
+}
+
+// Call drawPulsatingCircle function to start animation
+drawPulsatingCircle();
+
+
+function determineDirection(snake, targetPoint) {
+    const head = snake[0];
+    
+    // Calculate the horizontal and vertical distances between the head and the target point
+    const dx = targetPoint.x - head.x;
+    const dy = targetPoint.y - head.y;
+    
+    // Determine the absolute differences
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    
+    // Choose the direction that reduces the distance the most
+    if (absDx > absDy) {
+        // If the absolute horizontal distance is greater than the absolute vertical distance
+        if (dx > head.x) {
+            // If the target is to the right of the head, move right
+            return 'right';
+        } else {
+            // Otherwise, move left
+            return 'left';
+        }
+    } else {
+        // If the absolute vertical distance is greater than or equal to the absolute horizontal distance
+        if (dy > head.y) {
+            // If the target is below the head, move down
+            return 'down';
+        } else {
+            // Otherwise, move up
+            return 'up';
+        }
+    }
+}
 
 function drawPolygon(x, y, length, sides, color) {
         ctx.beginPath();
@@ -564,8 +650,7 @@ setTimeout(() => {
     dynamicObstacles.forEach(obstacle => {
         ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
     });
-
-    // Draw Score
+        // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay');
     scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
@@ -633,7 +718,6 @@ eatenSegments.forEach((segment, index) => {
 
 originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
-
 
 function getFoodColor(foodType) {
 
@@ -837,9 +921,7 @@ HaHaNoCollision(100);
                       changeInterval(150)   
                 setTimeout(function() {
     changeInterval(100);
-}, 500);
-                   
-                
+}, 500);           
                 }else{
                     gamefoods.push('normal')
                     score += 1;
@@ -855,6 +937,7 @@ HaHaNoCollision(100);
                 }
             }
 
+   gravitywell = isSnakeHeadNearPoint(well.x, well.y, gridSize)
     if (!isPaused) { // Check if the game is not paused
         // Move Snake
         snake.pop();
@@ -1073,7 +1156,10 @@ function animateExplosion() {
             resizeCanvasHeight();
             update();
             draw();
-
+                
+         if (gravitywell === true){
+                 direction = determineDirection(snake, well);
+             }
             // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
