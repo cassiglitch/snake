@@ -314,9 +314,20 @@ if (increase === true) {
         if (distance <= explode) {
             dynamicObstacles.splice(dynamicObstacleIndex, 1);
         }
+        
     });
+        thwomps.forEach((thwomp, dynamicObstacleIndex) => {
+        const thwompx = (thwomp.x + 1) * gridSize;
+        const thwompy = (thwomp.y + 1) * gridSize;
+        
+        const distance = Math.sqrt((thwompx - x) ** 2 + (thwompy - y) ** 2);
+        
+        // If the dynamic obstacle is within the explosion radius, destroy it
+        if (distance <= explode) {
+            thwomp.splice(dynamicObstacleIndex, 1);
+        }
 }
-
+                        }
 
 function shockwaveAnimation(x, y) {
     // Get the canvas element
@@ -1071,6 +1082,7 @@ function spawnObstacle() {
             animateExplosion();
             pauseGame();
             gotextralife = false;
+            thwomps = []
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
             gamefoods = [];
