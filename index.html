@@ -261,6 +261,20 @@ if (increase === true) {
                 }
             });
 
+            thwomps.forEach((thwomp, dynamicObstacleIndex) => {
+                if (projectile.x >= thwomp.x * gridSize && projectile.x <= (thwomp.x + 2) * gridSize &&
+                    projectile.y >= thwomp.y * gridSize && projectile.y <= (thwomp.y + 2) * gridSize) {
+                    // Remove the dynamic obstacle from the array
+                    thwomp.splice(dynamicObstacleIndex, 1);
+
+                    // Create an explosion shockwave
+                    createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+
+                    // Remove the projectile from the array
+                    projectiles.splice(index, 1);
+                }
+            });
+
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
                 // Remove the projectile from the array
@@ -326,7 +340,7 @@ if (increase === true) {
         if (distance <= explode) {
             thwomp.splice(dynamicObstacleIndex, 1);
         }
-}
+})
                         }
 
 function shockwaveAnimation(x, y) {
