@@ -172,7 +172,9 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             sides: sides,
             size: projectileSize,
             reflect: false,
-            count: 0
+            count: 0,
+            circle: circle
+            
         };
 
         // Push the projectile into the array
@@ -210,7 +212,7 @@ if (increase === true) {
             
     
             // Draw the projectile at its new position
-            if (circle === true){
+            if (projectile.circle === true){
             ctx.beginPath();
             ctx.fillStyle = projectile.color;
             ctx.arc(projectile.x, projectile.y, projectile.size, 0, Math.PI * 2);
