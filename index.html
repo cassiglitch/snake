@@ -100,7 +100,7 @@
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
        let currentInterval = 1;
-            
+let thwomps = []
 let pX = 0;
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
@@ -602,6 +602,10 @@ setTimeout(() => {
     ctx.fillStyle = 'darkgrey';
 mirrors.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+ctx.fillStyle = 'black';
+    thwomps.forEach(obstacle => {
+        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
+    });
 
     // Draw Dynamic Obstacles
     ctx.fillStyle = 'grey';
@@ -757,7 +761,8 @@ switch (direction) {
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
                 dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2)))) {
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) || thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) {
                 const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
@@ -959,7 +964,26 @@ if (!freeze) {
             }
         });
 }
-    }
+        thwomps.forEach(obstacle => {
+            if (obstacle.state === 2) {
+                // Left to right movement
+                obstacle.y -= 0.25;
+                if (obstacle.y + 1 === 0) {
+                    obstacle.state = 1; // Reset to the top if it goes beyond the canvas boundary
+                }
+                }else if (obstacle.state === 1) {
+                // Up and down movement
+                obstacle.y += 1;
+                if (obstacle.y + 1 > canvas.height / gridSize) {
+                    obstacle.state = 2; // Reset to the top if it goes beyond the canvas boundary
+                }
+            }           
+                   
+            }
+        );
+}
+
+
 
             // Check for victory
             if (score >= maxscore) {
@@ -1030,6 +1054,8 @@ function spawnObstacle() {
             obstacles.push({ x: x, y: y });
         } else if (Math.random() < 0.6) { 
             mirrors.push({ x: x, y: y });
+        }else if (Math.random() < 0.9){
+            thwomps.push({ x: x, y: 0, state: 1 });
         } else {
             // Randomly assign an ID to the dynamic obstacle
             const id = Math.random() < 0.5 ? 1 : 2;
