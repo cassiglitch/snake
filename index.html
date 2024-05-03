@@ -92,6 +92,7 @@
         let neoncolor = '#39ff14';
         let sunset = '#00FFFF'
         let timeslow = '#00ff8c'
+        let timespeed = '#ff0073'
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -707,6 +708,8 @@ function getFoodColor(foodType) {
             return sunset;
         case 'slow':
             return timeslow;
+        case 'fast':
+            return timespeed
     }
 }
 
@@ -911,7 +914,13 @@ HaHaNoCollision(100);
                       changeInterval(150)   
                 setTimeout(function() {
     changeInterval(100);
-}, 500);           
+}, 6000);           
+                }else if(food.type === 'fast'){
+changeInterval(50)   
+                setTimeout(function() {
+    changeInterval(100);
+}, 300);           
+                    
                 }else{
                     gamefoods.push('normal')
                     score += 1;
@@ -1000,7 +1009,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood', 'fast']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             }
