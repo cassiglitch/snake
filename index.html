@@ -59,7 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-        let gravitywell = false;
+        let mirrors = []
         let gotextralife = false;
         let lives = 0.5;
         let gamefoods = [];
@@ -69,7 +69,7 @@
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0 };
+        let food = { x: 0, y: 0};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
@@ -108,6 +108,19 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
+function isCollidingWithBody(x, y) {
+    // Loop through each segment of the snake's body
+    for (let i = 1; i < snake.length; i++) {
+        // Check if the specified position matches the position of any segment of the snake's body
+        if (snake[i].x === x && snake[i].y === y) {
+            // If a match is found, return true indicating collision
+            return true;
+        }
+    }
+    // If no match is found, return false indicating no collision
+    return false;
+}
+
 
 function drawPolygon(x, y, length, sides, color) {
         ctx.beginPath();
@@ -133,9 +146,7 @@ const directionRadians = {
 
 // Convert direction string to radians
 const directionRad = directionRadians[direction.toLowerCase()] || 0;
-
-
-    // Calculate the angle between projectiles
+// Calculate the angle between projectiles
     const halfSpread = waveSpreadAngle / 2;
     const adjustedAngle = directionRad - (halfSpread * (Math.PI / 180));
 
@@ -159,7 +170,9 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             velocityY: velocityY,
             color: projectileColor, 
             sides: sides,
-            size: projectileSize
+            size: projectileSize,
+            reflect: false,
+            count: 0
         };
 
         // Push the projectile into the array
@@ -174,8 +187,17 @@ const directionRad = directionRadians[direction.toLowerCase()] || 0;
             ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
 
             // Update the projectile's position
-            projectile.x += projectile.velocityX;
-            projectile.y += projectile.velocityY;
+if(increase === false|| projectile.count <= 5){
+    if (projectile.reflect === true){
+             projectile.x -= projectile.velocityX;
+             projectile.y -= projectile.velocityY;
+        projectile.count += 1
+            }else{
+    projectile.x += projectile.velocityX;
+    projectile.y += projectile.velocityY;
+    projectile.count += 1
+                 }
+}
 if (increase === true) {
                     projectile.size += 10;
     explode = projectile.size * explosionstrength
@@ -183,7 +205,8 @@ if (increase === true) {
     projectile.size = projectileSize
     
                 }
-
+            
+    
             // Draw the projectile at its new position
             if (circle === true){
             ctx.beginPath();
@@ -193,7 +216,16 @@ if (increase === true) {
             } else{
             drawPolygon(projectile.x, projectile.y, projectile.size, projectile.sides, projectile.color)
             }
-
+            mirrors.forEach((mirror, obstacleIndex) => {
+                if (projectile.x >= mirror.x * gridSize && projectile.x <= (mirror.x + 1) * gridSize &&
+                    projectile.y >= mirror.y * gridSize && projectile.y <= (mirror.y + 1) * gridSize) {
+                if(projectile.reflect === false){
+                    projectile.reflect = true
+                }else{
+                projectile.reflect = false
+                }
+                }
+            })
             // Check for collision with obstacles
             obstacles.forEach((obstacle, obstacleIndex) => {
                 if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
@@ -235,6 +267,7 @@ if (increase === true) {
         // If all projectiles are removed, stop the interval
         if (projectiles.length === 0) {
             clearInterval(updateInterval);
+            projectile.count = 0
         }
         }
         else{
@@ -560,6 +593,11 @@ setTimeout(() => {
     ctx.fillStyle = 'black';
     obstacles.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+
+    ctx.fillStyle = 'darkgrey';
+mirrors.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+
+
     // Draw Dynamic Obstacles
     ctx.fillStyle = 'grey';
     dynamicObstacles.forEach(obstacle => {
@@ -724,7 +762,41 @@ switch (direction) {
             restartGame(); // End the game if segments (lives) run out
             return;
         }              
+            } 
+if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
+    // If the head collides with a mirror and the player is not invincible
+    // Reverse the direction of movement
+    switch (direction) {
+        case 'right':
+            if (!mirrors.some(obstacle => obstacle.x === head.x + 1 && obstacle.y === head.y) && !isCollidingWithBody(head.x + 1, head.y)) {
+                direction = 'left';
+                snake[0].x -= 1;
             }
+            break;
+        case 'left':
+            if (!mirrors.some(obstacle => obstacle.x === head.x - 1 && obstacle.y === head.y) && !isCollidingWithBody(head.x - 1, head.y)) {
+                direction = 'right';
+                snake[0].x += 1
+            }
+            break;
+        case 'up':
+            if (!mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y - 1) && !isCollidingWithBody(head.x, head.y - 1)) {
+                direction = 'down';
+                snake[0].y -= 1
+            }
+            break;
+        case 'down':
+            if (!mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y + 1) && !isCollidingWithBody(head.x, head.y + 1)) {
+                direction = 'up';
+                snake[0].y += 1
+            }
+            break;
+        default:
+            // Handle any other direction cases here
+            break;
+    }
+}
+
 
             // Check if Snake eats Food
             if (head.x === food.x && head.y === food.y){
@@ -936,7 +1008,9 @@ const rare = ['invincibility']; // Possible directions
 
             if (Math.random() < 0.5) {
                 obstacles.push({ x: x, y: y });
-            } else {
+            } if (Math.random() < 0.6){ 
+            mirrors.push({ x: x, y: y });
+            }else {
                 // Randomly assign an ID to the dynamic obstacle
                 const id = Math.random() < 0.5 ? 1 : 2;
                 dynamicObstacles.push({ x: x, y: y, id: id });
