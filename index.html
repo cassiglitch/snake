@@ -1006,20 +1006,28 @@ const rare = ['invincibility']; // Possible directions
             }
         }
 
-        function spawnObstacle() {
-            const x = Math.floor(Math.random() * (canvas.width / gridSize));
-            const y = Math.floor(Math.random() * (canvas.height / gridSize));
+function spawnObstacle() {
+    const x = Math.floor(Math.random() * (canvas.width / gridSize));
+    const y = Math.floor(Math.random() * (canvas.height / gridSize));
 
-            if (Math.random() < 0.5) {
-                obstacles.push({ x: x, y: y });
-            } if (Math.random() < 0.6){ 
+    // Check if the coordinates are already occupied by something else
+    const occupied = obstacles.some(obstacle => obstacle.x === x && obstacle.y === y) ||
+                     mirrors.some(mirror => mirror.x === x && mirror.y === y) ||
+                     dynamicObstacles.some(dynamic => dynamic.x === x && dynamic.y === y)||
+                    (food.x === x && food.y === y)
+
+    if (!occupied) {
+        if (Math.random() < 0.5) {
+            obstacles.push({ x: x, y: y });
+        } else if (Math.random() < 0.6) { 
             mirrors.push({ x: x, y: y });
-            }else {
-                // Randomly assign an ID to the dynamic obstacle
-                const id = Math.random() < 0.5 ? 1 : 2;
-                dynamicObstacles.push({ x: x, y: y, id: id });
-            }
+        } else {
+            // Randomly assign an ID to the dynamic obstacle
+            const id = Math.random() < 0.5 ? 1 : 2;
+            dynamicObstacles.push({ x: x, y: y, id: id });
         }
+    }
+}
 
 
         function restartGame() {
@@ -1206,6 +1214,25 @@ function resizeCanvas() {
     if (food.y >= canvasHeight / gridSize) {
         food.y = canvasHeight / gridSize - 1;
     }
+    if (
+    obstacles.some(obstacle => obstacle.x === food.x && obstacle.y === food.y) ||
+    dynamicObstacles.some(obstacle => 
+        (food.x >= obstacle.x && food.x < obstacle.x + 2) &&
+        (food.y >= obstacle.y && food.y < obstacle.y + 2)
+    ) ||
+    mirrors.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
+) {
+    food.x += 1;
+    food.y += 1;
+}
+obstacles.forEach((obstacle, obstacleIndex) => {
+  mirrors.forEach((mirror, mirrorIndex) => {
+    if (mirror.x === obstacle.x && mirror.y === obstacle.y) {
+      obstacle.x += 1;
+      obstacle.y += 1;
+    }
+  });
+});
 }
 
 
