@@ -201,6 +201,8 @@ if(increase === false|| projectile.count <= 5){
 if (increase === true) {
                     projectile.size += 10;
     explode = projectile.size * explosionstrength
+    projectile.x += projectile.velocityX;
+    projectile.y += projectile.velocityY;
                 }else if (increase === false){
     projectile.size = projectileSize
     
