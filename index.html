@@ -88,6 +88,7 @@
         let isFoodOrange = false;
         let livecount = 2;
         let pausetimer = 900;
+        let snakeprojectilecollisiontime = 2000
         let originalSnakeColor = '#00FF00';
         let neoncolor = '#39ff14';
         let sunset = '#00FFFF'
@@ -261,11 +262,11 @@ if (increase === true) {
                 }
             });
 
-            thwomps.forEach((thwomp, dynamicObstacleIndex) => {
+            thwomps.forEach((thwomp, thwompindex) => {
                 if (projectile.x >= thwomp.x * gridSize && projectile.x <= (thwomp.x + 2) * gridSize &&
                     projectile.y >= thwomp.y * gridSize && projectile.y <= (thwomp.y + 2) * gridSize) {
                     // Remove the dynamic obstacle from the array
-                    thwomp.splice(dynamicObstacleIndex, 1);
+                    thwomps.splice(thwompindex, 1);
 
                     // Create an explosion shockwave
                     createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
@@ -274,6 +275,22 @@ if (increase === true) {
                     projectiles.splice(index, 1);
                 }
             });
+
+           setTimeout(function() {
+    snake.forEach((snake, obstacleIndex) => {
+        if (projectile.x >= snake.x * gridSize && projectile.x <= (snake.x + 1) * gridSize &&
+            projectile.y >= snake.y * gridSize && projectile.y <= (snake.y + 1) * gridSize) {
+            // Remove the obstacle from the array
+            // Create an explosion shockwave
+            createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+
+            // Remove the projectile from the array
+            projectiles.splice(index, 1);
+        }
+    });
+}, snakeprojectilecollisiontime);
+
+
 
             // Check if the projectile is out of bounds
             if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
