@@ -110,6 +110,28 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 
+function calculateGameProbability(score, foodCounts) {
+        const totalFoods = Object.values(foodCounts).reduce((acc, count) => acc + count, 0);
+    const foodTypeProbabilities = {
+        rare: foodCounts.rare / totalFoods,
+        special: foodCounts.special / totalFoods,
+        common: foodCounts.common / totalFoods
+    };
+
+    // Probability of an obstacle spawning and a specific food type spawning
+    const gameProbability = foodTypeProbabilities.rare * foodTypeProbabilities.special * foodTypeProbabilities.common;
+    return gameProbability;
+}
+
+// Example usage:
+
+let foodCounts = {
+    rare: 1, // Example count of rare foods
+    special: 10, // Example count of special foods
+    common: 3 // Example count of common foods
+};
+const probability = calculateGameProbability
+    
 function isCollidingWithBody(x, y) {
     // Loop through each segment of the snake's body
     for (let i = 1; i < snake.length; i++) {
@@ -1068,14 +1090,17 @@ if (!freeze) {
             const random = Math.random();
             if (random <= 0.01) {
 const rare = ['invincibility']; // Possible directions
+                foodCounts.rare = rare.length
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
             } else if (random <= 0.4) {
     const Special = ['teleport', 'earth', 'ice', 'fire', 'air', 'poison', 'morph', 'slow', 'breath', 'fast']; // Possible directions
+                foodCounts.special = Special.length
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
                 const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
+                foodCounts.common = common.length
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
             }
