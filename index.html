@@ -794,6 +794,7 @@ function pauseGame() {
 }
 
 
+spawnSymbiote()
 
 function draw() {
     // Clear the canvas
@@ -851,7 +852,7 @@ setTimeout(() => {
 
 if (symbiote.length !== 0) {
     // Layer 2: Draw Snake Body
-            ctx.fillStyle = 'grey';
+            ctx.fillStyle = getSymbioteColor(symbote.type);
         symbiote.forEach(symbiote => ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize));
      }
 
@@ -1250,6 +1251,8 @@ if (esnake.length !== 0) {
                     spawnObstacle();
                 }
             }
+            if (symbiote.length !== 0) {
+
             // Assuming symbiote is an array of objects with x, y, and type properties
 symbiote.forEach((symbiote, index) => {
     if (symbiote.x === snake[1].x && symbiote.y === snake[1].y) {
@@ -1283,7 +1286,7 @@ symbiote.forEach((symbiote, index) => {
 }
         }
     });
-
+            }
 
     if (!isPaused) { // Check if the game is not paused
         // Move Snake
@@ -1546,8 +1549,9 @@ function animateExplosion() {
 if (esnake.length !== 0) {
             enemyAI(esnake, canvas, gridSize) 
 }
-symbioteAi(symbiote, canvas, gridSize)
-            
+if (symbiote.length !== 0) {
+            symbioteAi(symbiote, canvas, gridSize)
+}
             // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
