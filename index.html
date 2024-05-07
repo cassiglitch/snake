@@ -95,7 +95,7 @@
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
-        let symbiote = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, type: 'magnet' }))
+        let symbiote = [];
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -612,7 +612,9 @@ function shockwaveAnimation(x, y) {
     // Start the animation
     let animationId = requestAnimationFrame(animate);
 }
-
+function spawnSymbiote(symbioteType){
+    symbiote = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, type: symbioteType }))
+}
 function checkIfPaused() {
     if (isPaused && !Object.is(direction, previousDirection))
         direction = previousDirection;
