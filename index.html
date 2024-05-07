@@ -95,7 +95,7 @@
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
-        let symbiote = [];
+        let symbiote = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, type: 'magnet' }))
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -112,9 +112,6 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
-
-
-spawnSymbiote('magnet')
 
 function Dieenemy(){
 esnake = []
@@ -615,9 +612,7 @@ function shockwaveAnimation(x, y) {
     // Start the animation
     let animationId = requestAnimationFrame(animate);
 }
-function spawnSymbiote(symbioteType){
-    symbiote = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, type: symbioteType }))
-}
+
 function checkIfPaused() {
     if (isPaused && !Object.is(direction, previousDirection))
         direction = previousDirection;
@@ -797,6 +792,7 @@ function pauseGame() {
 }
 
 
+
 function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -853,7 +849,7 @@ setTimeout(() => {
 
 if (symbiote.length !== 0) {
     // Layer 2: Draw Snake Body
-            ctx.fillStyle = getSymbioteColor(symbote.type);
+            ctx.fillStyle = 'grey';
         symbiote.forEach(symbiote => ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize));
      }
 
@@ -1252,9 +1248,8 @@ if (esnake.length !== 0) {
                     spawnObstacle();
                 }
             }
-            if (symbiote.length !== 0) {
-
             // Assuming symbiote is an array of objects with x, y, and type properties
+            if (symbiote.length !== 0){
 symbiote.forEach((symbiote, index) => {
     if (symbiote.x === snake[1].x && symbiote.y === snake[1].y) {
         if (symbiote.type === 'magnet') {
@@ -1288,6 +1283,7 @@ symbiote.forEach((symbiote, index) => {
         }
     });
             }
+
 
     if (!isPaused) { // Check if the game is not paused
         // Move Snake
@@ -1550,9 +1546,9 @@ function animateExplosion() {
 if (esnake.length !== 0) {
             enemyAI(esnake, canvas, gridSize) 
 }
-if (symbiote.length !== 0) {
-            symbioteAi(symbiote, canvas, gridSize)
-}
+            if (symbiote.length !== 0){
+symbioteAi(symbiote, canvas, gridSize)
+            }
             // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
