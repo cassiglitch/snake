@@ -94,6 +94,7 @@
         let sunset = '#00FFFF'
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
+        let esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed }));
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -109,7 +110,12 @@ const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
 const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
+let enemymovementspeed = 1
 
+function Dieenemy(){
+esnake = []
+}
+        
 function calculateGameProbability(score, foodCounts) {
         const totalFoods = Object.values(foodCounts).reduce((acc, count) => acc + count, 0);
     const foodTypeProbabilities = {
@@ -131,7 +137,142 @@ let foodCounts = {
     common: 3 // Example count of common foods
 };
 const probability = calculateGameProbability
-    
+
+// Define the enemy AI function with A* pathfinding
+// Define the enemy AI function with A* pathfinding
+function enemyAI(esnake, canvas, gridSize) {
+    // A* pathfinding
+    // Start node is the head of the enemy snake
+    let startNode = { x: esnake[0].x, y: esnake[0].y };
+    // End node is the head of the player snake (snake[0])
+    let endNode = { x: snake[0].x, y: snake[0].y };
+
+    // Implement A* algorithm to find the shortest path from startNode to endNode
+    let path = aStarPathfinding(startNode, endNode, canvas, gridSize);
+
+    // Move the enemy snake towards the next node in the path
+    if (path.length > 1) {
+        // Next node in the path
+        let nextNode = path[1];
+        // Move towards the next node
+        if (nextNode.x < esnake[0].x) {
+            // Move left
+            esnake[0].x = (esnake[0].x - enemymovementspeed + canvas.width / gridSize) % (canvas.width / gridSize);
+        } else if (nextNode.x > esnake[0].x) {
+            // Move right
+            esnake[0].x = (esnake[0].x + enemymovementspeed) % (canvas.width / gridSize);
+        } else if (nextNode.y < esnake[0].y) {
+            // Move up
+            esnake[0].y = (esnake[0].y - enemymovementspeed + canvas.height / gridSize) % (canvas.height / gridSize);
+        } else if (nextNode.y > esnake[0].y) {
+            // Move down
+            esnake[0].y = (esnake[0].y + enemymovementspeed) % (canvas.height / gridSize);
+        }
+    }
+
+    // Move the body of the enemy snake to follow the head
+    for (let i = esnake.length - 1; i > 0; i--) {
+        esnake[i].x = esnake[i - 1].x;
+        esnake[i].y = esnake[i - 1].y;
+    }
+}
+
+// A* pathfinding algorithm
+function aStarPathfinding(startNode, endNode, canvas, gridSize) {
+    // Define grid dimensions
+    let gridWidth = canvas.width / gridSize;
+    let gridHeight = canvas.height / gridSize;
+
+    // Initialize open and closed lists
+    let openList = [];
+    let closedList = [];
+
+    // Initialize start node
+    startNode.g = 0;
+    startNode.h = heuristic(startNode, endNode);
+    startNode.f = startNode.g + startNode.h;
+    openList.push(startNode);
+
+    // Start A* algorithm
+    while (openList.length > 0) {
+        // Find node with lowest f value in the open list
+        let currentNode = openList[0];
+        for (let i = 1; i < openList.length; i++) {
+            if (openList[i].f < currentNode.f || (openList[i].f === currentNode.f && openList[i].h < currentNode.h)) {
+                currentNode = openList[i];
+            }
+        }
+
+        // Move current node from open to closed list
+        openList = openList.filter(node => node !== currentNode);
+        closedList.push(currentNode);
+
+        // Check if current node is the goal
+        if (currentNode.x === endNode.x && currentNode.y === endNode.y) {
+            return reconstructPath(currentNode);
+        }
+
+        // Generate neighbors of current node
+        let neighbors = [];
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                if (dx === 0 && dy === 0) continue; // Skip current node
+                let neighborX = (currentNode.x + dx + gridWidth) % gridWidth;
+                let neighborY = (currentNode.y + dy + gridHeight) % gridHeight;
+                let neighbor = { x: neighborX, y: neighborY };
+                neighbors.push(neighbor);
+            }
+        }
+
+        // Process each neighbor
+        for (let neighbor of neighbors) {
+            // Skip neighbor if it's in the closed list or is an obstacle
+            if (closedList.find(node => node.x === neighbor.x && node.y === neighbor.y)) continue;
+
+            // Calculate tentative g score for neighbor
+            let tentativeG = currentNode.g + 1; // Assuming each move has a cost of 1
+
+            // Check if neighbor is already in the open list
+            let existingNode = openList.find(node => node.x === neighbor.x && node.y === neighbor.y);
+            if (!existingNode || tentativeG < existingNode.g) {
+                if (!existingNode) {
+                    // Add neighbor to open list
+                    neighbor.g = tentativeG;
+                    neighbor.h = heuristic(neighbor, endNode);
+                    neighbor.f = neighbor.g + neighbor.h;
+                    neighbor.parent = currentNode;
+                    openList.push(neighbor);
+                } else {
+                    // Update neighbor in open list with new g score
+                    existingNode.g = tentativeG;
+                    existingNode.f = existingNode.g + existingNode.h;
+                    existingNode.parent = currentNode;
+                }
+            }
+        }
+    }
+
+    // If open list is empty and goal is not found, return an empty path
+    return [];
+}
+
+// Calculate heuristic value (Manhattan distance)
+function heuristic(node, target) {
+    return Math.abs(node.x - target.x) + Math.abs(node.y - target.y);
+}
+
+// Reconstruct path from goal node to start node
+function reconstructPath(goalNode) {
+    let path = [];
+    let currentNode = goalNode;
+    while (currentNode) {
+        path.unshift(currentNode);
+        currentNode = currentNode.parent;
+    }
+    return path;
+}
+
+
 function isCollidingWithBody(x, y) {
     // Loop through each segment of the snake's body
     for (let i = 1; i < snake.length; i++) {
@@ -298,6 +439,19 @@ if (increase === true) {
                 }
             });
 
+esnake.forEach((esnake, obstacleIndex) => {
+        if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
+            projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
+            // Remove the obstacle from the array
+            // Create an explosion shockwave
+            createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+            
+            projectiles.splice(index, 1);
+            
+            Dieenemy()
+        }
+    });
+
            setTimeout(function() {
     snake.forEach((snake, obstacleIndex) => {
         if (projectile.x >= snake.x * gridSize && projectile.x <= (snake.x + 1) * gridSize &&
@@ -311,7 +465,6 @@ if (increase === true) {
         }
     });
 }, snakeprojectilecollisiontime);
-
 
 
             // Check if the projectile is out of bounds
@@ -648,6 +801,16 @@ setTimeout(() => {
     const head = snake[0];
     ctx.fillStyle = 'lightgreen'; // Head color
     ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+    
+    if (esnake.length !== 0) {
+    // Layer 2: Draw Snake Body
+            ctx.fillStyle = timespeed;
+        esnake.forEach(esnake => ctx.fillRect(esnake.x * gridSize, esnake.y * gridSize, gridSize, gridSize));
+ 
+        const ehead = esnake[0];
+    ctx.fillStyle = 'red'; // Head color
+    ctx.fillRect(ehead.x * gridSize, ehead.y * gridSize, gridSize, gridSize);
+    }
 
     // Draw Food
             ctx.fillStyle = getFoodColor(food.type);
@@ -826,13 +989,14 @@ switch (direction) {
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
                 dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
                     (head.y >= obstacle.y && head.y < obstacle.y + 2))) || thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) {
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || (esnake.some(esnake => (esnake.x === (snake[1].x) && esnake.y === (snake[1].y)) && livecount === 2))) {
                 const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
             lives = (lives * 2);
             livecount = livecount - 1;
             HaHaNoCollision(10)
+            
         } else {
             livecount = livecount - 1;
             restartGame(); // End the game if segments (lives) run out
@@ -872,8 +1036,20 @@ if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.
             break;
     }
 }
-
-
+projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleIndex) => {
+        if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
+            projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
+            // Remove the obstacle from the array
+            // Create an explosion shockwave
+            createExplosion(ctx, projectile.x, projectile.y, projectileColor, obstacles, dynamicObstacles, gridSize, explode);
+            
+            projectiles.splice(index, 1);
+            
+            esnake.splice(0, esnake.length);
+        }
+    });
+                                           })
+                    
             // Check if Snake eats Food
             if (head.x === food.x && head.y === food.y){
                 if (food.type === 'superfood') {
@@ -881,6 +1057,12 @@ if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.
                     score += 2;
                     snake.unshift({ ...snake[0], color: 'green' });
                     snake.unshift({ ...snake[0], color: 'green' });
+
+                    if (esnake.length !== 0) {
+                    esnake.unshift({ ...esnake[0], color: timeslow });
+                    esnake.unshift({ ...esnake[0], color: timeslow });
+                    }
+
                 } else if (food.type === 'poison') {
                     gamefoods.push('poison')
                     if (snake.length < 4) {
@@ -890,6 +1072,11 @@ if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.
                     snake.pop();
                     snake.pop();
                     snake.pop();
+                    if (esnake.length !== 0) {
+                    esnake.pop();
+                    esnake.pop();
+                    esnake.pop();
+                    }
                     score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
                 } else if (food.type === 'teleport') {
                     gamefoods.push('teleport')
@@ -942,6 +1129,11 @@ HaHaNoCollision(100);
                     snake.unshift({ ...snake[0], color: 'green' });
                     snake.unshift({ ...snake[0], color: 'green' });
                     snake.unshift({ ...snake[0], color: 'green' });
+                if (esnake.length !== 0) {
+                    esnake.unshift({ ...esnake[0], color: timeslow });
+                    esnake.unshift({ ...esnake[0], color: timeslow });
+                    esnake.unshift({ ...esnake[0], color: timeslow });
+                }
                     
                 } else if (food.type === 'air'){
                 let pcolourr = 'lightgrey'
@@ -983,7 +1175,7 @@ HaHaNoCollision(100);
                       changeInterval(150)   
                 setTimeout(function() {
     changeInterval(100);
-}, 60000);           
+}, 6000);           
                 }else if(food.type === 'fast'){
 changeInterval(50)   
                 setTimeout(function() {
@@ -994,6 +1186,9 @@ changeInterval(50)
                     gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'green' });
+if (esnake.length !== 0) {
+                    esnake.unshift({ ...esnake[0], color: timeslow });
+}
                   }
                 isEating = true;
                 eatingAnimationFrames = 8; // Set the number of frames for the eating animation
@@ -1009,6 +1204,7 @@ changeInterval(50)
         // Move Snake
         snake.pop();
         snake.unshift(head);
+
 
 if (!freeze) {
         // Move Dynamic Obstacles
@@ -1144,6 +1340,7 @@ function spawnObstacle() {
             gamefoods = [];
             dynamicObstacles = [];
             score = 0;
+            esnake = [{x:1, y:1}]        
             isEating = false;
             isInvincible = false;
             eatingAnimationFrames = 0;
@@ -1258,7 +1455,10 @@ function animateExplosion() {
             resizeCanvasHeight();
             update();
             draw();
-                
+if (esnake.length !== 0) {
+            enemyAI(esnake, canvas, gridSize) 
+}
+            
             // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
