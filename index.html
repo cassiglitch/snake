@@ -94,7 +94,7 @@
         let sunset = '#00FFFF'
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
-        let esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed }));
+        let esnake = [];
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -1051,7 +1051,7 @@ projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleInd
                                            })
                     
             // Check if Snake eats Food
-            if (head.x === food.x && head.y === food.y){
+            if ((head.x === food.x && head.y === food.y )|| projectiles.forEach((projectile, index) => { projectile.x === food.x && projectile.y === food.y})){
                 if (food.type === 'superfood') {
                     gamefoods.push('superfood')
                     score += 2;
@@ -1313,6 +1313,9 @@ function spawnObstacle() {
                     (food.x === x && food.y === y)
 
     if (!occupied) {
+        if ((Math.random <= 0.1) && esnake.length === 0){
+           esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed })) 
+        }
         if (Math.random() < 0.5) {
             obstacles.push({ x: x, y: y });
         } else if (Math.random() < 0.6) { 
@@ -1340,14 +1343,14 @@ function spawnObstacle() {
             gamefoods = [];
             dynamicObstacles = [];
             score = 0;
-            esnake = [{x:1, y:1}]        
+            esnake = []        
             isEating = false;
             isInvincible = false;
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
             spawnFood();
-changeInterval(100)
+            changeInterval(100)
         }
 
  
