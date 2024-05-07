@@ -113,6 +113,9 @@ const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
 
+
+spawnSymbiote('magnet')
+
 function Dieenemy(){
 esnake = []
 }
@@ -793,8 +796,6 @@ function pauseGame() {
     isPaused = !isPaused; // Toggle the paused state
 }
 
-
-spawnSymbiote()
 
 function draw() {
     // Clear the canvas
