@@ -113,7 +113,9 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
-
+function venomreset(){
+    symbiote = []
+}
 function Dieenemy(){
 esnake = []
 }
@@ -837,10 +839,9 @@ setTimeout(() => {
         ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
     });
 
-    // Layer 3: Draw Snake Head
-    const head = snake[0];
-    ctx.fillStyle = 'lightgreen'; // Head color
-    ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+
+
+
     
     if (esnake.length !== 0) {
     // Layer 2: Draw Snake Body
@@ -859,6 +860,9 @@ if (symbiote.length !== 0) {
         ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize);
     });
 }
+    const head = snake[0];
+    ctx.fillStyle = 'lightgreen'; // Head color
+    ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
 
 
     // Draw Food
@@ -961,6 +965,8 @@ function getVenomColor(symbioteType){
     switch (symbioteType) {
         case 'magnet':
             return 'grey';
+        case 'wave':
+            return 'orange'
     }
 }
 
@@ -1295,8 +1301,12 @@ symbiote.forEach((symbiote, index) => {
             food.y = (food.y + enemymovementspeed) % (canvas.height / gridSize);
         }
     }
-}
-        }
+}else if (symbiote.type === 'wave'){
+            pX = snake[0].x * gridSize + gridSize / 2;
+                pY = snake[0].y * gridSize + gridSize / 2;
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false, 20, 1)
+            }
+    }
     });
             }
 
@@ -1343,6 +1353,10 @@ if (!freeze) {
         );
 }
 
+    // Randomize the direction
+    const types = ['magnet', 'wave']; // Possible directions
+    const randomIndex = Math.floor(Math.random() * types.length);
+    type = types[randomIndex];
 
 
             // Check for victory
@@ -1351,9 +1365,9 @@ if (score >= maxscore) {
 }
 if (score >= maxscore / 2) {
     if (symbiote.length === 0) {
-        symbiote = Array.from({ length: snake.length }, (_, index) => ({ x: 10, y: 10 - index, type: 'magnet' })) 
+                symbiote = Array.from({ length: snake.length }, (_, index) => ({ x: 10, y: 10 - index, type: type }));
+            }
     }
-}
 
             if (laser.isShooting) {
         obstacles.forEach((obstacle, index) => {
@@ -1419,7 +1433,7 @@ function spawnObstacle() {
                     (food.x === x && food.y === y)
 
     if (!occupied) {
-        if ((Math.random() <= 0.1) && esnake.length === 0){
+        if ((Math.random() < 0.1) && esnake.length === 0){
            esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed })) 
         }
         if (Math.random() < 0.5) {
@@ -1456,6 +1470,8 @@ function spawnObstacle() {
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
+            cangetvenom = true
+            venomreset()
             spawnFood();
             changeInterval(100)
         }
