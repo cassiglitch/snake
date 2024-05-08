@@ -95,14 +95,15 @@
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
-        let symbiote = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, type: 'magnet' }))
-        var deviceWidth, landscape = Math.abs(window.orientation) == 90
+        let symbiote = []
+            var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
             else deviceWidth = window.screen[landscape ? "height" : "width"]
             var zoomFactor = deviceWidth / window.innerWidth;
             var antiZoomFactor = 1 / zoomFactor;
        let currentInterval = 1;
+        let track = []
 let thwomps = []
 let pX = 0;
 let pY = 0;
@@ -116,7 +117,11 @@ let enemymovementspeed = 1
 function Dieenemy(){
 esnake = []
 }
-        
+
+function spawnvenom(type){
+symbiote = Array.from({ length: snake.length }, (_, index) => ({ x: 10, y: 10 - index, type: type }));
+}
+
 function calculateGameProbability(score, foodCounts) {
         const totalFoods = Object.values(foodCounts).reduce((acc, count) => acc + count, 0);
     const foodTypeProbabilities = {
@@ -139,7 +144,7 @@ let foodCounts = {
 };
 const probability = calculateGameProbability
 
-function symbioteAi(symbiote, canvas, gridSize){
+function symbioteAi(symbiotes, canvas, gridSize){
       let startNode = { x: symbiote[0].x, y: symbiote[0].y };
     // End node is the head of the player snake (snake[0])
     let endNode = { x: snake[0].x, y: snake[0].y };
@@ -849,9 +854,12 @@ setTimeout(() => {
 
 if (symbiote.length !== 0) {
     // Layer 2: Draw Snake Body
-            ctx.fillStyle = 'grey';
-        symbiote.forEach(symbiote => ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize));
-     }
+    symbiote.forEach((symbiote, index) => {
+        ctx.fillStyle = getVenomColor(symbiote.type);
+        ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize);
+    });
+}
+
 
     // Draw Food
             ctx.fillStyle = getFoodColor(food.type);
@@ -949,7 +957,7 @@ eatenSegments.forEach((segment, index) => {
 originalSnakeColor = '#00FF00'; // Reset snake color after eating animation
 }
 
-function getSymbioteColor(symbioteType){
+function getVenomColor(symbioteType){
     switch (symbioteType) {
         case 'magnet':
             return 'grey';
@@ -990,7 +998,7 @@ function getFoodColor(foodType) {
             return timeslow;
         case 'fast':
             return timespeed
-    }
+       }
 }
 
 // Function to trigger invincibility
@@ -1020,15 +1028,23 @@ previousDirection = direction;
 switch (direction) {
     case 'up':
         head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+        track = []
+        track = [{x:head.x, y:head.y + 1}]
         break;
     case 'down':
         head.y = (head.y + 1) % (canvas.height / gridSize);
+        track = []
+        track = [{x:head.x, y:head.y - 1}]
         break;
     case 'left':
         head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
+        track = []
+        track = [{x:head.x + 1, y:head.y}]
         break;
     case 'right':
         head.x = (head.x + 1) % (canvas.width / gridSize);
+        track = []
+        track = [{x:head.x - 1, y:head.y}]
         break;
 }
 
@@ -1255,7 +1271,7 @@ symbiote.forEach((symbiote, index) => {
         if (symbiote.type === 'magnet') {
      let startNode = { x: food.x, y: food.y };
     // End node is the head of the player snake (snake[0])
-    let endNode = { x: (snake[0].x), y: (snake[0].y) };
+    let endNode = { x: (track[0].x), y: (track[0].y) };
 
     // Implement A* algorithm to find the shortest path from startNode to endNode
     let path = aStarPathfinding(startNode, endNode, canvas, gridSize);
@@ -1283,7 +1299,6 @@ symbiote.forEach((symbiote, index) => {
         }
     });
             }
-
 
     if (!isPaused) { // Check if the game is not paused
         // Move Snake
@@ -1331,9 +1346,15 @@ if (!freeze) {
 
 
             // Check for victory
-            if (score >= maxscore) {
-                declareVictory();
-            }
+if (score >= maxscore) {
+    declareVictory();
+}
+if (score >= maxscore / 2) {
+    if (symbiote.length === 0) {
+        symbiote = Array.from({ length: snake.length }, (_, index) => ({ x: 10, y: 10 - index, type: 'magnet' })) 
+    }
+}
+
             if (laser.isShooting) {
         obstacles.forEach((obstacle, index) => {
             // Check if the laser intersects with the obstacle
@@ -1380,7 +1401,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood', 'venomspawn']; // Possible directions
                 foodCounts.common = common.length
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
@@ -1398,7 +1419,7 @@ function spawnObstacle() {
                     (food.x === x && food.y === y)
 
     if (!occupied) {
-        if ((Math.random <= 0.1) && esnake.length === 0){
+        if ((Math.random() <= 0.1) && esnake.length === 0){
            esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed })) 
         }
         if (Math.random() < 0.5) {
@@ -1422,6 +1443,7 @@ function spawnObstacle() {
             animateExplosion();
             pauseGame();
             gotextralife = false;
+            symbiotes = []
             thwomps = []
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
@@ -1547,8 +1569,10 @@ if (esnake.length !== 0) {
             enemyAI(esnake, canvas, gridSize) 
 }
             if (symbiote.length !== 0){
+            if (isPaused === false){
 symbioteAi(symbiote, canvas, gridSize)
-            }
+            }}
+            
             // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
@@ -1556,8 +1580,6 @@ symbioteAi(symbiote, canvas, gridSize)
                 // Apply the wavelike animation
                 for (let i = 1; i < snake.length; i++) {
                     if (i <= eatingAnimationFrames) {
-                        snake[i].color = 'blue';
-                    } else {
                         snake[i].color = 'green';
                     }
                 }
