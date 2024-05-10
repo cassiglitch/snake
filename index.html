@@ -113,6 +113,7 @@ const projectileSpeed = 10; // Speed of the projectiles
 const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
+
 function venomreset(){
     symbiote = []
 }
@@ -155,6 +156,29 @@ function generateStraightLineCoordinates(startX, startY, endX, endY, coordinates
         coordinates.push({ x, y });
     }
 }
+
+function formshape(x, y, length, sides, coordinates){
+    let fill = 1 
+    for (let i = 0; i < length; i++) {
+   generatePolygonCoordinates(x, y, fill, sides, coordinates) 
+    fill += 1
+    }
+    }
+
+function formrandomshape(length){
+    let sides = 2
+    let array = []
+    const x2 = Math.floor(Math.random() * (canvas.width / gridSize));
+    const y2 = Math.floor(Math.random() * (canvas.height / gridSize));
+    const sidenumber = [3, 4, 5, 6, 7, 8]; // Possible directions
+    const sideIndex = Math.floor(Math.random() * sidenumber.length);
+    sides = sidenumber[sideIndex];
+    const arrays = [obstacles, mirrors]; // Possible directions
+    const arrayIndex = Math.floor(Math.random() * arrays.length);
+    array = arrays[arrayIndex];
+    formshape(x2, y2, length, sides, array)
+}
+
 function spawnvenom(type){
 symbiote = Array.from({ length: snake.length }, (_, index) => ({ x: 10, y: 10 - index, type: type }));
 }
@@ -1450,7 +1474,7 @@ const rare = ['invincibility']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
             } else{
-                const common = ['normal', 'superfood', 'ultrafood', 'venomspawn']; // Possible directions
+                const common = ['normal', 'superfood', 'ultrafood']; // Possible directions
                 foodCounts.common = common.length
     const randomIndex2 = Math.floor(Math.random() * common.length);
     return common[randomIndex2];
@@ -1460,6 +1484,7 @@ const rare = ['invincibility']; // Possible directions
 function spawnObstacle() {
     const x = Math.floor(Math.random() * (canvas.width / gridSize));
     const y = Math.floor(Math.random() * (canvas.height / gridSize));
+
 
     // Check if the coordinates are already occupied by something else
     const occupied = obstacles.some(obstacle => obstacle.x === x && obstacle.y === y) ||
@@ -1473,7 +1498,9 @@ function spawnObstacle() {
         }
         if (Math.random() < 0.5) {
             obstacles.push({ x: x, y: y });
-        } else if (Math.random() < 0.6) { 
+        }else if (Math.random() < 0.7){
+        formrandomshape(5)            
+        }else if (Math.random() < 0.6) { 
             mirrors.push({ x: x, y: y });
         }else if (Math.random() < 0.9){
             thwomps.push({ x: x, y: 0, state: 1 });
