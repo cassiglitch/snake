@@ -1126,10 +1126,9 @@ switch (direction) {
 
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
-                dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) {
-                const numSegmentsToRemove = Math.ceil(snake.length * lives);
+                !isInvincible && dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || !isInvincible && thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) {                const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
             lives = (lives * 2);
