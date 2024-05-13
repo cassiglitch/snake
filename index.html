@@ -1125,10 +1125,10 @@ switch (direction) {
 
 
             // Check if Snake hits obstacles
-            if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y) ||
+            if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
                 dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) || thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || (esnake.some(esnake => (esnake.x === (snake[1].x) && esnake.y === (snake[1].y)) && livecount === 2))) {
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2))) {
                 const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
@@ -1141,7 +1141,23 @@ switch (direction) {
             restartGame(); // End the game if segments (lives) run out
             return;
         }              
-            } 
+            }
+if (!isInvincible &&  (esnake.some(esnake => (esnake.x === (snake[1].x) && esnake.y === (snake[1].y)) && esnake.damage === false))){
+             const numSegmentsToRemove2 = Math.ceil(snake.length * lives);
+        if (snake.length > numSegmentsToRemove2) {
+            snake.splice(0, numSegmentsToRemove2);
+            lives = (lives * 2);
+            livecount = livecount - 1;
+            HaHaNoCollision(10)
+esnake.forEach(enemySegment => enemySegment.damage = true)
+        } else {
+            livecount = livecount - 1;
+            restartGame(); // End the game if segments (lives) run out
+            return;
+        }              
+}
+
+
 if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
     // If the head collides with a mirror and the player is not invincible
     // Reverse the direction of movement
@@ -1665,7 +1681,7 @@ function spawnObstacle() {
 
     if (!occupied) {
         if ((Math.random() < 0.1) && esnake.length === 0){
-           esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed })) 
+           esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false })) 
         }
         if (Math.random() < 0.5) {
             obstacles.push({ x: x, y: y });
