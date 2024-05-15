@@ -665,7 +665,6 @@ esnake.forEach((esnake, obstacleIndex) => {
                         }
 
 function shockwaveAnimation(x, y) {
-    // Get the canvas element
     // Set up animation parameters
     const radiusMax = Math.max(canvas.width, canvas.height);
     let radius = 0;
@@ -694,11 +693,13 @@ function shockwaveAnimation(x, y) {
             radius = 0;
             opacity = maxOpacity;
             cancelAnimationFrame(animationId);
-            applyEarthquake(obstacles)
-        pauseGame()
-        if (isPaused === true){
-                        isPaused = false
-                    }
+
+            // Assuming these functions are defined somewhere else
+            applyEarthquake(obstacles);
+            pauseGame();
+            
+            // No need to check if `isPaused` is `true` before setting it to `false`
+            isPaused = false;
         }
 
         // Request next frame
@@ -708,6 +709,7 @@ function shockwaveAnimation(x, y) {
     // Start the animation
     let animationId = requestAnimationFrame(animate);
 }
+
 
 function checkIfPaused() {
     if (isPaused && !Object.is(direction, previousDirection))
