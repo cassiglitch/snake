@@ -206,7 +206,7 @@ function formrandomshape(length){
     const sidenumber = [3, 4, 5, 6, 7, 8]; // Possible directions
     const sideIndex = Math.floor(Math.random() * sidenumber.length);
     sides = sidenumber[sideIndex];
-    const arrays = [obstacles, mirrors]; // Possible directions
+    const arrays = [obstacles, wells]; // Possible directions
     const arrayIndex = Math.floor(Math.random() * arrays.length);
     array = arrays[arrayIndex];
     formshape(x2, y2, length, sides, array)
@@ -214,21 +214,16 @@ function formrandomshape(length){
 function checkAndSplice(polygons, obstacles, mirrors) {
     const polygonsCopy = [...polygons]; // Create copies of the arrays
     const obstaclesCopy = [...obstacles];
-    const mirrorsCopy = [...mirrors];
-
+    
     for (let i = polygonsCopy.length - 1; i >= 0; i--) {
         const coord = polygonsCopy[i];
         const obstacleIndex = obstaclesCopy.findIndex(obstacle => obstacle[0] === coord[0] && obstacle[1] === coord[1]);
-        const mirrorIndex = mirrorsCopy.findIndex(mirror => mirror[0] === coord[0] && mirror[1] === coord[1]);
-
+        
         if (obstacleIndex !== -1) {
             obstacles.splice(obstacles.indexOf(obstaclesCopy[obstacleIndex]), 1); // Remove from original array
             console.log(`Removed coordinate ${coord} from obstacles.`);
         }
-        if (mirrorIndex !== -1) {
-            mirrors.splice(mirrors.indexOf(mirrorsCopy[mirrorIndex]), 1); // Remove from original array
         }
-    }
 }
 
 function spawnvenom(type){
