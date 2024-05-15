@@ -70,7 +70,7 @@
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0};
+        let food = { x: 0, y: 0, type: 'earth'};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
