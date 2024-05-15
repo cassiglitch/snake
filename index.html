@@ -116,9 +116,14 @@ let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
     let wellcolor = '#00000080'
 let wells = []
-
+let polygons = []
 let isGravityWellActive = true; 
 
+document.addEventListener('keypress', function(event) {
+    if (event.key === 'p') {
+        pauseGame();
+    }
+});
 
 let wellStrength = 5
 function checkDistance(snake) {
@@ -182,6 +187,7 @@ function generateStraightLineCoordinates(startX, startY, endX, endY, coordinates
         const x = Math.round(startX + dx * (i / steps));
         const y = Math.round(startY + dy * (i / steps));
         coordinates.push({ x, y });
+        polygons.push({ x, y })
     }
 }
 
@@ -192,7 +198,6 @@ function formshape(x, y, length, sides, coordinates){
     fill += 1
     }
     }
-
 function formrandomshape(length){
     let sides = 2
     let array = []
@@ -205,6 +210,25 @@ function formrandomshape(length){
     const arrayIndex = Math.floor(Math.random() * arrays.length);
     array = arrays[arrayIndex];
     formshape(x2, y2, length, sides, array)
+}
+function checkAndSplice(polygons, obstacles, mirrors) {
+    const polygonsCopy = [...polygons]; // Create copies of the arrays
+    const obstaclesCopy = [...obstacles];
+    const mirrorsCopy = [...mirrors];
+
+    for (let i = polygonsCopy.length - 1; i >= 0; i--) {
+        const coord = polygonsCopy[i];
+        const obstacleIndex = obstaclesCopy.findIndex(obstacle => obstacle[0] === coord[0] && obstacle[1] === coord[1]);
+        const mirrorIndex = mirrorsCopy.findIndex(mirror => mirror[0] === coord[0] && mirror[1] === coord[1]);
+
+        if (obstacleIndex !== -1) {
+            obstacles.splice(obstacles.indexOf(obstaclesCopy[obstacleIndex]), 1); // Remove from original array
+            console.log(`Removed coordinate ${coord} from obstacles.`);
+        }
+        if (mirrorIndex !== -1) {
+            mirrors.splice(mirrors.indexOf(mirrorsCopy[mirrorIndex]), 1); // Remove from original array
+        }
+    }
 }
 
 function spawnvenom(type){
@@ -1763,7 +1787,9 @@ function spawnObstacle() {
             lives = 0.5;
             livecount = 2;
             cangetvenom = true
- wells = []
+            wells = []
+            checkAndSplice(polygons, obstacles, mirrors)
+            polygons = []
             venomreset()
             spawnFood();
             changeInterval(100)
