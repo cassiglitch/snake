@@ -690,12 +690,13 @@ function shockwaveAnimation(x, y) {
         if (opacity <= 0 && doshockwave === true) {
             // Clear the canvas
             doshockwave = false
+            cancelAnimationFrame(animationId);
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             // Reset parameters for next animation
             radius = 0;
-opacity = 1
-            cancelAnimationFrame(animationId);
-
+            opacity = maxOpacity
+            
             // Assuming these functions are defined somewhere else
             applyEarthquake(obstacles);
             pauseGame();
