@@ -70,7 +70,7 @@
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0, type: 'earth'};
+        let food = { x: 0, y: 0};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
@@ -97,7 +97,6 @@
         let timespeed = '#ff0073'
         let esnake = [];
         let symbiote = []
-        let doshockwave = true
             var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -666,6 +665,7 @@ esnake.forEach((esnake, obstacleIndex) => {
                         }
 
 function shockwaveAnimation(x, y) {
+    // Get the canvas element
     // Set up animation parameters
     const radiusMax = Math.max(canvas.width, canvas.height);
     let radius = 0;
@@ -687,22 +687,16 @@ function shockwaveAnimation(x, y) {
         radius += 5;
 
         // Check if animation is complete
-        if (opacity <= 0 && doshockwave === true) {
+        if (opacity <= 0) {
             // Clear the canvas
-            doshockwave = false
-            cancelAnimationFrame(animationId);
-
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             // Reset parameters for next animation
             radius = 0;
-            opacity = maxOpacity
-            
-            // Assuming these functions are defined somewhere else
-            applyEarthquake(obstacles);
-            pauseGame();
-            
-            // No need to check if `isPaused` is `true` before setting it to `false`
-            isPaused = false;
+            opacity = maxOpacity;
+            cancelAnimationFrame(animationId);
+            applyEarthquake(obstacles)
+            isPaused = false
+            return;
         }
 
         // Request next frame
@@ -712,7 +706,6 @@ function shockwaveAnimation(x, y) {
     // Start the animation
     let animationId = requestAnimationFrame(animate);
 }
-
 
 function checkIfPaused() {
     if (isPaused && !Object.is(direction, previousDirection))
@@ -1316,7 +1309,6 @@ HaHaNoCollision(100);
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
-                    
                 } else if (food.type === 'fire'){
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
