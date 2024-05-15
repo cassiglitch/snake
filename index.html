@@ -695,8 +695,10 @@ function shockwaveAnimation(x, y) {
             opacity = maxOpacity;
             cancelAnimationFrame(animationId);
             applyEarthquake(obstacles)
-            isPaused = false
-            return;
+        pauseGame()
+        if (isPaused === true){
+                        isPaused = false
+                    }
         }
 
         // Request next frame
@@ -1309,9 +1311,7 @@ HaHaNoCollision(100);
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
-                    if (isPaused === true){
-                        isPaused = false
-                    }
+                    
                 } else if (food.type === 'fire'){
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
