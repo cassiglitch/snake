@@ -58,7 +58,7 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-
+let isFast = false
         let timezone = []
         let mirrors = []
         let gotextralife = false;
@@ -140,7 +140,7 @@ function checkForEffects(){
         applyStatus(1000, 'burn')
     }
     if (isTaxed === true){
-        applyStatus(900, 'IRS')
+        applyStatus(900, 'taxes')
     }
 }
 function applyStatus(cooldown, effect){
@@ -164,7 +164,7 @@ if (isBurned === true && effect === 'burn'){
     snake.pop()
     effectApplied = currentTime
 }
-if(isTaxed === true && effect === 'IRS'){
+if(isTaxed === true && effect === 'taxes'){
  score -= 1    
 effectApplied = currentTime
 }
@@ -1019,13 +1019,9 @@ setTimeout(() => {
     
     if (esnake.length !== 0) {
     // Layer 2: Draw Snake Body
-            ctx.fillStyle = getenemycolor(esnake.type);
+            ctx.fillStyle = getenemycolor(esnake[0].type);
         esnake.forEach(esnake => ctx.fillRect(esnake.x * gridSize, esnake.y * gridSize, gridSize, gridSize));
- 
-        const ehead = esnake[0];
-    ctx.fillStyle = getenemyheadcolor(esnake.type); // Head color
-    ctx.fillRect(ehead.x * gridSize, ehead.y * gridSize, gridSize, gridSize);
-    }
+     }
 
 if (symbiote.length !== 0) {
     // Layer 2: Draw Snake Body
@@ -1266,7 +1262,7 @@ switch (direction) {
         }              
             }
 if (!isInvincible &&  (esnake.some(esnake => (esnake.x === (snake[1].x) && esnake.y === (snake[1].y)) && esnake.damage === false))){
-    if (esnake.type === 'base'){
+    if (esnake[0].type === 'base'){
              const numSegmentsToRemove2 = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove2) {
             snake.splice(0, numSegmentsToRemove2);
@@ -1279,14 +1275,17 @@ esnake.forEach(enemySegment => enemySegment.damage = true)
             restartGame(); // End the game if segments (lives) run out
             return;
         }              
-} else if (esnake.type === 'IRS'){
+} else if (esnake[0].type === 'IRS'){
         isTaxed = true
 }
 }
-
 if (!isInvincible &&  (esnake.some(esnake => (!esnake.x === (snake[1].x) && !esnake.y === (snake[1].y)) && esnake.damage === false && esnake.type === 'IRS'))){
 isTaxed = false    
 }
+            if (score <= 0 && isTaxed === true){
+                score = 0
+                esnake = []
+            }
 if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
     // If the head collides with a mirror and the player is not invincible
     // Reverse the direction of movement
@@ -1532,7 +1531,6 @@ symbiote.forEach((symbiote, index) => {
     }
     });
             }
-
 if (!isInvincible && timezone.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
     pickrandomeffect()
   if (timezone.type === 'superfood') {
@@ -1658,8 +1656,10 @@ HaHaNoCollision(100);
 }, 6000);           
                 }else if(timezone.type === 'fast'){
 changeInterval(50)   
+      isFast = true
                 setTimeout(function() {
     changeInterval(100);
+                isFast = false
 }, 3000);           
                     
                 }else if (timezone.type === 'normal'){
@@ -1999,7 +1999,7 @@ symbioteAi(symbiote, canvas, gridSize)
             }}
             if (isBurned === true){
                     changeInterval(50)
-} else if (isBurned === false) {
+} else if (isBurned === false && currentInterval === 0.5 && isFast === false) {
     changeInterval(100)
             }
             // Handle eating animation
