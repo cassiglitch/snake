@@ -119,25 +119,35 @@ let wells = []
 let polygons = []
 let isGravityWellActive = true;   
 let isPoisoned = false;
-let effectApplyed = 0
+let effectApplied = 0
 let isConfused = false
+let isBurned = false
+let isTaxed = false
 function cancelEffects(){
     isPoisoned = false
     isConfused = false
+    isBurned = false
+    isTaxed = false
 }
 function checkForEffects(){
             if (isPoisoned === true){
-            applyStatus(1500, 'poison')
+            applyStatus(1000, 'poison')
             }
-    if (isConfused == true){
+    if (isConfused === true){
         applyStatus(1000, 'confuse')
+    }
+    if (isBurned === true){
+        applyStatus(1000, 'burn')
+    }
+    if (isTaxed === true){
+        applyStatus(900, 'IRS')
     }
 }
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
 
     // Check if the cooldown period has elapsed
-    if (currentTime - effectApplyed < cooldown) {
+    if (currentTime - effectApplied < cooldown) {
         return; // Laser is still on cooldown
     } else {
 if (isPoisoned === true && effect === 'poison'){
@@ -148,7 +158,15 @@ if (isConfused === true && effect === 'confuse'){
     const directions = ['up', 'down', 'left', 'right']; // Possible directions
     const randomIndex = Math.floor(Math.random() * directions.length);
     direction = directions[randomIndex];
-    effectApplyed = currentTime
+    effectApplied = currentTime
+}
+if (isBurned === true && effect === 'burn'){
+    snake.pop()
+    effectApplied = currentTime
+}
+if(isTaxed === true && effect === 'IRS'){
+ score -= 1    
+effectApplied = currentTime
 }
 }
 }
@@ -1364,6 +1382,7 @@ HaHaNoCollision(100);
                     shockwaveAnimation(x, y)
                 } else if (food.type === 'fire'){
                     cancelEffects()
+                    isBurned = true
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
@@ -1951,7 +1970,11 @@ if (isPaused === false){
             if (isPaused === false){
 symbioteAi(symbiote, canvas, gridSize)
             }}
-            
+            if (isBurned === true){
+                    changeInterval(50)
+} else if (isBurned === false) {
+    changeInterval(100)
+            }
             // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
