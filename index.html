@@ -197,6 +197,23 @@ direction = 'left'
     });
 }
 
+function getenemycolor(enemytype){
+switch (enemytype) {
+        case 'base':
+            return timespeed;
+        case 'IRS':
+            return 'lightgrey';
+       }
+}
+
+function getenemyheadcolor(enemytype){
+switch (enemytype) {
+        case 'base':
+            return 'red';
+        case 'IRS':
+            return 'black';
+       }
+}
 
 function venomreset(){
     symbiote = []
@@ -1002,11 +1019,11 @@ setTimeout(() => {
     
     if (esnake.length !== 0) {
     // Layer 2: Draw Snake Body
-            ctx.fillStyle = timespeed;
+            ctx.fillStyle = getenemycolor(esnake.type);
         esnake.forEach(esnake => ctx.fillRect(esnake.x * gridSize, esnake.y * gridSize, gridSize, gridSize));
  
         const ehead = esnake[0];
-    ctx.fillStyle = 'red'; // Head color
+    ctx.fillStyle = getenemyheadcolor(esnake.type); // Head color
     ctx.fillRect(ehead.x * gridSize, ehead.y * gridSize, gridSize, gridSize);
     }
 
@@ -1249,6 +1266,7 @@ switch (direction) {
         }              
             }
 if (!isInvincible &&  (esnake.some(esnake => (esnake.x === (snake[1].x) && esnake.y === (snake[1].y)) && esnake.damage === false))){
+    if (esnake.type === 'base'){
              const numSegmentsToRemove2 = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove2) {
             snake.splice(0, numSegmentsToRemove2);
@@ -1261,9 +1279,14 @@ esnake.forEach(enemySegment => enemySegment.damage = true)
             restartGame(); // End the game if segments (lives) run out
             return;
         }              
+} else if (esnake.type === 'IRS'){
+        isTaxed = true
+}
 }
 
-
+if (!isInvincible &&  (esnake.some(esnake => (!esnake.x === (snake[1].x) && !esnake.y === (snake[1].y)) && esnake.damage === false && esnake.type === 'IRS'))){
+isTaxed = false    
+}
 if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
     // If the head collides with a mirror and the player is not invincible
     // Reverse the direction of movement
@@ -1796,7 +1819,11 @@ function spawnObstacle() {
 
     if (!occupied) {
         if ((Math.random() < 0.1) && esnake.length === 0){
-           esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false })) 
+            let etype = 0
+        const etypes = ['base', 'IRS']; // Possible directions
+    const randomIndex = Math.floor(Math.random() * etypes.length);
+    etype = etypes[randomIndex];
+           esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false, type:etype })) 
         }
         if (Math.random() < 0.5) {
             obstacles.push({ x: x, y: y });
