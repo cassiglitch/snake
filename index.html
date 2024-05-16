@@ -117,8 +117,41 @@ let enemymovementspeed = 1
     let wellcolor = '#00000080'
 let wells = []
 let polygons = []
-let isGravityWellActive = true; 
+let isGravityWellActive = true;   
+let isPoisoned = false;
+let effectApplyed = 0
+let isConfused = false
+function cancelEffects(){
+    isPoisoned = false
+    isConfused = false
+}
+function checkForEffects(){
+            if (isPoisoned === true){
+            applyStatus(1500, 'poison')
+            }
+    if (isConfused == true){
+        applyStatus(1000, 'confuse')
+    }
+}
+function applyStatus(cooldown, effect){
+    const currentTime = new Date().getTime();
 
+    // Check if the cooldown period has elapsed
+    if (currentTime - effectApplyed < cooldown) {
+        return; // Laser is still on cooldown
+    } else {
+if (isPoisoned === true && effect === 'poison'){
+ snake.pop()  
+effectApplyed = currentTime
+}
+if (isConfused === true && effect === 'confuse'){
+    const directions = ['up', 'down', 'left', 'right']; // Possible directions
+    const randomIndex = Math.floor(Math.random() * directions.length);
+    direction = directions[randomIndex];
+    effectApplyed = currentTime
+}
+}
+}
 document.addEventListener('keypress', function(event) {
     if (event.key === 'p') {
         pauseGame();
@@ -199,6 +232,7 @@ function formshape(x, y, length, sides, coordinates){
     fill += 1
     }
     }
+
 function formrandomshape(length){
     let sides = 2
     let array = []
@@ -207,24 +241,22 @@ function formrandomshape(length){
     const sidenumber = [3, 4, 5, 6, 7, 8]; // Possible directions
     const sideIndex = Math.floor(Math.random() * sidenumber.length);
     sides = sidenumber[sideIndex];
-    const arrays = [obstacles]; // Possible directions
+    const arrays = [obstacles, mirrors]; // Possible directions
     const arrayIndex = Math.floor(Math.random() * arrays.length);
     array = arrays[arrayIndex];
     formshape(x2, y2, length, sides, array)
 }
-function checkAndSplice(polygons, obstacles, mirrors) {
-    const polygonsCopy = [...polygons]; // Create copies of the arrays
-    const obstaclesCopy = [...obstacles];
+function checkAndSplice(polygons, mirrors) {
+    // Filter out mirrors that have matching coordinates in the polygons array
+    const filteredMirrors = mirrors.filter(mirror => {
+        return !polygons.some(polygon => {
+            return mirror.x === polygon.x && mirror.y === polygon.y;
+        });
+    });
     
-    for (let i = polygonsCopy.length - 1; i >= 0; i--) {
-        const coord = polygonsCopy[i];
-        const obstacleIndex = obstaclesCopy.findIndex(obstacle => obstacle[0] === coord[0] && obstacle[1] === coord[1]);
-        
-        if (obstacleIndex !== -1) {
-            obstacles.splice(obstacles.indexOf(obstaclesCopy[obstacleIndex]), 1); // Remove from original array
-            console.log(`Removed coordinate ${coord} from obstacles.`);
-        }
-        }
+    // Update the original mirrors array with the filtered mirrors
+    mirrors.length = 0; // Clear the original array
+    Array.prototype.push.apply(mirrors, filteredMirrors); // Add filtered mirrors back to the original array
 }
 
 function spawnvenom(type){
@@ -1222,24 +1254,30 @@ if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.
             if (!mirrors.some(obstacle => obstacle.x === head.x + 1 && obstacle.y === head.y) && !isCollidingWithBody(head.x + 1, head.y)) {
                 direction = 'left';
                 snake[0].x -= 1;
+                isConfused = true
             }
             break;
         case 'left':
             if (!mirrors.some(obstacle => obstacle.x === head.x - 1 && obstacle.y === head.y) && !isCollidingWithBody(head.x - 1, head.y)) {
                 direction = 'right';
                 snake[0].x += 1
+                isConfused = true
+
             }
             break;
         case 'up':
             if (!mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y - 1) && !isCollidingWithBody(head.x, head.y - 1)) {
                 direction = 'down';
                 snake[0].y -= 1
+                isConfused = true
+
             }
             break;
         case 'down':
             if (!mirrors.some(obstacle => obstacle.x === head.x && obstacle.y === head.y + 1) && !isCollidingWithBody(head.x, head.y + 1)) {
                 direction = 'up';
                 snake[0].y += 1
+                isConfused = true
             }
             break;
         default:
@@ -1264,6 +1302,7 @@ projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleInd
             // Check if Snake eats Food
             if ((head.x === food.x && head.y === food.y) || projectiles.some((projectile, index) => { return projectile.x === food.x && projectile.y === food.y })){
                 if (food.type === 'superfood') {
+                    cancelEffects()
                     gamefoods.push('superfood')
                     score += 2;
                     snake.unshift({ ...snake[0], color: 'green' });
@@ -1276,22 +1315,13 @@ projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleInd
 
                 } else if (food.type === 'poison') {
                     gamefoods.push('poison')
-                    if (snake.length < 4) {
-                        restartGame();
-                        return;
-                    }
-                    snake.pop();
-                    snake.pop();
-                    snake.pop();
-                    if (esnake.length !== 0) {
-                    esnake.pop();
-                    esnake.pop();
-                    esnake.pop();
-                    }
+                    cancelEffects()
                     score = Math.max(0, Math.ceil(score / 2)); // Reduce score by 50% rounded up
+                    isPoisoned = true
                 } else if (food.type === 'teleport') {
                     gamefoods.push('teleport')
     // Teleport the snake to a random location
+    cancelEffects()
     const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
     const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
     head.x = randomX;
@@ -1304,6 +1334,7 @@ projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleInd
     HaHaNoCollision(10)
                 } else if (food.type === 'invincibility') {
                     gamefoods.push('invincibility')
+                    cancelEffects()
                     if (gotextralife === false) {
     isFoodOrange = true;
     lives = (lives / 2);
@@ -1313,6 +1344,7 @@ projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleInd
 HaHaNoCollision(100);
 
                 } else if (food.type === 'ice') {
+                    cancelEffects()
                     gamefoods.push('ice')
                     let pcolor = 'lightblue';
  if (freeze === false){                    
@@ -1324,17 +1356,20 @@ HaHaNoCollision(100);
      return;         
  }
                 } else if (food.type === 'earth'){
+                    cancelEffects()
                     gamefoods.push('earth')
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
                     pauseGame()
                     shockwaveAnimation(x, y)
                 } else if (food.type === 'fire'){
+                    cancelEffects()
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false, 20, 1)
                 }else if (food.type === 'ultrafood'){
+                    cancelEffects()
                     gamefoods.push('ultrafood')
                     score += 3;
                     snake.unshift({ ...snake[0], color: 'green' });
@@ -1347,15 +1382,18 @@ HaHaNoCollision(100);
                 }
                     
                 } else if (food.type === 'air'){
-                let pcolourr = 'lightgrey'
+cancelEffects()
+    let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false, 20, 1)
                 }else if (food.type === 'morph'){
+                cancelEffects()
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, 1, 1, 30, neoncolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, true, 3, true, 100, 2)
                 }else if (food.type === 'breath'){
+                    cancelEffects()
     let repeat = 30; // Initial size
     let timeInteger = 1;
     // Define a function for shooting projectiles with a delay
@@ -1383,17 +1421,20 @@ HaHaNoCollision(100);
     shootWithDelay(10);
 
             }else if(food.type === 'slow') {
+                    cancelEffects()
                       changeInterval(150)   
                 setTimeout(function() {
     changeInterval(100);
 }, 6000);           
                 }else if(food.type === 'fast'){
+                    cancelEffects()
 changeInterval(50)   
                 setTimeout(function() {
     changeInterval(100);
 }, 3000);           
                     
                 }else{
+                    cancelEffects()
                     gamefoods.push('normal')
                     score += 1;
                     snake.unshift({ ...snake[0], color: 'green' });
@@ -1612,12 +1653,11 @@ if (esnake.length !== 0) {
     }
   }
 }
+checkForEffects()
     if (!isPaused) { // Check if the game is not paused
         // Move Snake
         snake.pop();
         snake.unshift(head);
-
-
 if (!freeze) {
         // Move Dynamic Obstacles
         dynamicObstacles.forEach(obstacle => {
@@ -1784,7 +1824,7 @@ function spawnObstacle() {
             livecount = 2;
             cangetvenom = true
             wells = []
-            checkAndSplice(polygons, obstacles, mirrors)
+            checkAndSplice(polygons, mirrors)
             polygons = []
             venomreset()
             spawnFood();
@@ -1899,7 +1939,10 @@ function animateExplosion() {
             if (isGravityWellActive === true && wells.length !== 0){
             checkDistance(snake)
             }
-
+if (snake.length <= 1){
+    restartGame()
+    isPoisoned = false
+}
 if (esnake.length !== 0) {
 if (isPaused === false){
             enemyAI(esnake, canvas, gridSize) 
