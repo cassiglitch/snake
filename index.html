@@ -96,6 +96,7 @@ let isFast = false
         let neoncolor = '#39ff14';
         let sunset = '#00FFFF'
        let welldeleter = '#00FFFF80'
+        let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
@@ -162,7 +163,7 @@ if (isBurned === true && effect === 'burn'){
     effectApplied = currentTime
 }
 if(isTaxed === true && effect === 'taxes' && esnake[0].damage === false){
-let tax = score * 0.20;
+let tax = score * taxrate;
 score -= tax;
 
 }
@@ -180,6 +181,10 @@ switch (enemytype) {
             return lightbrown;
     case 'antidote':
         return 'pink'
+    case 'coin':
+        return 'yellow'
+    case 'welldelete':
+        return welldeleter
                }
 }
 // Assume snake is an array representing the snake's body
@@ -292,6 +297,8 @@ switch (enemytype) {
             return 'lightgrey';
     case 'welldelete':
         return welldeleter
+    case 'coin':
+        return 'yellow'
        }
 }
 
@@ -1799,6 +1806,8 @@ if (item.length !== 0) {
             laserTimer = laserTimer/2
         }else if (item[0].type === 'welldelete'){
          wells = []   
+        }else if (item[0].type === 'coin'){
+taxrate += 0.01
         }
         // Clear the item list
         item = [];
@@ -1813,6 +1822,9 @@ if (esnake.some(esnake => esnake.type === 'IRS') && TaxFormGot === true) {
     TaxFormGot = false
 }
 
+            if (taxrate >= 1.00){
+                taxrate = 0.20
+            }
 
 checkForEffects()
     if (!isPaused) { // Check if the game is not paused
@@ -1906,19 +1918,20 @@ function spawnItem() {
                 dynamicObstacles.some(obstacle => (newItem.x >= obstacle.x && newItem.x < obstacle.x + 1) &&
                     (newItem.y >= obstacle.y && newItem.y < obstacle.y + 1)));
 
+    item = []
             item.push(newItem);
         }
 
 function generateItem() {
             // Adjust the probability for different types of food as needed
             const random = Math.random();
-            if (random <= 0.01) {
+            if (random <= 0.1) {
 const rare = ['antidote']; // Possible directions
                 foodCounts.rare = rare.length
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
             } else if (random <= 0.4) {
-    const Special = ['welldelete']; // Possible directions
+    const Special = ['welldelete', 'coin']; // Possible directions
                 foodCounts.special = Special.length
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
@@ -2017,6 +2030,7 @@ function spawnObstacle() {
             animateExplosion();
             pauseGame();
             gotextralife = false;
+            taxrate = 0.20
             symbiotes = []
             thwomps = []
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
