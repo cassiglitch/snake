@@ -66,7 +66,7 @@ let isFast = false
         let gamefoods = [];
         let maxscore = 100;
         let psize = 20;
-        let item = [{x:1, y:1, type: 'antidote'}]
+        let item = []
         let startingGridSize = 20;
         let gridSize = 20;
         let startingLength = 5;
@@ -181,6 +181,85 @@ switch (enemytype) {
         return 'pink'
                }
 }
+// Assume snake is an array representing the snake's body
+// and itemIndex is the index of the item to be picked up
+
+function pickUpItem(itemIndex) {
+    // Define the canvas context and gridSize variables
+    // Store the original colors of the snake segments
+    const originalColors = snake.map(segment => segment.color);
+
+    // Temporary color for the animation
+    const tempColor = 'rgba(255, 255, 0, 1)'; // Solid yellow color
+
+    // Create a wave effect by changing colors of the snake segments
+    const animationInterval = setInterval(() => {
+        // Change color of snake segments
+        for (let i = 0; i < snake.length; i++) {
+            // Calculate distance from itemIndex
+            const distance = Math.abs(i - itemIndex);
+            
+            // Calculate color intensity based on distance
+            const intensity = 1 - (distance / 10); // Adjust 10 to control the intensity
+            
+            // Set temporary color with reduced intensity
+            snake[i].color = tempColor;
+        }
+
+        // Add a breaking wave effect at snake[0]
+        snake[0].color = 'rgba(255, 255, 0, 1)'; // Set snake[0] to solid yellow
+    // Additional wave breaking effect
+            let deviceWidth, landscape = Math.abs(window.orientation) == 90;
+        if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320;
+        else deviceWidth = window.screen[landscape ? "height" : "width"];
+        let zoomFactor = deviceWidth / window.innerWidth;
+        let antiZoomFactor = 1 / zoomFactor;
+
+    const animationColor = 'rgba(255, 255, 0, 0.5)'; // Blue color with transparency
+    let segmentSize = gridSize; // Adjust segment size based on anti-zoom factor
+    let waveSize = 5; // Adjust the size of the wave based on anti-zoom factor
+    let maxFrames = 8; // Number of frames for the eating animation
+
+    let head = snake[0];
+    let eatingAnimationFrames = Math.min(maxFrames, snake.length - 1);
+    let eatenSegments = snake.slice(1, eatingAnimationFrames + 1);
+    eatenSegments.forEach((segment, index) => {
+        let animationFrame = eatingAnimationFrames - index;
+        const segmentX = segment.x * gridSize;
+        const segmentY = segment.y * gridSize;
+
+        let originalOffset = waveSize * (maxFrames - animationFrame);
+        var scaledOffset = Math.max(0, Math.ceil(originalOffset * antiZoomFactor));
+
+        // Draw the wave-like effect
+        ctx.fillStyle = animationColor;
+        ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+        ctx.fillRect(segmentX - scaledOffset, segmentY, segmentSize, segmentSize);
+        ctx.fillRect(segmentX + scaledOffset, segmentY, segmentSize, segmentSize);
+        ctx.fillRect(segmentX, segmentY - scaledOffset, segmentSize, segmentSize);
+        ctx.fillRect(segmentX, segmentY + scaledOffset, segmentSize, segmentSize);
+
+        // Draw the original segment
+        ctx.fillRect(segmentX, segmentY, segmentSize, segmentSize);
+    });
+
+    // Reset snake color after eating animation
+    originalSnakeColor = '#00FF00';
+
+        // After the animation duration, restore original colors and stop the animation
+        setTimeout(() => {
+            // Restore original colors
+            snake.forEach((segment, index) => {
+                segment.color = originalColors[index];
+            });
+
+            // Stop the animation interval
+            clearInterval(animationInterval);
+
+ }, 1000); // Adjust this time to control animation duration
+    }, 100); // Adjust this time to control animation speed
+
+        }
 
 
 let wellStrength = 5
@@ -1718,6 +1797,7 @@ if (item.length !== 0) {
         }
         // Clear the item list
         item = [];
+        pickUpItem(item)
     }
 }
 
