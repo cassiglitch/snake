@@ -95,6 +95,7 @@ let isFast = false
         let originalSnakeColor = '#00FF00';
         let neoncolor = '#39ff14';
         let sunset = '#00FFFF'
+       let welldeleter = '#00FFFF80'
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
@@ -289,6 +290,8 @@ switch (enemytype) {
             return timespeed;
         case 'IRS':
             return 'lightgrey';
+    case 'welldelete':
+        return welldeleter
        }
 }
 
@@ -1794,6 +1797,8 @@ if (item.length !== 0) {
         } else if (item[0].type === 'antidote'){
             cancelEffects()
             laserTimer = laserTimer/2
+        }else if (item[0].type === 'welldelete'){
+         wells = []   
         }
         // Clear the item list
         item = [];
@@ -1913,7 +1918,7 @@ const rare = ['antidote']; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     return rare[randomIndex2];
             } else if (random <= 0.4) {
-    const Special = ['taxform']; // Possible directions
+    const Special = ['welldelete']; // Possible directions
                 foodCounts.special = Special.length
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     return Special[randomIndex2];
