@@ -144,11 +144,11 @@ function checkForEffects(){
     }
     if (isTaxed === true){
         applyStatus(900, 'taxes')
+    }
     if (controltype === 'mobile'){
     applyStatus(5000, 'well')
     }
     }
-}
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
 
