@@ -385,6 +385,11 @@ function spawnvenom(type){
 symbiote = Array.from({ length: snake.length }, (_, index) => ({ x: 10, y: 10 - index, type: type }));
 }
 
+
+function wellToggle(){
+    isGravityWellActive = !isGravityWellActive
+}
+        
 function calculateGameProbability(score, foodCounts) {
         const totalFoods = Object.values(foodCounts).reduce((acc, count) => acc + count, 0);
     const foodTypeProbabilities = {
