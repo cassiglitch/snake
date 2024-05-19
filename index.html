@@ -2024,6 +2024,7 @@ function spawnObstacle() {
 
 
         function restartGame() {
+            cancelEffects()
             pauseGame();
             TaxFormGot = false
             createParticles('red');
