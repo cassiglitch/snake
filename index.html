@@ -103,6 +103,7 @@ let isFast = false
         let symbiote = []
         let hasBeenTaxed = false
         let laserTimer = 45
+        let controltype = 'arrow'
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -143,6 +144,9 @@ function checkForEffects(){
     }
     if (isTaxed === true){
         applyStatus(900, 'taxes')
+    if (controltype === 'mobile'){
+    applyStatus(5000, 'well')
+    }
     }
 }
 function applyStatus(cooldown, effect){
@@ -165,7 +169,11 @@ if (isBurned === true && effect === 'burn'){
 if(isTaxed === true && effect === 'taxes' && esnake[0].damage === false){
 let tax = score * taxrate;
 score -= tax;
+effectApplied = currentTime
 
+}
+if (effect === 'well'){
+wellToggle()
 }
 }
 }
@@ -2273,15 +2281,19 @@ document.addEventListener('keydown', event => {
         switch (event.key) {
             case 'ArrowUp':
                 direction = 'up';
+                controltype = 'arrow'
                 break;
             case 'ArrowDown':
                 direction = 'down';
+                controltype = 'arrow'
                 break;
             case 'ArrowLeft':
                 direction = 'left';
+                controltype = 'arrow'
                 break;
             case 'ArrowRight':
                 direction = 'right';
+                controltype = 'arrow'
                 break;
         }
     }
@@ -2306,10 +2318,12 @@ function handleTouchEnd(event) {
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
         // Horizontal swipe
         direction = deltaX > 0 ? 'right' : 'left';
+        controltype = 'mobile'
     } else {
         // Vertical swipe
         if (Math.abs(deltaY) > 10) {
             direction = deltaY > 0 ? 'down' : 'up';
+            controltype = 'mobile'
         } 
     }
 
