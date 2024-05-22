@@ -60,7 +60,7 @@
         const ctx = canvas.getContext('2d');
 let isFast = false
         let timezone = []
-        let mirrors = []
+        let mirrors = [{x:1, y:2}]
         let gotextralife = false;
         let lives = 0.5;
         let gamefoods = [];
@@ -71,7 +71,7 @@ let isFast = false
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0};
+        let food = { x: 10, y: 2, type: 'fire'};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
@@ -787,7 +787,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         projectile.velocityY = Math.sin(angle) * projectileSpeed;
                     }
 
-                    if (projectile.reflect) {
+                    if (projectile.reflect === true) {
                         projectile.x -= projectile.velocityX;
                         projectile.y -= projectile.velocityY;
                     } else {
