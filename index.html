@@ -71,7 +71,7 @@ let isFast = false
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0};
+        let food = { x: 0, y: 0, type:'fire'};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
@@ -82,7 +82,7 @@ let isFast = false
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = []
+        let kamek = [{x:0,y:0}]
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
