@@ -71,7 +71,7 @@ let isFast = false
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0, type:'fire'};
+        let food = { x: 0, y: 0, type:'fast'};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
@@ -1784,7 +1784,7 @@ changeInterval(50)
                 setTimeout(function() {
     changeInterval(100);
 }, 3000);           
-                    
+isFast = true
                 }else{
                     cancelEffects()
                     gamefoods.push('normal')
