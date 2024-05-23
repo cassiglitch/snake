@@ -154,11 +154,11 @@ if (kamek.length !== 0){
       }
 }
 }
-
+        
 function kamekMagic() {
     if (!isPaused) {
         // Determine the type of magic
-        if ((Math.random() <= 0.5 && kamekcanteleport === false) && isBurned === false && isParalyzed === false && isConfused === false) {
+        if ((Math.random() <= 0.5 && kamekcanteleport === false)&&isParalyzed === false) {
             const magic = ['bolt'];
             const randomIndex = Math.floor(Math.random() * magic.length);
             magictype = magic[randomIndex];
@@ -181,15 +181,11 @@ function kamekMagic() {
             generatePolygonCoordinates(kamek[0].x, kamek[0].y, 5, 3, timezone);
             kamekcanteleport = false;
         } else if (magictype === 'status') {
-            const status = ['burn', 'confused', 'paralyzed'];
+            const status = ['paralyzed'];
             const randomIndex = Math.floor(Math.random() * status.length);
             const magicstatus = status[randomIndex];
             
-            if (magicstatus === 'burn') {
-                isBurned = true;
-            } else if (magicstatus === 'confused') {
-                isConfused = true;
-            } else if (magicstatus === 'paralyzed') {
+           if (magicstatus === 'paralyzed') {
                 isParalyzed = true;
                 setTimeout(turnoffpara, 1000);
             }
@@ -934,7 +930,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                     projectiles.splice(index, 1);
                 }
-                } else if (projectile.homing && isPaused === true){
+                } else if (projectile.homing){
                 snake.forEach((snakePart) => {
                         if ((projectile.x >= snakePart.x * gridSize && projectile.x <= (snakePart.x + 1) * gridSize &&
                             projectile.y >= snakePart.y * gridSize && projectile.y <= (snakePart.y + 1) * gridSize) && !isInvincible) {
@@ -980,6 +976,15 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
         }
     });
 
+
+    timezone.forEach((obstacle, index) => {
+                if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
+                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
+                    // Remove the obstacle from the array
+                    timezone.splice(index, 1);
+                }
+            });
+    
     dynamicObstacles.forEach((dynamicObstacle, dynamicObstacleIndex) => {
         const dynamicObstacleCenterX = (dynamicObstacle.x + 1) * gridSize;
         const dynamicObstacleCenterY = (dynamicObstacle.y + 1) * gridSize;
@@ -1192,7 +1197,22 @@ function shootLaser(targetX, targetY) {
                     obstacles.splice(index, 1);
                 }
             });
+            timezone.forEach((obstacle, index) => {
+                if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
+                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
+                    // Remove the obstacle from the array
+                    timezone.splice(index, 1);
+                }
+            });
 
+            kamek.forEach((obstacle, index) => {
+                if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
+                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
+                    // Remove the obstacle from the array
+                    kamek.splice(index, 1);
+                }
+            });
+            
             // Check for collision with dynamic obstacles for the laser pixel
             dynamicObstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 2) * gridSize &&
