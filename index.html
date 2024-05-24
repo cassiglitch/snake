@@ -58,7 +58,8 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-let isFast = false
+        
+        let isFast = false
         let timezone = []
         let mirrors = []
         let gotextralife = false;
@@ -77,6 +78,7 @@ let isFast = false
         let direction = 'right';
         let previousDirection = 'direction';
         let score = 0;
+        let hascollided = false
         let isEating = false;
         let eatingAnimationFrames = 0;
         let isInvincible = false;
@@ -97,11 +99,12 @@ let isFast = false
         let originalSnakeColor = '#00FF00';
         let neoncolor = '#39ff14';
         let sunset = '#00FFFF'
-       let welldeleter = '#00FFFF80'
+        let welldeleter = '#00FFFF80'
         let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
+        let turrets = []
         let symbiote = [];
         let hasBeenTaxed = false
         let laserTimer = 45
@@ -135,6 +138,8 @@ let isTaxed = false
 let magicstatus = 0
 let lightbrown = '#C4A484'
 let kamekcanteleport = true
+let sideshield = 6
+        let shield = false
 let magictype = 'bolt'
 function kamekUpdate(){
             if (kamek.length > 1) {
@@ -142,6 +147,9 @@ function kamekUpdate(){
 }
     if (kamek.length !== 0){
         applyStatus(1000, 'magic')
+if (kamek[0].health === undefined){
+    kamek[0].health = 100;
+}
     }
 if (kamek.length !== 0){
     const distance = Math.abs(snake[0].x - kamek[0].x) + Math.abs(snake[0].y - kamek[0].y);
@@ -151,19 +159,33 @@ if (kamek.length !== 0){
     kamek[0].x = randomX;
     kamek[0].y = randomY;
         timezone = []
+    kamekcanteleport = true
+      if (shield === true){
+       timezone = []
+       generatePolygonCoordinates(kamek[0].x, kamek[0].y, 5, sideshield, timezone)
       }
+      }
+}
+if (kamek.length === 0){
+    timezone = []
 }
 }
         
 function kamekMagic() {
     if (!isPaused) {
         // Determine the type of magic
-        if ((Math.random() <= 0.5 && kamekcanteleport === false)&&isParalyzed === false) {
-            const magic = ['bolt'];
+        if ((Math.random() <= 0.2 && kamekcanteleport === false) && isParalyzed === false) {
+            const magic = ['bolt', 'status', 'obstacle'];
             const randomIndex = Math.floor(Math.random() * magic.length);
             magictype = magic[randomIndex];
-        } else {
-            const magic = ['port', 'wall', 'status'];
+        } else if (sideshield <= 2){
+            shield = false
+            timezone = []
+            const magic = ['port', 'obstacle'];
+            const randomIndex = Math.floor(Math.random() * magic.length);
+            magictype = magic[randomIndex];
+        }else{
+            const magic = ['port', 'wall', 'obstacle'];
             const randomIndex = Math.floor(Math.random() * magic.length);
             magictype = magic[randomIndex];
         }
@@ -178,7 +200,8 @@ function kamekMagic() {
             kamek[0].y = randomY;
             timezone = [];
         } else if (magictype === 'wall') {
-            generatePolygonCoordinates(kamek[0].x, kamek[0].y, 5, 3, timezone);
+            generatePolygonCoordinates(kamek[0].x, kamek[0].y, 5, sideshield, timezone);
+            shield = true
             kamekcanteleport = false;
         } else if (magictype === 'status') {
             const status = ['paralyzed'];
@@ -189,6 +212,22 @@ function kamekMagic() {
                 isParalyzed = true;
                 setTimeout(turnoffpara, 1000);
             }
+        }else if (magictype === 'obstacle'){
+// Assume obstacles and mirrors are defined arrays
+const obstacles2 = [turrets];
+
+// Generate a random index to select either the obstacles or mirrors array
+const randomIndex = Math.floor(Math.random() * obstacles2.length);
+
+// Select the array based on the random index
+const spawner = obstacles2[randomIndex];
+
+// Calculate random coordinates within the grid
+const x = Math.floor(Math.random() * (canvas.width / gridSize));
+const y = Math.floor(Math.random() * (canvas.height / gridSize));
+
+// Add the new obstacle or mirror at the random coordinates
+spawner.push({ x, y });
         }
     }
 }
@@ -212,7 +251,7 @@ function checkForEffects(){
         applyStatus(900, 'taxes')
     }
     if (controltype === 'mobile'){
-    applyStatus(5000, 'well')
+    applyStatus(1000, 'well')
     }
     }
 function applyStatus(cooldown, effect){
@@ -236,18 +275,10 @@ if(isTaxed === true && effect === 'taxes' && esnake[0].damage === false){
 let tax = score * taxrate;
 score -= tax;
 effectApplied = currentTime
-
 }
 if (effect === 'well'){
-    wells.forEach((well) => {
-      const distance = Math.abs(snake[0].x - well.x) + Math.abs(snake[0].y - well.y);
-      if (distance <= wellStrength) {
-wellToggle()
+  wellToggle()
 effectApplied = currentTime
-}else{
-return
-}
-})
 }
 if (effect === 'magic' && kamek.length !== 0){
     kamekMagic()
@@ -352,7 +383,37 @@ function pickUpItem(itemIndex) {
     }, 100); // Adjust this time to control animation speed
 
         }
+// Ensure each turret has a lastFired property
 
+function ManageTurrets() {
+  turrets.forEach((turret) => {
+  if (turret.lastFired === undefined) {
+    turret.lastFired = 0; // Initialize with a timestamp indicating it hasn't fired yet
+  }
+}); 
+    const now = Date.now(); // Current timestamp
+
+  if (turrets.length !== 0) {
+    turrets.forEach((well) => {
+      const distance = Math.abs(snake[0].x - well.x) + Math.abs(snake[0].y - well.y);
+
+      // Check if the turret is within range and if it can fire
+      if (distance <= 5 && (now - well.lastFired >= 1000)) {
+        shootWaveOfProjectiles(well.x * gridSize, well.y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true);
+
+        // Update the last fired timestamp
+        well.lastFired = now;
+      }
+    });
+  } else {
+    return;
+  }
+
+  // Limit the number of turrets to 5
+  if (turrets.length > 5) {
+    turrets.length = 5;
+  }
+}
 
 let wellStrength = 5
 function checkDistance(snake) {
@@ -360,9 +421,8 @@ function checkDistance(snake) {
       const distance = Math.abs(snake[0].x - well.x) + Math.abs(snake[0].y - well.y);
       if (distance <= wellStrength) {
 if (snake[0].x < well.x) {
-
 direction = 'right'
-} else if (snake[0].x > well.x) {
+}else if (snake[0].x > well.x) {
 direction = 'left'
         } 
           if (snake[0].y < well.y) {
@@ -705,6 +765,13 @@ function drawFlatPolygon(x, y, size, sides, color) {
         ctx.lineTo(x + size / 2, y - size / 2); // Top right
         ctx.lineTo(x + size / 2, y + size / 2); // Bottom right
         ctx.lineTo(x - size / 2, y + size / 2); // Bottom left
+    } else if (sides === 5) {
+        // Pentagon
+        ctx.moveTo(x, y - size); // Top vertex
+        ctx.lineTo(x - size * Math.cos(Math.PI / 10), y - size * Math.sin(Math.PI / 10)); // Top left
+        ctx.lineTo(x - size * Math.cos(Math.PI / 2.5), y + size * Math.sin(Math.PI / 10)); // Bottom left
+        ctx.lineTo(x + size * Math.cos(Math.PI / 2.5), y + size * Math.sin(Math.PI / 10)); // Bottom right
+        ctx.lineTo(x + size * Math.cos(Math.PI / 10), y - size * Math.sin(Math.PI / 10)); // Top right
     } else {
         // General case for regular polygons, centered at (x, y)
         let angleIncrement = (Math.PI * 2) / sides;
@@ -724,8 +791,11 @@ function drawKamek(x, y){
     y = y * gridSize;
 
     // Draw the polygons (hat and robe)
+    drawFlatPolygon(x, y + gridSize + gridSize, gridSize + (gridSize / 2), 5, 'blue');
     drawPolygon(x, y + gridSize, gridSize, 4, 'gold');
-     drawFlatPolygon(x, y, gridSize, 3, 'blue');
+    drawFlatPolygon(x, y, gridSize, 3, 'blue');
+    drawPolygon(x + gridSize, y + gridSize + gridSize, (gridSize / 2), 4, 'gold');
+    drawPolygon(x - gridSize, y + gridSize + gridSize, (gridSize / 2), 4, 'gold');
     
     // Calculate eye positions relative to the robe polygon
     let eyeBaseX = x; // Center of the robe
@@ -744,6 +814,7 @@ function drawKamek(x, y){
     ctx.arc(eyeBaseX - gridSize / 4, eyeBaseY - gridSize / 2, gridSize / 8, 0, Math.PI * 2); // Left pupil
     ctx.arc(eyeBaseX + gridSize / 4, eyeBaseY - gridSize / 2, gridSize / 8, 0, Math.PI * 2); // Right pupil
     ctx.fill();
+
 }
 
 function getDirectionToSnakeHead(x, y, snake) {
@@ -803,6 +874,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             reflect: false,
             count: 0,
             circle: circle,
+            speed:projectileSpeed,
             homing: enemy // Only set to true if enemy is true
         };
 
@@ -820,8 +892,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
                         const angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
-                        projectile.velocityX = Math.cos(angle) * projectileSpeed;
-                        projectile.velocityY = Math.sin(angle) * projectileSpeed;
+                        projectile.velocityX = Math.cos(angle) * projectile.speed;
+                        projectile.velocityY = Math.sin(angle) * projectile.speed;
                     }
 
                     if (projectile.reflect === true) {
@@ -860,6 +932,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         projectile.y >= mirror.y * gridSize && projectile.y <= (mirror.y + 1) * gridSize) {
                         projectile.homing = true;
                         projectile.color = 'purple'
+                        projectile.speed = 0.5
                     }
                 });
 
@@ -914,6 +987,10 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                         kamek.splice(index, 1);
+      const distance = Math.abs(kamke[0].x - projectile.x) + Math.abs(kamek[0].y - projectile.y);
+      if (distance <= wellStrength) {
+          projectile.homing = true
+      }
                     }
                 });
                 setTimeout(() => {
@@ -1009,7 +1086,7 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
 function enemyshootmagic() {
     if (kamek.length !== 0) {
         kamek.forEach((kamek, index) => {
-            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, snake, ctx);
+            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true);
         });
     }
 }
@@ -1199,19 +1276,13 @@ function shootLaser(targetX, targetY) {
             });
             timezone.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
-                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
+                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize && hascollided === false) {
                     // Remove the obstacle from the array
-                    timezone.splice(index, 1);
+                    sideshield -= 1
+                    hascollided = true
                 }
             });
 
-            kamek.forEach((obstacle, index) => {
-                if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
-                    y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
-                    // Remove the obstacle from the array
-                    kamek.splice(index, 1);
-                }
-            });
             
             // Check for collision with dynamic obstacles for the laser pixel
             dynamicObstacles.forEach((obstacle, index) => {
@@ -1250,6 +1321,7 @@ thwomps.forEach((obstacle, index) => {
         setTimeout(() => {
             isShooting = false;
             charging = true;
+            hascollided = false
         }, 5 * 1000);
 
         // Update the timestamp of the last laser shot
@@ -1356,6 +1428,9 @@ ctx.fillStyle = wellcolor;
 
     ctx.fillStyle = 'darkgrey';
 mirrors.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+
+ctx.fillStyle = '#007BA7';
+turrets.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 ctx.fillStyle = 'black';
     thwomps.forEach(obstacle => {
@@ -1502,8 +1577,7 @@ function HaHaNoCollision(duration) {
                     isInvincible = false;
                 }
             }
-
-
+            ManageTurrets()
             if (kamek !== 0){
                 kamekUpdate()
             }
@@ -1780,11 +1854,12 @@ cancelEffects()
 }, 6000);           
                 }else if(food.type === 'fast'){
                     cancelEffects()
-changeInterval(50)   
+                    isFast = true
+                    changeInterval(50)   
                 setTimeout(function() {
     changeInterval(100);
+    isFast = false
 }, 3000);           
-isFast = true
                 }else{
                     cancelEffects()
                     gamefoods.push('normal')
@@ -2093,6 +2168,7 @@ function spawnObstacle() {
         function restartGame() {
             cancelEffects()
             pauseGame();
+            shield = false
             TaxFormGot = false
             createParticles('red');
             animateExplosion();
