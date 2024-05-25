@@ -2182,7 +2182,7 @@ function spawnObstacle() {
     }
         else if (Math.random() < 0.6) { 
             mirrors.push({ x: x, y: y });
-        }else if(Math.random() < 0.7){
+        }else if(Math.random() < 0.7 && controltype === 'arrows'){
          wells.push({x:x, y:y})   
         }
             else if(Math.random() < 0.9){
