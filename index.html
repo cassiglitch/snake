@@ -61,7 +61,7 @@
         
         let isFast = false
         let timezone = []
-        let mirrors = [{x:0,y:0}]
+        let mirrors = []
         let gotextralife = false;
         let lives = 0.5;
         let gamefoods = [];
@@ -72,7 +72,7 @@
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 10, y: 0, type: 'fire'};
+        let food = { x: 0, y: 0};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
