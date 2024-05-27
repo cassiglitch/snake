@@ -61,7 +61,7 @@
         
         let isFast = false
         let timezone = []
-        let mirrors = []
+        let mirrors = [{x:0,y:0}]
         let gotextralife = false;
         let lives = 0.5;
         let gamefoods = [];
@@ -72,7 +72,7 @@
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0};
+        let food = { x: 10, y: 0, type: 'fire'};
         let obstacles = [];
         let dynamicObstacles = [];
         let direction = 'right';
@@ -883,6 +883,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             angle2:angle,
             velocityX: velocityX,
             velocityY: velocityY,
+            velocityX2: velocityX,
+            velocityY2: velocityY,
             color: projectileColor,
             sides: sides,
             size: projectileSize,
@@ -890,7 +892,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             count: 0,
             circle: circle,
             speed:projectileSpeed,
-            reflected:false,
+            reflected:true,
             homing: enemy // Only set to true if enemy is true
         };
 
@@ -911,19 +913,21 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         projectile.velocityX = Math.cos(projectile.angle) * projectile.speed;
                         projectile.velocityY = Math.sin(projectile.angle) * projectile.speed;
                     }
+                
+                    if (projectile.reflected !== projectile.reflect) {
 
-                    if (projectile.reflect === true && projectile.reflected === false) {
-                        projectile.angle = invertAngle(projectile.angle);
-                        projectile.velocityX = Math.cos(projectile.angle) * projectile.speed;
-                        projectile.velocityY = Math.sin(projectile.angle) * projectile.speed;
-                        projectile.reflected = true
-                    } else if (projectile.reflect === false){
-                        projectile.angle = projectile.angle2;
-                        projectile.velocityX = Math.cos(projectile.angle) * projectile.speed;
-                        projectile.velocityY = Math.sin(projectile.angle) * projectile.speed;
-                        projectile.reflected = false
+    if (projectile.reflect) {
+        projectile.velocityX = -projectile.velocityX;
+        projectile.velocityY = -projectile.velocityY;
+        projectile.reflected = projectile.reflect;
+    } else {
+        // Optionally, store the original velocity if you want to reset to those values
+        projectile.velocityX = projectile.velocityX2;
+        projectile.velocityY = projectile.velocityY2;
+        projectile.reflected = projectile.reflect;
+    }
                     }
-                    projectile.count += 1;
+                    projectile.count += 1
                 }
 
                 if (increase && !projectile.homing) {
@@ -2182,7 +2186,7 @@ function spawnObstacle() {
     }
         else if (Math.random() < 0.6) { 
             mirrors.push({ x: x, y: y });
-        }else if(Math.random() < 0.7 && controltype === 'arrows'){
+        }else if(Math.random() < 0.7){
          wells.push({x:x, y:y})   
         }
             else if(Math.random() < 0.9){
