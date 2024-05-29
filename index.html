@@ -910,8 +910,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
                         const angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
-                        projectile.velocityX = Math.cos(projectile.angle) * projectile.speed;
-                        projectile.velocityY = Math.sin(projectile.angle) * projectile.speed;
+                        projectile.velocityX = Math.cos(angle) * projectile.speed;
+                        projectile.velocityY = Math.sin(angle) * projectile.speed;
                     }
                 
                     if (projectile.reflected !== projectile.reflect) {
