@@ -58,7 +58,10 @@
     <script>
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-        
+
+        let goombadirection = 'left'
+        let goombaoffset = 1.00
+        let reflector = []
         let isFast = false
         let timezone = []
         let mirrors = []
@@ -84,13 +87,14 @@
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = [{x:2,y:2}]
+        let kamek = []
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
         let freeze = false;
         let freezetimer = 5;
         let isFoodOrange = false;
+        let inverted = false;
         let livecount = 2;
         let pausetimer = 900;
         let TaxFormGot = false
@@ -106,9 +110,11 @@
         let esnake = [];
         let turrets = []
         let symbiote = [];
+        let controlsinverted = false
         let hasBeenTaxed = false
         let laserTimer = 45
         let controltype = 'arrow'
+        let goombas = [{x:1,y:1}, {x:10, y:1}]
         let magic = []
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
@@ -214,7 +220,7 @@ function kamekMagic() {
             }
         }else if (magictype === 'obstacle'){
 // Assume obstacles and mirrors are defined arrays
-const obstacles2 = [turrets];
+const obstacles2 = [turrets, goombas];
 
 // Generate a random index to select either the obstacles or mirrors array
 const randomIndex = Math.floor(Math.random() * obstacles2.length);
@@ -798,6 +804,75 @@ function drawFlatPolygon(x, y, size, sides, color) {
     ctx.fill();
 }
 
+function drawGoomba(gx, gy) {
+    // Scale size
+    let x = gx * gridSize
+    let y = gy * gridSize
+    let size = gridSize
+    const headHeight = size * 2;
+    const bodyHeight = size;
+    const bodyWidth = size * 1.2;
+    const eyeRadius = size * 0.3;
+    const pupilRadius = size * 0.1;
+    const footRadius = size * 0.6;
+    const browWidth = size * 0.6;
+    const browHeight = size * 0.1;
+    const mouthWidth = size * 0.8;
+    const mouthHeight = size * 0.15;
+
+
+    // Draw the body (a rectangle)
+    ctx.fillStyle = "#f1e0c6";
+    ctx.fillRect(x - bodyWidth / 2, y + headHeight - (headHeight/8), bodyWidth * 1.5, bodyHeight * 1.2);
+
+    // Draw the head (a hexagon)
+    ctx.fillStyle = "#b5651d";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + size * 1.5, y + headHeight / 3);
+    ctx.lineTo(x + size * 1.5, y + headHeight);
+    ctx.lineTo(x, y + headHeight * 1.25);
+    ctx.lineTo(x - size * 1.5, y + headHeight);
+    ctx.lineTo(x - size * 1.5, y + headHeight / 3);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw the feet (two circles)
+    ctx.fillStyle = "#8b4513";
+    ctx.beginPath();
+    ctx.arc(x - size * 1, y + headHeight + bodyHeight + footRadius - (headHeight/2), footRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + size * 1, y + headHeight + bodyHeight + footRadius - (headHeight/2), footRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the eyes (two circles and black pupils)
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(x - size * 0.5, y + headHeight / 2, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + size * 0.5, y + headHeight / 2, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#000000";
+    ctx.beginPath();
+    ctx.arc(x - size * 0.5, y + headHeight / 2, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + size * 0.5, y + headHeight / 2, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the eyebrows (two rectangles)
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(x - size * 0.8, y + headHeight / 3.5, browWidth, browHeight);
+    ctx.fillRect(x + size * 0.2, y + headHeight / 3.5, browWidth, browHeight);
+
+    // Draw the mouth (a rectangle)
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(x - mouthWidth / 2, y + headHeight * 0.8, mouthWidth, mouthHeight);
+}
+
 function drawKamek(x, y){
     // Scale the coordinates by gridSize
     x = x * gridSize;
@@ -893,6 +968,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             circle: circle,
             speed:projectileSpeed,
             reflected:true,
+            reflectored:false,
             homing: enemy // Only set to true if enemy is true
         };
 
@@ -909,7 +985,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         // Adjust velocity to home in on the target
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
-                        const angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
+                        angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
                         projectile.velocityX = Math.cos(angle) * projectile.speed;
                         projectile.velocityY = Math.sin(angle) * projectile.speed;
                     }
@@ -988,6 +1064,15 @@ mirrors.forEach((mirror) => {
                         projectiles.splice(index, 1);
                     }
                 });
+
+        reflector.forEach((obstacle, obstacleIndex) => {
+                    if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
+                        projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize && projectile.reflectored === false) {
+                        angle = invertAngle(angle)
+                    }
+                });
+
+
 
                 dynamicObstacles.forEach((dynamicObstacle, dynamicObstacleIndex) => {
                     if (projectile.x >= dynamicObstacle.x * gridSize && projectile.x <= (dynamicObstacle.x + 2) * gridSize &&
@@ -1351,7 +1436,11 @@ thwomps.forEach((obstacle, index) => {
             }
         });
         ctx.stroke();
-
+if (laserTimer > 22.5){
+        laserTimer = laserTimer/2
+           laserCooldown = laserTimer * 1000
+ 
+}
         // After 5 seconds, reset the shooting state and fade out the laser
         setTimeout(() => {
             isShooting = false;
@@ -1376,6 +1465,12 @@ function draw() {
 if (kamek.length !== 0) {
         kamek.forEach((kamek, index) => {
     drawKamek(kamek.x, kamek.y)
+        })
+}
+
+if (goombas.length !== 0){
+        goombas.forEach((goomba, index) => {
+    drawGoomba(goomba.x, goomba.y)
         })
 }
     // Layer 1: Draw Invincibility Aura
@@ -1450,6 +1545,11 @@ ctx.fillRect(item[0].x * gridSize, item[0].y * gridSize, gridSize, gridSize);
     ctx.fillStyle = 'lightgreen';
 timezone.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+    // Draw Food
+            ctx.fillStyle = '#5B8DFF';
+            reflector.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize))
+
+    
 ctx.fillStyle = wellcolor;
   wells.forEach((well) => {
     const pulse = Math.sin(Date.now() / 200) * 5; // Adjust pulsating effect
@@ -1625,6 +1725,7 @@ function HaHaNoCollision(duration) {
 previousDirection = direction;
 
 // Update the direction based on user input or logic
+            if (inverted === false){
 switch (direction) {
     case 'up':
         head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
@@ -1647,6 +1748,30 @@ switch (direction) {
         track = [{x:head.x - 1, y:head.y}]
         break;
 }
+            }else if (inverted === true){
+           switch (direction) {
+    case 'down':
+        head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+        track = []
+        track = [{x:head.x, y:head.y + 1}]
+        break;
+    case 'up':
+        head.y = (head.y + 1) % (canvas.height / gridSize);
+        track = []
+        track = [{x:head.x, y:head.y - 1}]
+        break;
+    case 'right':
+        head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
+        track = []
+        track = [{x:head.x + 1, y:head.y}]
+        break;
+    case 'left':
+        head.x = (head.x + 1) % (canvas.width / gridSize);
+        track = []
+        track = [{x:head.x - 1, y:head.y}]
+        break;
+}
+       }
 
 
 
@@ -1743,6 +1868,12 @@ if (!isInvincible && mirrors.some(obstacle => obstacle.x === head.x && obstacle.
             break;
     }
 }
+
+if (!isInvincible && reflector.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
+    inverted = !inverted
+    return
+}
+        
 projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleIndex) => {
         if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
             projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
@@ -1981,7 +2112,6 @@ if (item.length !== 0) {
             TaxFormGot = true;
         } else if (item[0].type === 'antidote'){
             cancelEffects()
-            laserTimer = laserTimer/2
         }else if (item[0].type === 'welldelete'){
          wells = []   
         }else if (item[0].type === 'coin'){
@@ -2028,7 +2158,44 @@ if (!freeze) {
                 }
             }
         });
-}
+
+goombas.forEach(obstacle => {
+    if (obstacle.direction === undefined){
+     obstacle.direction = 'left'   
+    }
+})
+goombas.forEach(obstacle => {
+  // Simplify the condition for moving up and down
+  if (obstacle.y + 3 + 0.60 <= canvas.height / gridSize) {
+    obstacle.y += 1;
+  }
+
+  // Ensure we're close enough to the target to account for floating-point precision
+  const epsilon = 0.01; // Small tolerance value
+  if (Math.abs(obstacle.y + 3 + 1.00) >= (canvas.height / gridSize)-epsilon) {
+    if (obstacle.direction === 'left'){
+     obstacle.x += 0.5
+     if (obstacle.x + 2 >= canvas.width/gridSize){
+    obstacle.direction = 'right'
+     }
+    }
+    if (obstacle.direction === 'right') {
+    obstacle.x -= 0.5;  // Moves the obstacle to the right
+    if (obstacle.x - 2 <= 0) {  // Assuming 20 is the right boundary
+      obstacle.direction = 'left';
+    }
+  }   
+  }
+});
+
+// Check for collisions with the player's head and remove the Goomba
+goombas.forEach((obstacle, index) => {
+  if (obstacle.y === head.y && Math.abs(obstacle.x - head.x) <= 0.5 && direction === 'down') {
+    goombas.splice(index, 1);
+    score += 1;
+  }
+});
+
         thwomps.forEach(obstacle => {
             if (obstacle.state === 2) {
                 // Left to right movement
@@ -2046,7 +2213,7 @@ if (!freeze) {
                    
             }
         );
-}
+}}
 
     // Randomize the direction
     const types = ['magnet', 'wave']; // Possible directions
@@ -2064,6 +2231,12 @@ if (score >= maxscore / 2) {
             }
     }
 
+if (reflector.length === 15 && kamek.length === 0){
+    let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
+    let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
+    kamek.push({ x: kamekX2, y: kamekY2 });
+}
+            
             if (laser.isShooting) {
         obstacles.forEach((obstacle, index) => {
             // Check if the laser intersects with the obstacle
@@ -2178,23 +2351,21 @@ function spawnObstacle() {
     const randomIndex = Math.floor(Math.random() * etypes.length);
     etype = etypes[randomIndex];
            esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false, type:etype })) 
-        }
-        if (Math.random() < 0.5) {
-            obstacles.push({ x: x, y: y });
-        }else if (Math.random() < 0.3){
+        } else if (Math.random() < 0.5) {
+const id = Math.random() < 0.5 ? 1 : 2;
+            dynamicObstacles.push({ x: x, y: y, id: id });
+            }else if (Math.random() < 0.3){
         formrandomshape(4)            
     }
-        else if (Math.random() < 0.6) { 
-            mirrors.push({ x: x, y: y });
-        }else if(Math.random() < 0.7){
-         wells.push({x:x, y:y})   
-        }
-            else if(Math.random() < 0.9){
+            else if(Math.random() < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
         } else {
-            // Randomly assign an ID to the dynamic obstacle
-            const id = Math.random() < 0.5 ? 1 : 2;
-            dynamicObstacles.push({ x: x, y: y, id: id });
+           let otype = 0
+const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
+    const randomIndex2 = Math.floor(Math.random() * rare.length);
+    otype = rare[randomIndex2];
+            otype.push({x:x, y:y})
+
         }
     }
 }
@@ -2204,6 +2375,9 @@ function spawnObstacle() {
             cancelEffects()
             pauseGame();
             shield = false
+            inverted = false
+            turrets = []
+            goombas = []
             TaxFormGot = false
             createParticles('red');
             animateExplosion();
@@ -2225,6 +2399,8 @@ function spawnObstacle() {
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
+            kamek = []
+            reflector = []
             cangetvenom = true
             wells = []
             checkAndSplice(polygons, mirrors)
