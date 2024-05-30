@@ -148,7 +148,6 @@ let sideshield = 6
         let shield = false
 let magictype = 'bolt'
 
-spawnObstacle()
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -1812,7 +1811,9 @@ esnake.forEach(enemySegment => enemySegment.damage = true)
         }              
 }
 if (esnake[0].type === 'IRS' && esnake[0].damage === false) {
-        isTaxed = true;
+        let tax = score * taxrate;
+        score -= tax;
+        score = Math.floor(score);
         esnake.forEach(enemySegment => enemySegment.damage = true);
     }
 
@@ -2353,15 +2354,13 @@ const randomValue = Math.random()
     const randomIndex = Math.floor(Math.random() * etypes.length);
     etype = etypes[randomIndex];
            esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false, type:etype })) 
-        } 
-        if (randomValue < 0.5) {
+        } else if (randomValue < 0.5) {
 const id = Math.random() < 0.5 ? 1 : 2;
             dynamicObstacles.push({ x: x, y: y, id: id });
             }
         if (randomValue < 0.3){
         formrandomshape(4)            
-    }
-    if (randomValue < 0.4){
+    } else if (randomValue < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
         } else {
            let otype = 0
