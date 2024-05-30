@@ -2359,7 +2359,38 @@ const id = Math.random() < 0.5 ? 1 : 2;
         formrandomshape(4)            
     }
             else if(Math.random() < 0.4){
+            thwomps.push({ x: x, y: 0, state: function spawnObstacle() {
+    const x = Math.floor(Math.random() * (canvas.width / gridSize));
+    const y = Math.floor(Math.random() * (canvas.height / gridSize));
+
+    // Check if the coordinates are already occupied by something else
+    const occupied = obstacles.some(obstacle => obstacle.x === x && obstacle.y === y) ||
+                     mirrors.some(mirror => mirror.x === x && mirror.y === y) ||
+                     dynamicObstacles.some(dynamic => dynamic.x === x && dynamic.y === y) ||
+                     (food.x === x && food.y === y);
+
+    if (!occupied) {
+        let randomValue = Math.random();
+
+        if ((randomValue < 0.1) && esnake.length === 0) {
+            const etypes = ['base', 'IRS'];
+            const randomIndex = Math.floor(Math.random() * etypes.length);
+            const etype = etypes[randomIndex];
+            esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false, type: etype }));
+        } else if (randomValue < 0.6) { // 0.5 chance for dynamicObstacles after the 0.1 for esnake
+            const id = Math.random() < 0.5 ? 1 : 2;
+            dynamicObstacles.push({ x: x, y: y, id: id });
+        } else if (randomValue < 0.9) { // 0.3 chance for formrandomshape after 0.6
+            formrandomshape(4);
+        } else if (randomValue < 1.0) { // 0.4 chance for thwomps after 0.9
             thwomps.push({ x: x, y: 0, state: 1 });
+        } else { // Remaining chance for the 90% spawn
+            const rare = [obstacles, mirrors, wells, reflector];
+            const randomIndex2 = Math.floor(Math.random() * rare.length);
+            rare[randomIndex2].push({ x, y });
+        }
+    }
+}
         }else if(Math.random() < 0.9){
            
 const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
@@ -2368,9 +2399,9 @@ const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
             otype.push({x, y})                
         } else {
         otype = 0
-const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
+const otype2 = [obstacles, mirrors, wells, reflector]; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
-    let otype = rare[randomIndex2];
+    let otype = otype2[randomIndex2];
             otype.push({x, y})
         }
     }
