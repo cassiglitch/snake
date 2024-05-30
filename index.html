@@ -1811,7 +1811,7 @@ esnake.forEach(enemySegment => enemySegment.damage = true)
         }              
 }
 if (esnake[0].type === 'IRS' && esnake[0].damage === false) {
-        isTaxed = true;
+        score = score * taxrate
         esnake.forEach(enemySegment => enemySegment.damage = true);
     }
 
@@ -2360,17 +2360,17 @@ const id = Math.random() < 0.5 ? 1 : 2;
     }
             else if(Math.random() < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
-        }else if(Math.random() >= 0.7){
-           let otype = 0
+        }else if(Math.random() < 0.9){
+           
 const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
-    otype = rare[randomIndex2];
+    let otype = rare[randomIndex2];
             otype.push({x, y})                
         } else {
-           let otype = 0
+        otype = 0
 const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
-    otype = rare[randomIndex2];
+    let otype = rare[randomIndex2];
             otype.push({x, y})
         }
     }
