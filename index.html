@@ -61,7 +61,7 @@
 
         let goombadirection = 'left'
         let goombaoffset = 1.00
-        let reflector = [{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1},{x:6,y:1},{x:7,y:1},{x:8,y:1}]
+        let reflector = []
         let isFast = false
         let timezone = []
         let mirrors = []
@@ -232,12 +232,16 @@ const spawner = obstacles2[randomIndex];
 
 // Calculate random coordinates within the grid
 const x = Math.floor(Math.random() * (canvas.width / gridSize));
-const y = Math.floor(Math.random() * (canvas.height / gridSize));
+let y = Math.floor(Math.random() * (canvas.height / gridSize));
 
 // Add the new obstacle or mirror at the random coordinates
 if (spawner !== goombas){
         spawner.push({ x, y });
         }else if(spawner === goombas){
+    y -= 6
+    if(y < 0){
+        y = 6
+    }
     spawnGoombas(x, y)
         }
         }
@@ -310,7 +314,7 @@ document.addEventListener('keypress', function(event) {
             const maxRadius = Math.min(maxSize, Math.hypot(canvas.width, canvas.height) / 2);
 
             let particles = [];
-            const numParticles = 200;
+            const numParticles = 400;
             let particleRadius = 3;
             let startTime;
 
@@ -340,7 +344,7 @@ document.addEventListener('keypress', function(event) {
 
             // Update particles
             function updateParticles(elapsedTime) {
-                if (elapsedTime >= duration) {
+                if (elapsedTime >= duration && portalRadius < 0) {
                     particles = []; // Clear particles array when duration elapses
                     return;
                 }
