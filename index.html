@@ -61,7 +61,7 @@
 
         let goombadirection = 'left'
         let goombaoffset = 1.00
-        let reflector = []
+        let reflector = [{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1},{x:6,y:1},{x:7,y:1},{x:8,y:1}]
         let isFast = false
         let timezone = []
         let mirrors = []
@@ -77,6 +77,7 @@
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
         let obstacles = [];
+        let kamekappears = false
         let dynamicObstacles = [];
         let direction = 'right';
         let previousDirection = 'direction';
@@ -234,7 +235,11 @@ const x = Math.floor(Math.random() * (canvas.width / gridSize));
 const y = Math.floor(Math.random() * (canvas.height / gridSize));
 
 // Add the new obstacle or mirror at the random coordinates
-spawner.push({ x, y });
+if (spawner !== goombas){
+        spawner.push({ x, y });
+        }else if(spawner === goombas){
+    spawnGoombas(x, y)
+        }
         }
     }
 }
@@ -298,7 +303,117 @@ document.addEventListener('keypress', function(event) {
         pauseGame();
     }
 });
+                function createPortalAnimation(x, y, maxSize, duration) {
 
+            const portalCenter = { x: x, y: y };
+            let portalRadius = 0;
+            const maxRadius = Math.min(maxSize, Math.hypot(canvas.width, canvas.height) / 2);
+
+            let particles = [];
+            const numParticles = 200;
+            let particleRadius = 3;
+            let startTime;
+
+            // Initialize particles
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    angle: Math.random() * 2 * Math.PI,
+                    distance: Math.random() * portalRadius,
+                    speed: Math.random() * 0.05 + 0.01,
+                    color: `hsl(${Math.random() * 60 + 60}, 100%, 50%)` // Greenish colors
+                });
+            }
+
+            // Draw a single particle
+            function drawParticle(particle) {
+                ctx.beginPath();
+                ctx.arc(
+                    portalCenter.x + particle.distance * Math.cos(particle.angle),
+                    portalCenter.y + particle.distance * Math.sin(particle.angle),
+                    particleRadius,
+                    0,
+                    2 * Math.PI
+                );
+                ctx.fillStyle = particle.color;
+                ctx.fill();
+            }
+
+            // Update particles
+            function updateParticles(elapsedTime) {
+                if (elapsedTime >= duration) {
+                    particles = []; // Clear particles array when duration elapses
+                    return;
+                }
+                for (let particle of particles) {
+                    particle.angle += particle.speed;
+                    particle.distance += particle.speed * 10;
+
+                    // Reset particle if it goes beyond max radius
+                    if (particle.distance > portalRadius) {
+                        particle.angle = Math.random() * 2 * Math.PI;
+                        particle.distance = Math.random() * portalRadius;
+                    }
+                }
+            }
+
+            // Draw portal
+            function drawPortal(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsedTime = timestamp - startTime;
+
+                // Clear only the area within the radius of the portal
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(portalCenter.x, portalCenter.y, portalRadius, 0, 2 * Math.PI);
+                ctx.clip();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+
+                // Update and draw particles
+                updateParticles(elapsedTime);
+                for (let particle of particles) {
+                    drawParticle(particle);
+                }
+
+                // Draw portal effect
+                const gradient = ctx.createRadialGradient(
+                    portalCenter.x, portalCenter.y, portalRadius / 2,
+                    portalCenter.x, portalCenter.y, portalRadius
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+                gradient.addColorStop(0.5, 'rgba(0, 0, 255, 0.5)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
+
+                ctx.beginPath();
+                ctx.arc(portalCenter.x, portalCenter.y, portalRadius, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Update portal radius
+                if (portalRadius < maxRadius && elapsedTime < duration) {
+                    portalRadius += 2;
+                } else if (portalRadius > 0) {
+                    // Collapse the portal
+                    portalRadius -= 2;
+                }
+
+                // Exit the function if both conditions are met
+                if (portalRadius > 0 || elapsedTime < duration) {
+                    requestAnimationFrame(drawPortal);
+                }
+            }
+
+            // Start animation
+            requestAnimationFrame(drawPortal);
+        }
+
+function spawnGoombas(x,y){
+            createPortalAnimation(x* gridSize, y * gridSize, 60, 1000);
+    setTimeout(() => {
+    goombas.push({ x: x, y: y });
+}, 500);
+
+    }
 function getitem(enemytype){
 switch (enemytype) {
         case 'taxform':
@@ -2234,11 +2349,21 @@ if (score >= maxscore / 2) {
             }
     }
 
-if (reflector.length === 15 && kamek.length === 0){
+if (reflector.length === 8 && kamek.length === 0 && kamekappears === false){
     let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
     let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
-    kamek.push({ x: kamekX2, y: kamekY2 });
+    isPaused = true
+    kamekappears = true
+            // Call the function with desired parameters
+        createPortalAnimation(kamekX2* gridSize, kamekY2 * gridSize, 120, 5000);
+    setTimeout(() => {
+kamek.push({ x: kamekX2, y: kamekY2 });
+    }, 2500);
+    setTimeout(() => {
+        isPaused = false
+    }, 5000);
 }
+
             
             if (laser.isShooting) {
         obstacles.forEach((obstacle, index) => {
@@ -2403,6 +2528,7 @@ const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
             lives = 0.5;
             livecount = 2;
             kamek = []
+            kamekappears = false
             reflector = []
             cangetvenom = true
             wells = []
@@ -2600,7 +2726,12 @@ function resizeCanvas() {
         (food.y >= obstacle.y && food.y < obstacle.y + 2)
     ) ||
     mirrors.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
-|| timezone.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)) {
+|| timezone.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
+||reflector.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
+||thwomps.some(obstacle => 
+        (food.x >= obstacle.x && food.x < obstacle.x + 2) &&
+        (food.y >= obstacle.y && food.y < obstacle.y + 2)
+    )) {
     food.x += 1;
     food.y += 1;
 }
