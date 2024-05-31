@@ -547,16 +547,30 @@ function checkDistance(snake) {
       const distance = Math.abs(snake[0].x - well.x) + Math.abs(snake[0].y - well.y);
       if (distance <= wellStrength) {
 if (snake[0].x < well.x) {
+if(inverted === false){
 direction = 'right'
-}else if (snake[0].x > well.x) {
+}else{
 direction = 'left'
+}
+}else if (snake[0].x > well.x) {
+if(inverted === false){
+direction = 'left'
+}else{
+direction = 'right';
+}
         } 
           if (snake[0].y < well.y) {
-          direction = 'down'
-        } else if (snake[0].y > well.y) {
-          direction = 'up'
+         if(inverted === false){
+direction = 'down'
+}else{
+direction = 'up'
+}        } else if (snake[0].y > well.y) {
+          if(inverted === false){
+direction = 'up'
+}else{
+direction = 'down'
 }
-
+          }
       }
     });
 }
