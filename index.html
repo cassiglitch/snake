@@ -109,7 +109,7 @@
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
         let esnake = [];
-        let turrets = []
+        let turrets = [{x:1,y:1}]
         let symbiote = [];
         let controlsinverted = false
         let hasBeenTaxed = false
@@ -1684,7 +1684,7 @@ ctx.fillStyle = wellcolor;
     ctx.fillStyle = 'darkgrey';
 mirrors.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
-ctx.fillStyle = '#007BA7';
+ctx.fillStyle = '#6ec485';
 turrets.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 ctx.fillStyle = 'black';
