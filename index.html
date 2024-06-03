@@ -236,8 +236,14 @@ let y = Math.floor(Math.random() * (canvas.height / gridSize));
 
 // Add the new obstacle or mirror at the random coordinates
 if (spawner !== goombas){
-        spawner.push({ x, y });
-        }else if(spawner === goombas){
+    if (spawner === turrets){
+        if (turrets.length <= 5){
+        spawnTurrets(x,y)
+        }
+    }else{
+        spawner.push({x:x,y:y})
+        }
+}else if(spawner === goombas){
     y -= 6
     if(y < 0){
         y = 6
@@ -411,6 +417,13 @@ document.addEventListener('keypress', function(event) {
             requestAnimationFrame(drawPortal);
         }
 
+function spawnTurrets(x,y){
+            createPortalAnimation((x* gridSize + gridSize/2), (y * gridSize + gridSize/2), 30, 500);
+    setTimeout(() => {
+    turrets.push({ x: x, y: y });
+}, 250);
+
+    }
 function spawnGoombas(x,y){
             createPortalAnimation(x* gridSize, y * gridSize, 60, 1000);
     setTimeout(() => {
@@ -1102,7 +1115,6 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             circle: circle,
             speed:projectileSpeed,
             reflected:true,
-            reflectored:false,
             homing: enemy // Only set to true if enemy is true
         };
 
@@ -1202,7 +1214,7 @@ mirrors.forEach((mirror) => {
         reflector.forEach((obstacle, obstacleIndex) => {
                     if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
                         projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize && projectile.reflectored === false) {
-                        angle = invertAngle(angle)
+                        projectile.reflect = !projectile.reflect
                     }
                 });
 
@@ -2371,6 +2383,7 @@ if (reflector.length === 8 && kamek.length === 0 && kamekappears === false){
     let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
     let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
     isPaused = true
+    reflector = []
     kamekappears = true
             // Call the function with desired parameters
         createPortalAnimation(kamekX2* gridSize, kamekY2 * gridSize, 120, 5000);
@@ -2501,13 +2514,13 @@ const randomValue = Math.random()
 const id = Math.random() < 0.5 ? 1 : 2;
             dynamicObstacles.push({ x: x, y: y, id: id });
             }
-        if (randomValue < 0.3){
+        else if (randomValue < 0.3){
         formrandomshape(4)            
     } else if (randomValue < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
         } else {
            let otype = 0
-const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
+const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
     const randomIndex2 = Math.floor(Math.random() * rare.length);
     otype = rare[randomIndex2];
             otype.push({x:x, y:y})
@@ -2547,7 +2560,6 @@ const rare = [obstacles, mirrors, wells, reflector]; // Possible directions
             livecount = 2;
             kamek = []
             kamekappears = false
-            reflector = []
             cangetvenom = true
             wells = []
             checkAndSplice(polygons, mirrors)
