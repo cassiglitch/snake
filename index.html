@@ -237,7 +237,7 @@ let y = Math.floor(Math.random() * (canvas.height / gridSize));
 // Add the new obstacle or mirror at the random coordinates
 if (spawner !== goombas){
     if (spawner === turrets){
-        if (turrets.length <= 5){
+        if (turrets.length < 5){
         spawnTurrets(x,y)
         }
     }else{
@@ -1582,18 +1582,23 @@ thwomps.forEach((obstacle, index) => {
             }
         });
         ctx.stroke();
-if (laserTimer > 22.5){
+
+if (kamekappears === true){
         laserTimer = laserTimer/2
-           laserCooldown = laserTimer * 1000
- 
+           laserCooldown = laserTimer * 1000 
+}else if (kamekappears === false){
+    laserTimer = 45
+           laserCooldown = laserTimer * 1000 
+
 }
         // After 5 seconds, reset the shooting state and fade out the laser
-        setTimeout(() => {
+
+        
             isShooting = false;
             charging = true;
-            hascollided = false
-        }, 5 * 1000);
-
+        
+        hascollided = false
+        
         // Update the timestamp of the last laser shot
         lastLaserShot = currentTime;
     }
@@ -2385,8 +2390,9 @@ if (reflector.length === 8 && kamek.length === 0 && kamekappears === false){
     isPaused = true
     reflector = []
     kamekappears = true
+    let gridOffset = ((2*gridSize) + (gridSize / 2))/2
             // Call the function with desired parameters
-        createPortalAnimation(kamekX2* gridSize, kamekY2 * gridSize, 120, 5000);
+        createPortalAnimation(kamekX2* gridSize, (kamekY2 * gridSize) + gridOffset, 120, 5000);
     setTimeout(() => {
 kamek.push({ x: kamekX2, y: kamekY2 });
     }, 2500);
