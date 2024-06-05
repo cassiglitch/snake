@@ -1445,32 +1445,43 @@ let tapEndX = 0;
 let tapEndY = 0;
 
 function handleTapStart(event) {
-    tapStartX = event.touches[0].clientX;
-    tapStartY = event.touches[0].clientY;
+    if (event.type === 'touchstart') {
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+    } else if (event.type === 'mousedown') {
+        startX = event.clientX;
+        startY = event.clientY;
+    }
 }
+
 function handleTapEnd(event) {
-    tapEndX = event.changedTouches[0].clientX;
-    tapEndY = event.changedTouches[0].clientY;
+    if (event.type === 'touchend') {
+        endX = event.changedTouches[0].clientX;
+        endY = event.changedTouches[0].clientY;
+    } else if (event.type === 'mouseup') {
+        endX = event.clientX;
+        endY = event.clientY;
+    }
 
     // Calculate the distance between start and end points
-    const deltaX = Math.abs(tapEndX - tapStartX);
-    const deltaY = Math.abs(tapEndY - tapStartY);
+    const deltaX = Math.abs(endX - startX);
+    const deltaY = Math.abs(endY - startY);
 
-    // If the distance is small enough, treat it as a tap
+    // If the distance is small enough, treat it as a tap/click
     if (deltaX < 10 && deltaY < 10) {
         // Only shoot the laser if it's not already shooting
         if (!laser.isShooting) {
             const canvasRect = canvas.getBoundingClientRect();
-            const canvasX = tapEndX - canvasRect.left;
-            const canvasY = tapEndY - canvasRect.top;
+            const canvasX = endX - canvasRect.left;
+            const canvasY = endY - canvasRect.top;
             shootLaser(canvasX, canvasY);
         }
     }
 }
-
 canvas.addEventListener('touchstart', handleTapStart);
 canvas.addEventListener('touchend', handleTapEnd);
-
+canvas.addEventListener('mousedown', handleTapStart);
+canvas.addEventListener('mouseup', handleTapEnd);
 
 // Drawing function to draw the laser with fade effect
 function drawLaser() {
