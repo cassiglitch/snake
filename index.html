@@ -114,7 +114,7 @@
         let controlsinverted = false
         let hasBeenTaxed = false
         let laserTimer = 45
-        let controltype = 'arrow'
+        let controltype = 'set'
         let goombas = []
         let magic = []
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
@@ -2782,72 +2782,95 @@ obstacles.forEach((obstacle, obstacleIndex) => {
 }
 
 
-// Handle arrow key presses
-document.addEventListener('keydown', event => {
-    // Prevent default arrow key behavior (scrolling)
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault();
-    }
+let firstControlSchemeSet = false;
 
-    if (!isPaused) {
-        switch (event.key) {
-            case 'ArrowUp':
-                direction = 'up';
-                controltype = 'arrow'
-                isGravityWellActive = true
-                break;
-            case 'ArrowDown':
-                direction = 'down';
-                controltype = 'arrow'
-                isGravityWellActive = true
-                break;
-            case 'ArrowLeft':
-                direction = 'left';
-                controltype = 'arrow'
-                isGravityWellActive = true
-                break;
-            case 'ArrowRight':
-                direction = 'right';
-                controltype = 'arrow'
-                isGravityWellActive = true
-                break;
+if ((controltype === 'set' || controltype === 'arrow') && controltype !== 'mobile') {
+    // Handle arrow key presses
+    document.addEventListener('keydown', event => {
+        // If a control scheme is already set, return early
+        if (firstControlSchemeSet && controltype !== 'arrow') return;
+
+        // Prevent default arrow key behavior (scrolling)
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            event.preventDefault();
         }
-    }
-});
-if (!isPaused) {
-// Handle touch events for mobile controls
-let touchStartX = 0;
-let touchStartY = 0;
 
-function handleTouchStart(event) {
-    touchStartX = event.touches[0].clientX;
-    touchStartY = event.touches[0].clientY;
+        if (!isPaused) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    direction = 'up';
+                    controltype = 'arrow';
+                    isGravityWellActive = true;
+                    break;
+                case 'ArrowDown':
+                    direction = 'down';
+                    controltype = 'arrow';
+                    isGravityWellActive = true;
+                    break;
+                case 'ArrowLeft':
+                    direction = 'left';
+                    controltype = 'arrow';
+                    isGravityWellActive = true;
+                    break;
+                case 'ArrowRight':
+                    direction = 'right';
+                    controltype = 'arrow';
+                    isGravityWellActive = true;
+                    break;
+            }
+            // Set the flag once a control type is chosen
+            if (!firstControlSchemeSet) {
+                firstControlSchemeSet = true;
+            }
+        }
+    });
 }
 
-function handleTouchEnd(event) {
-    const touchEndX = event.changedTouches[0].clientX;
-    const touchEndY = event.changedTouches[0].clientY;
+if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arrow') {
+    if (!isPaused) {
+        // Handle touch events for mobile controls
+        let touchStartX = 0;
+        let touchStartY = 0;
 
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
+        function handleTouchStart(event) {
+            // If a control scheme is already set, return early
+            if (firstControlSchemeSet && controltype !== 'mobile') return;
 
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe
-        direction = deltaX > 0 ? 'right' : 'left';
-        controltype = 'mobile'
-    } else {
-        // Vertical swipe
-        if (Math.abs(deltaY) > 10) {
-            direction = deltaY > 0 ? 'down' : 'up';
-            controltype = 'mobile'
-        } 
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        }
+
+        function handleTouchEnd(event) {
+            // If a control scheme is already set, return early
+            if (firstControlSchemeSet && controltype !== 'mobile') return;
+
+            const touchEndX = event.changedTouches[0].clientX;
+            const touchEndY = event.changedTouches[0].clientY;
+
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                // Horizontal swipe
+                direction = deltaX > 0 ? 'right' : 'left';
+                controltype = 'mobile';
+            } else {
+                // Vertical swipe
+                if (Math.abs(deltaY) > 10) {
+                    direction = deltaY > 0 ? 'down' : 'up';
+                    controltype = 'mobile';
+                }
+            }
+
+            // Perform actions based on direction if needed
+            if (!firstControlSchemeSet) {
+                firstControlSchemeSet = true;
+            }
+        }
+
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchend', handleTouchEnd);
     }
-
-    // Perform actions based on direction if needed
-}
-
-canvas.addEventListener('touchstart', handleTouchStart);
-canvas.addEventListener('touchend', handleTouchEnd);
 }
 
         // Start the game loop
