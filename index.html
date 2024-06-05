@@ -1974,10 +1974,13 @@ esnake.forEach(enemySegment => enemySegment.damage = true)
 }
 if (esnake[0].type === 'IRS' && esnake[0].damage === false) {
         let tax = score * taxrate;
-        score -= tax;
+    let prescore = score   
+    score -= tax;
         score = Math.floor(score);
+    if (score !== prescore){
         esnake.forEach(enemySegment => enemySegment.damage = true);
     }
+}
 
     if (!isInvincible && esnake.some(segment => segment.x === snake[1].x && segment.y === snake[1].y && segment.damage === false && segment.type === 'IRS')) {
         isTaxed = false;
