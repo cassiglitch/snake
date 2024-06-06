@@ -2890,15 +2890,15 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
             // Perform actions based on direction if needed
             if (!firstControlSchemeSet) {
                 firstControlSchemeSet = true;
+                canvas.addEventListener('mousedown', handleTapStart);
+canvas.addEventListener('mouseup', handleTapEnd);
+canvas.addEventListener('touchstart', handleTapStart);
+canvas.addEventListener('touchend', handleTapEnd);
             }
         }
 
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchend', handleTouchEnd);
-        canvas.addEventListener('mousedown', handleTapStart);
-canvas.addEventListener('mouseup', handleTapEnd);
-canvas.addEventListener('touchstart', handleTapStart);
-canvas.addEventListener('touchend', handleTapEnd);
     }
 }
 
