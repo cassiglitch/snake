@@ -59,6 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
+        let eventListenersAdded = false;  // Flag to check if listeners are added
         let goombadirection = 'left'
         let goombaoffset = 1.00
         let reflector = []
@@ -2703,6 +2704,19 @@ function animateExplosion() {
             resizeCanvasHeight();
             update();
             draw();
+if (firstControlSchemeSet === true && !eventListenersAdded) {
+    canvas.addEventListener('mousedown', handleTapStart);
+    canvas.addEventListener('mouseup', handleTapEnd);
+    canvas.addEventListener('touchstart', handleTapStart);
+    canvas.addEventListener('touchend', handleTapEnd);
+    eventListenersAdded = true;
+    console.log('Event listeners added.');
+} else if (!firstControlSchemeSet) {
+    canvas.removeEventListener('mousedown', handleTapStart);
+    canvas.removeEventListener('mouseup', handleTapEnd);
+    canvas.removeEventListener('touchstart', handleTapStart);
+    canvas.removeEventListener('touchend', handleTapEnd);
+}  
             if (isGravityWellActive === true && wells.length !== 0){
             checkDistance(snake)
             }
@@ -2842,10 +2856,6 @@ if ((controltype === 'set' || controltype === 'arrow') && controltype !== 'mobil
             // Set the flag once a control type is chosen
             if (!firstControlSchemeSet) {
                 firstControlSchemeSet = true;
-                canvas.addEventListener('mousedown', handleTapStart);
-canvas.addEventListener('mouseup', handleTapEnd);
-canvas.addEventListener('touchstart', handleTapStart);
-canvas.addEventListener('touchend', handleTapEnd);
             }
         }
     });
@@ -2890,10 +2900,6 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
             // Perform actions based on direction if needed
             if (!firstControlSchemeSet) {
                 firstControlSchemeSet = true;
-                canvas.addEventListener('mousedown', handleTapStart);
-canvas.addEventListener('mouseup', handleTapEnd);
-canvas.addEventListener('touchstart', handleTapStart);
-canvas.addEventListener('touchend', handleTapEnd);
             }
         }
 
