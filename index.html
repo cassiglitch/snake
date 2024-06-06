@@ -1485,10 +1485,7 @@ function handleTapEnd(event) {
 }else{
         return
     }}
-canvas.addEventListener('touchstart', handleTapStart);
-canvas.addEventListener('touchend', handleTapEnd);
-canvas.addEventListener('mousedown', handleTapStart);
-canvas.addEventListener('mouseup', handleTapEnd);
+
 
 // Drawing function to draw the laser with fade effect
 function drawLaser() {
@@ -2845,6 +2842,10 @@ if ((controltype === 'set' || controltype === 'arrow') && controltype !== 'mobil
             // Set the flag once a control type is chosen
             if (!firstControlSchemeSet) {
                 firstControlSchemeSet = true;
+                canvas.addEventListener('mousedown', handleTapStart);
+canvas.addEventListener('mouseup', handleTapEnd);
+canvas.addEventListener('touchstart', handleTapStart);
+canvas.addEventListener('touchend', handleTapEnd);
             }
         }
     });
@@ -2894,6 +2895,10 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
 
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchend', handleTouchEnd);
+        canvas.addEventListener('mousedown', handleTapStart);
+canvas.addEventListener('mouseup', handleTapEnd);
+canvas.addEventListener('touchstart', handleTapStart);
+canvas.addEventListener('touchend', handleTapEnd);
     }
 }
 
