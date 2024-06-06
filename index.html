@@ -1445,6 +1445,7 @@ let tapEndX = 0;
 let tapEndY = 0;
 
 function handleTapStart(event) {
+    if (firstControlSchemeSet === true){
     if (event.type === 'touchstart') {
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
@@ -1452,9 +1453,13 @@ function handleTapStart(event) {
         startX = event.clientX;
         startY = event.clientY;
     }
+}else{
+        return
+    }
 }
 
 function handleTapEnd(event) {
+    if (firstControlSchemeSet === true){
     if (event.type === 'touchend') {
         endX = event.changedTouches[0].clientX;
         endY = event.changedTouches[0].clientY;
@@ -1477,7 +1482,9 @@ function handleTapEnd(event) {
             shootLaser(canvasX, canvasY);
         }
     }
-}
+}else{
+        return
+    }}
 canvas.addEventListener('touchstart', handleTapStart);
 canvas.addEventListener('touchend', handleTapEnd);
 canvas.addEventListener('mousedown', handleTapStart);
