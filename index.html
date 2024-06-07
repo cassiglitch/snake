@@ -1074,12 +1074,21 @@ function getDirectionToSnakeHead(x, y, snake) {
 }
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed, explosionstrength, enemy) {
-    const directionRadians = {
+ 
+    if (inverted === false)
+    {
+        const directionRadians = {
         'right': 0,
         'left': Math.PI,
         'up': -Math.PI / 2,
         'down': Math.PI / 2
-    };
+    }}else{
+        const directionRadians = {
+        'left': 0,
+        'right': Math.PI,
+        'down': -Math.PI / 2,
+        'up': Math.PI / 2
+    }}
 
     const directionRad = directionRadians[direction.toLowerCase()] || 0;
     const halfSpread = waveSpreadAngle / 2;
