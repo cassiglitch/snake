@@ -75,7 +75,7 @@
         let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0};
+        let food = { x: 1, y: 0};
         let obstacles = [];
         let kamekappears = false
         let firstControlSchemeSet = false;
@@ -1075,13 +1075,13 @@ function getDirectionToSnakeHead(x, y, snake) {
 
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed, explosionstrength, enemy) {
  
-    
-        const directionRadians = {
-        'right': 0,
-        'left': Math.PI,
-        'up': -Math.PI / 2,
-        'down': Math.PI / 2
-    }
+    const directionRadians = {
+    'right': inverted ? Math.PI : 0,
+    'left': inverted ? 0 : Math.PI,
+    'up': inverted ? Math.PI / 2 : -Math.PI / 2,
+    'down': inverted ? -Math.PI / 2 : Math.PI / 2
+};
+
 
     const directionRad = directionRadians[direction.toLowerCase()] || 0;
     const halfSpread = waveSpreadAngle / 2;
