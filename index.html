@@ -1124,7 +1124,26 @@ function getDirectionToSnakeHead(x, y, snake) {
 
     return direction;
 }
-
+function kamekDeath(){
+    isPaused = true
+    let gridOffset = ((2*gridSize) + (gridSize / 2))/2
+    turrets.forEach((turret, index) =>{
+createPortalAnimation(turret.x* gridSize, turret.y * gridSize, 30, 2000);
+    })
+    goombas.forEach((turret, index) =>{
+createPortalAnimation(turret.x* gridSize, (turret.y * gridSize) + gridSize /2, 75, 2000);
+    })
+    createExplosion(ctx, kamek[0].x* gridSize, (kamek[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90)
+createPortalAnimation(kamek[0].x* gridSize, (kamek[0].y * gridSize) + gridOffset, 100, 2000);
+    setTimeout(() => {
+    kamek=[]
+    turrets = []
+    goombas = []
+}, 1100);
+setTimeout(() => {
+    isPaused = false
+}, 2000);
+}
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed, explosionstrength, enemy) {
  
     const directionRadians = {
@@ -1307,7 +1326,7 @@ mirrors.forEach((mirror) => {
                         projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
-                        kamek.splice(index, 1);
+                        kamekDeath()
       const distance = Math.abs(kamke[0].x - projectile.x) + Math.abs(kamek[0].y - projectile.y);
       if (distance <= wellStrength) {
           projectile.homing = true
@@ -1644,7 +1663,7 @@ thwomps.forEach((obstacle, index) => {
     );
 
     if (collisionResult === true && sideshield >= 2) {
-        kamek.splice(i, 1);
+        kamekDeath()
         }
     }}
         }
