@@ -1680,7 +1680,7 @@ thwomps.forEach((obstacle, index) => {
         });
         ctx.stroke();
 
-if (kamekappears === true){
+if (kamekappears === true && laserTimer < 11.25){
         laserTimer = laserTimer/2
            laserCooldown = laserTimer * 1000 
 }else if (kamekappears === false){
