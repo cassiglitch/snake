@@ -1142,6 +1142,7 @@ createPortalAnimation(kamek[0].x* gridSize, (kamek[0].y * gridSize) + gridOffset
 }, 1100);
 setTimeout(() => {
     isPaused = false
+    kamekappears = false
 }, 2000);
 }
 function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed, explosionstrength, enemy) {
@@ -1616,7 +1617,7 @@ function shootLaser(targetX, targetY) {
 
             // Add the pixel coordinates to the laserPixels array
             laserPixels.push({ x: x, y: y });
-
+if (kamekappears === false) {
             // Check for collision with obstacles for the laser pixel
             obstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
@@ -1625,6 +1626,7 @@ function shootLaser(targetX, targetY) {
                     obstacles.splice(index, 1);
                 }
             });
+}
             timezone.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
                     y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize && hascollided === false) {
@@ -1634,7 +1636,7 @@ function shootLaser(targetX, targetY) {
                 }
             });
 
-            
+            if (kamekappears === false){
             // Check for collision with dynamic obstacles for the laser pixel
             dynamicObstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 2) * gridSize &&
@@ -1651,6 +1653,7 @@ thwomps.forEach((obstacle, index) => {
                     thwomps.splice(index, 1);
                 }
             });
+            }
          if(kamek.length > 0){
     for (let i = kamek.length - 1; i >= 0; i--) {
     let kamekElement = kamek[i];
