@@ -59,7 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-        let lavacoords = [{x:1,y:9}]
+        let lavacoords = []
         let goombadirection = 'left'
         let goombaoffset = 1.00
         let reflector = []
@@ -74,6 +74,7 @@
         let item = []
         let startingGridSize = 20;
         let gridSize = 20;
+        let flaming = false
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
@@ -117,7 +118,7 @@
         let hasBeenTaxed = false
         let laserTimer = 45
         let controltype = 'set'
-        let goombas = []
+        let goombas = [{x:1,y:1,}]
         let magic = []
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
@@ -129,6 +130,7 @@
         let track = []
 let thwomps = []
 let pX = 0;
+let firelord = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -156,14 +158,16 @@ let magictype = 'bolt'
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
-    for (let dx = -offset; dx <= offset; dx++) {
-        for (let dy = -offset; dy <= offset; dy++) {
-            let newX = x + dx;
-            let newY = y + dy;
-            // Add the coordinates with initial color to the lava array
-            lava.push({x: newX, y: newY, countdown: countdown});
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            lava.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
         }
     }
+    
 }
 
 function kamekUpdate(){
@@ -970,9 +974,9 @@ function drawFlatPolygon(x, y, size, sides, color) {
 
 function drawGoomba(gx, gy) {
     // Scale size
-    let x = gx * gridSize
-    let y = gy * gridSize
-    let size = gridSize
+    let x = gx * gridSize;
+    let y = gy * gridSize;
+    let size = gridSize;
     const headHeight = size * 2;
     const bodyHeight = size;
     const bodyWidth = size * 1.2;
@@ -984,10 +988,9 @@ function drawGoomba(gx, gy) {
     const mouthWidth = size * 0.8;
     const mouthHeight = size * 0.15;
 
-
     // Draw the body (a rectangle)
     ctx.fillStyle = "#f1e0c6";
-    ctx.fillRect(x - bodyWidth / 2, y + headHeight - (headHeight/8), bodyWidth * 1.5, bodyHeight * 1.2);
+    ctx.fillRect(x - bodyWidth / 2, y + headHeight - (headHeight / 8), bodyWidth * 1.5, bodyHeight * 1.2);
 
     // Draw the head (a hexagon)
     ctx.fillStyle = "#b5651d";
@@ -1004,10 +1007,10 @@ function drawGoomba(gx, gy) {
     // Draw the feet (two circles)
     ctx.fillStyle = "#8b4513";
     ctx.beginPath();
-    ctx.arc(x - size * 1, y + headHeight + bodyHeight + footRadius - (headHeight/2), footRadius, 0, Math.PI * 2);
+    ctx.arc(x - size * 1, y + headHeight + bodyHeight + footRadius - (headHeight / 2), footRadius, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(x + size * 1, y + headHeight + bodyHeight + footRadius - (headHeight/2), footRadius, 0, Math.PI * 2);
+    ctx.arc(x + size * 1, y + headHeight + bodyHeight + footRadius - (headHeight / 2), footRadius, 0, Math.PI * 2);
     ctx.fill();
 
     // Draw the eyes (two circles and black pupils)
@@ -1035,7 +1038,39 @@ function drawGoomba(gx, gy) {
     // Draw the mouth (a rectangle)
     ctx.fillStyle = "#000000";
     ctx.fillRect(x - mouthWidth / 2, y + headHeight * 0.8, mouthWidth, mouthHeight);
+
+    // Calculate bounding box coordinates
+    const boundingBoxX = x - size * 1.5;
+    const boundingBoxY = y;
+    const boundingBoxWidth = size * 3;
+    const boundingBoxHeight = headHeight + bodyHeight + footRadius
+
 }
+
+// Function to check if a point collides with the bounding box
+function isPointInGoombaBoundingBox(px, py, gx, gy) {
+    let x = gx * gridSize;
+    let y = gy * gridSize;
+    let size = gridSize;
+    const headHeight = size * 2;
+    const bodyHeight = size;
+    const footRadius = size * 0.6;
+
+    const boundingBoxX = x - size * 1.5;
+    const boundingBoxY = y;
+    const boundingBoxWidth = size * 3;
+    const boundingBoxHeight = headHeight + bodyHeight + footRadius
+
+    return (
+        px >= boundingBoxX &&
+        px <= boundingBoxX + boundingBoxWidth &&
+        py >= boundingBoxY &&
+        py <= boundingBoxY + boundingBoxHeight
+    );
+}
+let GoombaCollision
+
+
 function getBoundingBox(polygon) {
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     
@@ -1118,9 +1153,135 @@ function drawKamek(x, y){
     ctx.arc(eyeBaseX - gridSize / 4, eyeBaseY - gridSize / 2, gridSize / 8, 0, Math.PI * 2); // Left pupil
     ctx.arc(eyeBaseX + gridSize / 4, eyeBaseY - gridSize / 2, gridSize / 8, 0, Math.PI * 2); // Right pupil
     ctx.fill();
+}
+  
+    function drawFireLord(x, y) {
+    // Scale the coordinates by gridSize
+    x = x * gridSize;
+    y = y * gridSize;
 
+    // Draw the body (a red pentagon)
+    drawFlatPolygon(x, y, gridSize, 5, 'red');
+
+    // Draw the head (an orange triangle) connected to the body
+    drawFlatPolygon(x, y - gridSize * 0.8, gridSize, 3, 'orange');
+
+    // Draw the crown (a yellow pentagon) on the head
+    drawFlatPolygon(x, y - gridSize * 1.4, gridSize * 0.5, 5, 'yellow');
+
+    // Draw the eyes (two white circles) on the head
+    let eyeRadius = gridSize * 0.2;
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the pupils (two black circles)
+    let pupilRadius = gridSize * 0.1;
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+let mouthWidth = gridSize * 0.8;
+    let mouthHeight = gridSize * 0.15;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x, y, mouthWidth, mouthHeight);
+
+
+    ctx.fillStyle = 'black';
+    
+ctx.fillRect(x - mouthWidth / 2, y + gridSize * 0.8, mouthWidth, mouthHeight);
+    
+    // Draw the robe (a black rectangle) covering the lower part of the body
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - gridSize * 0.7, y, gridSize * 1.4, gridSize);
+
+ctx.strokeStyle = 'orange';
+    ctx.lineWidth = gridSize * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + gridSize);
+    ctx.stroke();
+        
+    // Draw the arms (small black rectangles) connected to the body
+    let armWidth = gridSize * 0.2;
+    let armHeight = gridSize * 0.6;
+    ctx.fillRect(x - gridSize * 0.9, y - gridSize * 0.2, armWidth, armHeight);
+    ctx.fillRect(x + gridSize * 0.7, y - gridSize * 0.2, armWidth, armHeight);
+
+    // Draw the feet (black rectangles) touching the body and robe
+    let footWidth = gridSize * 0.4;
+    let footHeight = gridSize * 0.4;
+    ctx.fillRect(x - gridSize * 0.5, y + gridSize * 0.8, footWidth, footHeight);
+    ctx.fillRect(x + gridSize * 0.1, y + gridSize * 0.8, footWidth, footHeight);
+
+    // Bounding box calculation
+    let boundingBox = {
+        xMin: x - gridSize * 0.9,
+        yMin: y - gridSize * 1.4,
+        xMax: x + gridSize * 0.9,
+        yMax: y + gridSize * 1.2
+    };
+
+    
+
+
+    return boundingBox;
 }
 
+
+
+// Collision detection function
+function isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY) {
+    return pointX >= fireLordBoundingBox.xMin && pointX <= fireLordBoundingBox.xMax &&
+           pointY >= fireLordBoundingBox.yMin && pointY <= fireLordBoundingBox.yMax;
+}
+
+        let langle = 0
+        let firelordmagic = 0
+        let firelordInMotion = false;
+let fireLordBoundingBox = drawFireLord(5, 5, gridSize);
+function manageFireLord(){
+if (firelord.length !== 0){
+addLavaArea(firelord[0].x,firelord[0].y,2,2)
+
+    if (firelordInMotion === false){
+    const targetX = snake[0].x * gridSize;
+    const targetY = snake[0].y * gridSize;
+     langle = Math.atan2(targetY - firelord[0].y * gridSize, targetX - firelord[0].x * gridSize);
+    }
+    let velocityX = Math.cos(langle);
+    let velocityY = Math.sin(langle);
+
+    if (firelord.length > 1) {
+        firelord.length = 1;
+    }
+if (firelordInMotion === false){
+    const magic = ['launch','bolt'];
+    const randomIndex = Math.floor(Math.random() * magic.length);
+    firelordmagic = magic[randomIndex];
+}
+    if (firelordmagic === 'launch') {
+        firelord[0].x += velocityX;
+        firelord[0].y += velocityY;
+firelordInMotion = true;
+        fireLordBoundingBox = drawFireLord(firelord[0].x, firelord[0].y);
+
+        // Check if the FireLord's bounding box touches any edge of the canvas
+        if (fireLordBoundingBox.xMin < 0 || fireLordBoundingBox.yMin < 0 ||
+            fireLordBoundingBox.xMax > canvas.width || fireLordBoundingBox.yMax > canvas.height) {
+            // Stop the FireLord
+            firelordInMotion = false;
+        }
+}else if(firelordmagic === 'bolt'&& firelordInMotion === false){
+        flaming = true
+shootWaveOfProjectiles(firelord[0].x * gridSize, firelord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true);
+    }
+}
+}
 function getDirectionToSnakeHead(x, y, snake) {
     // Get the head of the snake
     const head = snake[0];
@@ -1221,7 +1382,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                 ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
 
                 if (increase === false || projectile.count <= 5) {
-                    if (projectile.homing) {
+                    if (projectile.homing && flaming === false) {
                         // Adjust velocity to home in on the target
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
@@ -1276,10 +1437,21 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     }
                 });
 
-
+if (flaming === true && projectile.homing === true){
+addLavaArea(projectile.x,projectile.y,4,2)
+}
 let reflecttime = 0; // Move this line outside of the loop
 let colldown = 1000
 
+
+firelord.forEach((firelord,findex) => {
+let firelordhit = isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY)
+if (firelordhit === true){
+    firelord.splice(findex,1)
+createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
+                        projectiles.splice(index, 1);
+}
+})
 mirrors.forEach((mirror) => {
     if (projectile.x >= mirror.x * gridSize && projectile.x <= (mirror.x + 1) * gridSize &&
         projectile.y >= mirror.y * gridSize && projectile.y <= (mirror.y + 1) * gridSize) {
@@ -1300,7 +1472,7 @@ mirrors.forEach((mirror) => {
                     if (projectile.x >= obstacle.x * gridSize && projectile.x <= (obstacle.x + 1) * gridSize &&
                         projectile.y >= obstacle.y * gridSize && projectile.y <= (obstacle.y + 1) * gridSize) {
                         obstacles.splice(obstacleIndex, 1);
-                        addCoordsToArray(projectile.x,projectile.y)
+                        
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                     }
@@ -1319,7 +1491,7 @@ mirrors.forEach((mirror) => {
                     if (projectile.x >= dynamicObstacle.x * gridSize && projectile.x <= (dynamicObstacle.x + 2) * gridSize &&
                         projectile.y >= dynamicObstacle.y * gridSize && projectile.y <= (dynamicObstacle.y + 2) * gridSize) {
                         dynamicObstacles.splice(dynamicObstacleIndex, 1);
-                        addCoordsToArray(projectile.x,projectile.y)
+                        
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                     }
@@ -1329,7 +1501,7 @@ mirrors.forEach((mirror) => {
                     if (projectile.x >= thwomp.x * gridSize && projectile.x <= (thwomp.x + 2) * gridSize &&
                         projectile.y >= thwomp.y * gridSize && projectile.y <= (thwomp.y + 2) * gridSize) {
                         thwomps.splice(thwompindex, 1);
-                        addCoordsToArray(projectile.x,projectile.y)
+                        
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                     }
@@ -1338,7 +1510,7 @@ mirrors.forEach((mirror) => {
                 esnake.forEach((esnake) => {
                     if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
                         projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
-                        addCoordsToArray(projectile.x,projectile.y)
+                    
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                         Dieenemy();
@@ -1348,7 +1520,7 @@ mirrors.forEach((mirror) => {
         kamek.forEach((esnake) => {
                     if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
                         projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
-                        addCoordsToArray(projectile.x,projectile.y)
+                        
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                         kamekDeath()
@@ -1369,7 +1541,7 @@ mirrors.forEach((mirror) => {
                 }, snakeprojectilecollisiontime);
 
                 if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
-                    addCoordsToArray(projectile.x,projectile.y)
+
                     createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                     projectiles.splice(index, 1);
                 }
@@ -1377,7 +1549,6 @@ mirrors.forEach((mirror) => {
                 snake.forEach((snakePart) => {
                         if ((projectile.x >= snakePart.x * gridSize && projectile.x <= (snakePart.x + 1) * gridSize &&
                             projectile.y >= snakePart.y * gridSize && projectile.y <= (snakePart.y + 1) * gridSize) && !isInvincible) {
-                            addCoordsToArray(projectile.x,projectile.y)
                             createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                             projectiles.splice(index, 1);
                             const numSegmentsToRemove = Math.ceil(snake.length * 0.01);
@@ -1404,13 +1575,13 @@ mirrors.forEach((mirror) => {
         
 
 function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
+    addLavaArea(x,y, 3, 10)
     ctx.beginPath();
     ctx.arc(x, y, explode, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.globalAlpha = 0.5;
     ctx.fill();
-    ctx.globalAlpha = 1;
-
+    ctx.globalAlpha = 1
     obstacles.forEach((obstacle, obstacleIndex) => {
         const obstacleCenterX = (obstacle.x + 0.5) * gridSize;
         const obstacleCenterY = (obstacle.y + 0.5) * gridSize;
@@ -1446,7 +1617,7 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
         const distance = Math.sqrt((thwompx - x) ** 2 + (thwompy - y) ** 2);
 
         if (distance <= explode) {
-            thwomp.splice(dynamicObstacleIndex, 1);
+            thwomps.splice(dynamicObstacleIndex, 1);
         }
     });
 }
@@ -1830,6 +2001,9 @@ timezone.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gr
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+firelord.forEach((firelord) =>{
+drawFireLord(firelord.x, firelord.y)
+})
     
 ctx.fillStyle = wellcolor;
   wells.forEach((well) => {
@@ -1859,7 +2033,7 @@ ctx.fillStyle = 'black';
         ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
     });
         // Draw Score
-    const scoreDisplay = document.getElementById('scoreDisplay');
+    const scoreDisplay = document.getElementById('scoreDisplay')
     scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
 }
@@ -1994,8 +2168,11 @@ function HaHaNoCollision(duration) {
                 }
             }
             ManageTurrets()
-            if (kamek !== 0){
+            if (kamek.length !== 0){
                 kamekUpdate()
+            }
+            if (!isPaused && firelord.length !== 0){
+            manageFireLord()
             }
             lavacoords.forEach((coords, index) => {
             addLavaArea(coords.x, coords.y, 4,4)
@@ -2067,8 +2244,46 @@ switch (direction) {
 }
        }
 
+const checkCollisions = (obstacles, isDynamic) => {
+    obstacles.forEach((obstacle, index) => {
+        lava.forEach((lava) => {
+            if (
+                (isDynamic
+                    ? lava.x >= obstacle.x && lava.x < obstacle.x + 2 &&
+                      lava.y >= obstacle.y && lava.y < obstacle.y + 2
+                    : lava.x === obstacle.x && lava.y === obstacle.y)
+            ) {
+                obstacles.splice(index, 1);
+            }
+        });
+    });
+};
+goombas.forEach((goomba,index) => {
+GoombaCollision = isPointInGoombaBoundingBox(snake[0].x* gridSize, snake[0].y * gridSize,goomba.x, goomba.y)
+    if (!isInvincible && (GoombaCollision === true && direction !== 'down')){
+const numSegmentsToRemove = Math.ceil(snake.length * lives);
+        if (snake.length > numSegmentsToRemove) {
+            snake.splice(0, numSegmentsToRemove);
+            lives = (lives * 2);
+            livecount = livecount - 1;
+            HaHaNoCollision(10)
+    } else {
+            livecount = livecount - 1;
+            restartGame(); // End the game if segments (lives) run out
+            return;
+        }              
+}
+})
 
+// Static obstacles
+checkCollisions(obstacles, false);
+checkCollisions(mirrors, false);
+checkCollisions(wells, false);
 
+// Dynamic obstacles
+checkCollisions(dynamicObstacles, true);
+checkCollisions(thwomps, true);
+            
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
                 !isInvincible && dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
@@ -2677,14 +2892,15 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
 const rare = [obstacles, mirrors, reflector, reflector]; // Possible directions    
 const randomIndex2 = Math.floor(Math.random() * rare.length);
     otype = rare[randomIndex2];
-}
             otype.push({x:x, y:y})
 
-        }
+        }else if (randomValue < 0.07){
+firelord.push({x:x,y:y})
+}
     }
 }
 
-
+}
         function restartGame() {
             cancelEffects()
             pauseGame();
@@ -2711,6 +2927,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             projectiles = []
             lava = []
             lavacoords = []
+            firelord = []
             isInvincible = false;
             eatingAnimationFrames = 0;
             lives = 0.5;
