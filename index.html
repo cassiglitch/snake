@@ -154,7 +154,6 @@ let sideshield = 6
 let magictype = 'bolt'
         let lava = []
         let lavacolor = '#f14e2380'
-
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -559,7 +558,7 @@ function ManageTurrets() {
 
       // Check if the turret is within range and if it can fire
       if (distance <= 5 && (now - well.lastFired >= 1000)) {
-        shootWaveOfProjectiles(well.x * gridSize, well.y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true);
+        shootWaveOfProjectiles(well.x * gridSize, well.y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true,kamek);
 
         // Update the last fired timestamp
         well.lastFired = now;
@@ -1278,7 +1277,7 @@ firelordInMotion = true;
         }
 }else if(firelordmagic === 'bolt'&& firelordInMotion === false){
         flaming = true
-shootWaveOfProjectiles(firelord[0].x * gridSize, firelord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true);
+shootWaveOfProjectiles(firelord[0].x * gridSize, firelord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,firelord);
     }
 }
 }
@@ -1325,7 +1324,7 @@ setTimeout(() => {
         function addCoordsToArray(lavax,lavay){
 lavacoords.push({x:lavax,y:lavay})
         }
-function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed, explosionstrength, enemy) {
+function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, projectileSize, explode, circle, sides, increase, updatespeed, explosionstrength, enemy,shooter) {
  
     const directionRadians = {
     'right': inverted ? Math.PI : 0,
@@ -1370,7 +1369,8 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
             circle: circle,
             speed:projectileSpeed,
             reflected:true,
-            homing: enemy // Only set to true if enemy is true
+            homing: enemy,
+            shooter:shooter
         };
 
         projectiles.push(projectile);
@@ -1437,7 +1437,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     }
                 });
 
-if (flaming === true && projectile.homing === true){
+if (flaming === true && projectile.homing === true && projectile.shooter === firelord){
 addLavaArea(projectile.x,projectile.y,4,2)
 }
 let reflecttime = 0; // Move this line outside of the loop
@@ -1625,7 +1625,7 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
 function enemyshootmagic() {
     if (kamek.length !== 0) {
         kamek.forEach((kamek, index) => {
-            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true);
+            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,kamek);
         });
     }
 }
@@ -2458,7 +2458,7 @@ HaHaNoCollision(100);
      freeze = true;
      pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3, false, 20, 1, false)
+                    shootWaveOfProjectiles(pX, pY, 30, 360, projectileSpeed, pcolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, false, 3, false, 20, 1, false,snake)
  } else {
      return;         
  }
@@ -2475,7 +2475,7 @@ HaHaNoCollision(100);
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false, 20, 1, false)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, 10, projectileSpeed, projectileColor, obstacles, dynamicObstacles, gridSize, direction, 10, 70, true, 3, false, 20, 1, false,snake)
                 }else if (food.type === 'ultrafood'){
                     cancelEffects()
                     gamefoods.push('ultrafood')
@@ -2494,12 +2494,12 @@ cancelEffects()
     let pcolourr = 'lightgrey'
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false, 20, 1, false)
+                shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false, 20, 1, false,snake)
                 }else if (food.type === 'morph'){
                 cancelEffects()
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
-                shootWaveOfProjectiles(pX, pY, 1, 1, 30, neoncolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, true, 3, true, 100, 2, false)
+                shootWaveOfProjectiles(pX, pY, 1, 1, 30, neoncolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, true, 3, true, 100, 2, false,snake)
                 }else if (food.type === 'breath'){
                     cancelEffects()
     let repeat = 30; // Initial size
@@ -2513,7 +2513,7 @@ cancelEffects()
             const pX = snake[0].x * gridSize + gridSize / 2;
             const pY = snake[0].y * gridSize + gridSize / 2;
             // Shoot projectiles
-            shootWaveOfProjectiles(pX, pY, 1, 1, 30, sunset, obstacles, dynamicObstacles, gridSize, direction, 30, 20, true, 3, false, 20, 1, false);
+            shootWaveOfProjectiles(pX, pY, 1, 1, 30, sunset, obstacles, dynamicObstacles, gridSize, direction, 30, 20, true, 3, false, 20, 1, false,snake);
             // Decrease size for the next iteration
             repeat--;
             // Schedule the next execution after a delay
@@ -2747,7 +2747,7 @@ if (score >= maxscore / 2) {
             }
     }
 
-if (reflector.length === 12 && kamek.length === 0 && kamekappears === false){
+if (reflector.length === 12 && kamek.length === 0 && kamekappears === false && firelord.length ===0) {
     let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
     let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
     isPaused = true
@@ -2899,7 +2899,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
     otype = rare[randomIndex2];
             otype.push({x:x, y:y})
 
-        }else if (randomValue < 0.07){
+        }else if (randomValue < 0.07 && kamek.length === 0){
 firelord.push({x:x,y:y})
 }
     }
