@@ -314,7 +314,7 @@ function checkForEffects(){
     applyStatus(1000, 'well')
     }
     electric.forEach((electric) => {
-    if (isParalyzed === true && electric.length !== 0 &&!(electric.x === snake[0].x && electric.y === snakw[0].y)){
+    if (isParalyzed === true && electric.length === 0 ){
 applyStatus(100,'para')
     }
     })
