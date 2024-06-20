@@ -154,7 +154,7 @@ let sideshield = 6
 let magictype = 'bolt'
         let lava = []
         let lavacolor = '#f14e2380'
-        let electric = [{x:1,y:3}]
+        let electric = []
         let electriccolor = '#77A0F280'
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
@@ -170,7 +170,20 @@ function addLavaArea(x, y, size, countdown) {
     }
     
 }
+function electricArea(x, y, size, countdown) {
+    let offset = Math.floor(size / 2);
 
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            electric.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
+        }
+    }
+    
+}
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -297,6 +310,9 @@ function checkForEffects(){
     if (controltype === 'mobile'){
     applyStatus(1000, 'well')
     }
+    if (isParalyzed === true){
+applyStatus(1000,'para')
+    }
     }
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
@@ -328,6 +344,9 @@ if (effect === 'magic' && kamek.length !== 0){
     kamekMagic()
     effectApplied = currentTime
 }
+        if(effect === 'para'){
+tuenoffpara()
+        }
     }
 }
 document.addEventListener('keypress', function(event) {
@@ -2196,7 +2215,17 @@ function HaHaNoCollision(duration) {
             lava.splice(index, 1);
         }
     }
-            
+
+
+        for (let index = electric.length - 1; index >= 0; index--) {
+        let lightningElement = electric[index];
+        if (lightningElement.countdown > 0) {
+            lightningElement.countdown -= 0.1;
+        }
+        if (lightningElement.countdown <= 0) {
+            electric.splice(index, 1);
+        }
+    }
             // Update Snake position
             const head = { ...snake[0] };
 // Define a variable to store the previous direction
