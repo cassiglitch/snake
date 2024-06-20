@@ -1340,9 +1340,9 @@ function isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY) {
         let langle = 0
         let lightningmagic = 0
         let lightninglordInMotion = false;
-let lightningLordBoundingBox = drawLightningLord(5, 5, gridSize);
+let lightningLordBoundingBox = drawLightningLord(5, 5);
 function manageLightningLord(){
-if (firelord.length !== 0){
+if (lightninglord.length !== 0){
 lightningArea(lightninglord[0].x,lightninglord[0].y,2,2)
 
     if (lightninglordInMotion === false){
@@ -1962,6 +1962,11 @@ let isfirelordhit = isCollidingWithFireLord(fireLordBoundingBox, x, y)
 if (isfirelordhit === true) {
 firelord = []
 }
+
+let islightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, x, y)
+if (islightninglordhit === true) {
+lightninglord = []
+}
             
             timezone.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
@@ -2319,6 +2324,9 @@ function HaHaNoCollision(duration) {
             if (!isPaused && firelord.length !== 0){
             manageFireLord()
             }
+if (!isPaused && lightninglord.length !== 0){
+            manageLightningLord()
+}
             lavacoords.forEach((coords, index) => {
             addLavaArea(coords.x, coords.y, 4,4)
             lavacoords.splice(index,1)
