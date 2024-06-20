@@ -313,11 +313,7 @@ function checkForEffects(){
     if (controltype === 'mobile'){
     applyStatus(1000, 'well')
     }
-    electric.forEach((electric) => {
-    if (isParalyzed === true && electric.length === 0 ){
-applyStatus(100,'para')
-    }
-    })
+    
 }
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
@@ -349,10 +345,7 @@ if (effect === 'magic' && kamek.length !== 0){
     kamekMagic()
     effectApplied = currentTime
 }
-        if(effect === 'para'){
-isParalyzed = false
-            effectApplied = currentTime
-        }
+
     }
 }
 document.addEventListener('keypress', function(event) {
@@ -2452,6 +2445,8 @@ checkCollisions(thwomps, true);
 electric.forEach((electric) => {
 if (electric.x === head.x && electric.y === head.y){
 isParalyzed = true
+}else if (electric.x !== head.x && electric.y !== head.y&& kamek.length === 0){
+isParalyzed === true
 }
 })
             // Check if Snake hits obstacles
