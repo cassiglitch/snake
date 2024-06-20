@@ -2292,7 +2292,12 @@ checkCollisions(wells, false);
 // Dynamic obstacles
 checkCollisions(dynamicObstacles, true);
 checkCollisions(thwomps, true);
-            
+
+electric.forEach((electric) ={
+if (electric.x === head.x && electric.y === head.y){
+isParalyzed = true
+}
+})
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
                 !isInvincible && dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
