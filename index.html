@@ -1338,7 +1338,7 @@ function isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY) {
 let lightningLordBoundingBox = drawLightningLord(5, 5);
 function manageLightningLord(){
 if (lightninglord.length !== 0){
-lightningArea(lightninglord[0].x,lightninglord[0].y,2,2)
+lightningArea(lightninglord[0].x,lightninglord[0].y,2,1)
 
     if (lightninglordInMotion === false){
     const targetX = snake[0].x * gridSize;
