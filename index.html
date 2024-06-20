@@ -1379,7 +1379,7 @@ lightninglordInMotion = true;
         
         let firelordmagic = 0
         let firelordInMotion = false;
-let fireLordBoundingBox = drawFireLord(5, 5, gridSize);
+let fireLordBoundingBox = drawFireLord(5, 5);
 function manageFireLord(){
 if (firelord.length !== 0){
 addLavaArea(firelord[0].x,firelord[0].y,2,2)
@@ -1396,7 +1396,7 @@ addLavaArea(firelord[0].x,firelord[0].y,2,2)
         firelord.length = 1;
     }
 if (firelordInMotion === false){
-    const magic = ['launch','bolt'];
+    const magic = ['launch'];
     const randomIndex = Math.floor(Math.random() * magic.length);
     firelordmagic = magic[randomIndex];
 }
