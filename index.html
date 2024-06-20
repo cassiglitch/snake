@@ -313,8 +313,8 @@ function checkForEffects(){
     if (controltype === 'mobile'){
     applyStatus(1000, 'well')
     }
-    if (isParalyzed === true){
-applyStatus(1000,'para')
+    if (isParalyzed === true && electric.length !== 0){
+applyStatus(100,'para')
     }
     }
 function applyStatus(cooldown, effect){
