@@ -313,7 +313,8 @@ function checkForEffects(){
     if (controltype === 'mobile'){
     applyStatus(1000, 'well')
     }
-    if (isParalyzed === true && electric.length !== 0){
+    electric.forEach((electric) => {
+    if (isParalyzed === true && electric.length !== 0 &&(electric.x === head.x && electric.y === head.y)){
 applyStatus(100,'para')
     }
     }
