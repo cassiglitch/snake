@@ -1337,8 +1337,46 @@ function isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY) {
     return pointX >= fireLordBoundingBox.xMin && pointX <= fireLordBoundingBox.xMax &&
            pointY >= fireLordBoundingBox.yMin && pointY <= fireLordBoundingBox.yMax;
 }
-
         let langle = 0
+        let lightningmagic = 0
+        let lightninglordInMotion = false;
+let lightningLordBoundingBox = drawLightningLord(5, 5, gridSize);
+function manageLightningLord(){
+if (firelord.length !== 0){
+lightningArea(lightninglord[0].x,lightninglord[0].y,2,2)
+
+    if (lightninglordInMotion === false){
+    const targetX = snake[0].x * gridSize;
+    const targetY = snake[0].y * gridSize;
+     langle = Math.atan2(targetY - lightninglord[0].y * gridSize, targetX - lightninglord[0].x * gridSize);
+    }
+    let velocityX = Math.cos(langle);
+    let velocityY = Math.sin(langle);
+
+    if (lightninglord.length > 1) {
+        lightninglord.length = 1;
+    }
+if (lightninglordInMotion === false){
+    const magic = ['launch'];
+    const randomIndex = Math.floor(Math.random() * magic.length);
+    lightningmagic = magic[randomIndex];
+}
+    if (lightningmagic === 'launch') {
+        firelord[0].x += velocityX;
+        firelord[0].y += velocityY;
+lightninglordInMotion = true;
+        lightningLordBoundingBox = drawLightningLord(lightninglord[0].x,lightninglord[0].y);
+
+        // Check if the FireLord's bounding box touches any edge of the canvas
+        if (lightningLordBoundingBox.xMin < 0 || lightningLordBoundingBox.yMin < 0 ||
+            lightningLordBoundingBox.xMax > canvas.width || lightningLordBoundingBox.yMax > canvas.height) {
+            // Stop the FireLord
+            lightninglordInMotion = false;
+        }
+}
+}
+}
+        
         let firelordmagic = 0
         let firelordInMotion = false;
 let fireLordBoundingBox = drawFireLord(5, 5, gridSize);
@@ -1374,10 +1412,7 @@ firelordInMotion = true;
             // Stop the FireLord
             firelordInMotion = false;
         }
-}else if(firelordmagic === 'bolt'&& firelordInMotion === false){
-        flaming = true
-shootWaveOfProjectiles(firelord[0].x * gridSize, firelord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,firelord);
-    }
+}
 }
 }
 function getDirectionToSnakeHead(x, y, snake) {
