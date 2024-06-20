@@ -317,7 +317,8 @@ function checkForEffects(){
     if (isParalyzed === true && electric.length !== 0 &&(electric.x === head.x && electric.y === head.y)){
 applyStatus(100,'para')
     }
-    }
+    })
+}
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
 
