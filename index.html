@@ -154,6 +154,8 @@ let sideshield = 6
 let magictype = 'bolt'
         let lava = []
         let lavacolor = '#f14e2380'
+        let electric = [{x:1,y:3}]
+        let electriccolor = '#0000FF80'
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -2002,6 +2004,9 @@ timezone.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gr
     // Draw Food
             ctx.fillStyle = '#5B8DFF';
             reflector.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize))
+
+ctx.fillStyle = electriccolor;
+electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
