@@ -77,7 +77,7 @@
         let flaming = false
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 3,type:'ice'};
+        let food = { x: 0, y: 0};
         let obstacles = [];
         let kamekappears = false
         let firstControlSchemeSet = false;
@@ -1577,7 +1577,6 @@ mirrors.forEach((mirror) => {
         
 
 function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize, explode) {
-    addLavaArea(x,y, 3, 10)
     ctx.beginPath();
     ctx.arc(x, y, explode, 0, Math.PI * 2);
     ctx.fillStyle = color;
