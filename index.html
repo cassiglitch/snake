@@ -2134,6 +2134,9 @@ timezone.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gr
             ctx.fillStyle = '#5B8DFF';
             reflector.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize))
 
+ctx.fillStyle = electriccolor;
+electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
