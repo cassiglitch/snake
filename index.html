@@ -133,7 +133,7 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
-        let icelord = []
+        let icelord = [{x:2,y:3}]
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -1468,40 +1468,43 @@ lightninglordInMotion = true;
 let icemahic = 0
         let icelordInMotion = false;
 let iceLordBoundingBox = drawIceLord(5, 5);
-function manageiceLord(){
-if (icelord.length !== 0){
-iceArea(icelord[0].x,icelord[0].y,2,1)
+function manageIceLord() {
+    if (icelord.length !== 0) {
+        iceArea(icelord[0].x, icelord[0].y, 2, 1);
 
-    if (icelordInMotion === false){
-    const targetX = snake[0].x * gridSize;
-    const targetY = snake[0].y * gridSize;
-     langle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
-    }
-    let velocityX = Math.cos(langle);
-    let velocityY = Math.sin(langle);
+        if (icelordInMotion === false) {
+            const targetX = snake[0].x * gridSize;
+            const targetY = snake[0].y * gridSize;
+            var langle = Math.atan2(targetY - lightninglord[0].y * gridSize, targetX - lightninglord[0].x * gridSize);
 
-    if (icelord.length > 1) {
-        icelord.length = 1;
-    }
-if (icelordInMotion === false){
-    const magic = ['launch'];
-    const randomIndex = Math.floor(Math.random() * magic.length);
-    icemahic = magic[randomIndex];
-}
-    if (icemahic === 'launch') {
-        icelord[0].x += velocityX;
-        icelord[0].y += velocityY;
-icelordInMotion = true;
-        iceLordBoundingBox = drawIceLord(lightninglord[0].x,lightninglord[0].y);
+            let velocityX = Math.cos(langle);
+            let velocityY = Math.sin(langle);
 
-        // Check if the FireLord's bounding box touches any edge of the canvas
-        if (iceLordBoundingBox.xMin < 0 || iceLordBoundingBox.yMin < 0 ||
-            iceLordBoundingBox.xMax > canvas.width || iceLordBoundingBox.yMax > canvas.height) {
-            // Stop the FireLord
-            icelordInMotion = false;
+            if (icelord.length > 1) {
+                icelord.length = 1;
+            }
+
+            if (icelordInMotion === false) {
+                const magic = ['launch'];
+                const randomIndex = Math.floor(Math.random() * magic.length);
+                icemahic = magic[randomIndex];
+            }
+
+            if (icemahic === 'launch') {
+                icelord[0].x += velocityX;
+                icelord[0].y += velocityY;
+                icelordInMotion = true;
+                iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
+
+                // Check if the IceLord's bounding box touches any edge of the canvas
+                if (iceLordBoundingBox.xMin < 0 || iceLordBoundingBox.yMin < 0 ||
+                    iceLordBoundingBox.xMax > canvas.width || iceLordBoundingBox.yMax > canvas.height) {
+                    // Stop the IceLord
+                    icelordInMotion = false;
+                }
+            }
         }
-}
-}
+    }
 }
         
         
@@ -2304,7 +2307,6 @@ icelord.forEach((firelord) =>{
 drawIceLord(firelord.x, firelord.y)
 })
 
-drawIceLord(2, 2)
 
 ctx.fillStyle = wellcolor;
   wells.forEach((well) => {
@@ -2477,7 +2479,7 @@ function HaHaNoCollision(duration) {
             }
 
 if (!isPaused && icelord.length !== 0){
-            manageiceLord()
+            manageIceLord()
             }
             
 if (!isPaused && lightninglord.length !== 0){
