@@ -133,7 +133,7 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
-        let icelord = []
+        let icelord = [{x:2,y:2}]
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -1475,7 +1475,7 @@ iceArea(icelord[0].x,icelord[0].y,2,1)
     if (icelordInMotion === false){
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
-     langle = Math.atan2(targetY - lightninglord[0].y * gridSize, targetX - lightninglord[0].x * gridSize);
+     langle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
     }
     let velocityX = Math.cos(langle);
     let velocityY = Math.sin(langle);
