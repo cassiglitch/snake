@@ -2494,7 +2494,9 @@ for (let index = electric.length - 1; index >= 0; index--) {
             // Update Snake position
             const head = { ...snake[0] };
 // Define a variable to store the previous direction
-
+let isIced = ice.some((ice) => {
+    return ice.x === head.x && ice.y === head.y;
+});
 // Store the current direction as the previous direction
 previousDirection = direction;
 
@@ -2606,9 +2608,7 @@ isParalyzed = electric.some((electric) => {
 });
 }
 
-let isIced = ice.some((ice) => {
-    return ice.x === head.x && ice.y === head.y;
-});
+
             
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
