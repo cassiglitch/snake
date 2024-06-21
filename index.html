@@ -133,7 +133,7 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
-        let icelord = [{x:2,y:2}]
+        let icelord = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -2303,6 +2303,8 @@ drawLightningLord(firelord.x, firelord.y)
 icelord.forEach((firelord) =>{
 drawIceLord(firelord.x, firelord.y)
 })
+
+drawIceLord(2, 2)
 
 ctx.fillStyle = wellcolor;
   wells.forEach((well) => {
