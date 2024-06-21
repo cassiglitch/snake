@@ -2505,54 +2505,22 @@ previousDirection = direction;
 switch (direction) {
     case 'up':
         head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
-if (isIced){
-head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
-for (let i = snake.length - 1; i > 0; i--) {
-        snake[i].x = snake[i - 1].x;
-        snake[i].y = snake[i - 1].y;
-    }
-}
         track = []
         track = [{x:head.x, y:head.y + 1}]
         break;
     case 'down':
         head.y = (head.y + 1) % (canvas.height / gridSize);
-        if (isIced){
-        head.y = (head.y + 1) % (canvas.height / gridSize)
-            for (let i = snake.length - 1; i > 0; i--) {
-        snake[i].x = snake[i - 1].x;
-        snake[i].y = snake[i - 1].y;
-    }
-        }
         track = []
         track = [{x:head.x, y:head.y - 1}]
         break;
     case 'left':
         head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
-        if (isIced){
-head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize)
-            for (let i = snake.length - 1; i > 0; i--) {
-        snake[i].x = snake[i - 1].x;
-        snake[i].y = snake[i - 1].y;
-    }
-        }
             
         track = []
         track = [{x:head.x + 1, y:head.y}]
         break;
     case 'right':
         head.x = (head.x + 1) % (canvas.width / gridSize);
-        for (let i = snake.length - 1; i > 0; i--) {
-        snake[i].x = snake[i - 1].x;
-        snake[i].y = snake[i - 1].y;
-    }
-        if (isIced){
-head.x = (head.x + 1) % (canvas.width / gridSize);
-            for (let i = snake.length - 1; i > 0; i--) {
-        snake[i].x = snake[i - 1].x;
-        snake[i].y = snake[i - 1].y;
-    }
-        }
         track = []
         track = [{x:head.x - 1, y:head.y}]
         break;
