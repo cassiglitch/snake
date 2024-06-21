@@ -120,6 +120,7 @@
         let controltype = 'set'
         let goombas = []
         let magic = []
+        let isIced= false
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
             if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
@@ -2497,15 +2498,11 @@ for (let index = electric.length - 1; index >= 0; index--) {
             // Update Snake position
             const head = { ...snake[0] };
 // Define a variable to store the previous direction
-let isIced = ice.some((ice) => {
+ isIced = ice.some((ice) => {
     return ice.x === head.x && ice.y === head.y;
 });
 
-if (isIced){
-changeInterval(50) 
-        }else if (!isIced && !isBurned&& !isFast){
-changeInterval(100)
-        }
+
             
 // Store the current direction as the previous direction
 previousDirection = direction;
@@ -3392,7 +3389,7 @@ if (isPaused === false){
             if (isPaused === false){
 symbioteAi(symbiote, canvas, gridSize)
             }}
-            if (isBurned === true){
+            if (isBurned === true || isIced = true){
                     changeInterval(50)
 } else if (isBurned === false && currentInterval === 0.5 && isFast === false) {
     changeInterval(100)
