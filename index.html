@@ -3057,8 +3057,11 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
     otype = rare[randomIndex2];
             otype.push({x:x, y:y})
 
-        }else if (randomValue < 0.07 && kamek.length === 0){
-firelord.push({x:x,y:y})
+        }else if (randomValue < 0.2!&& kamek.length === 0){
+const rare = [firelord,lightninglotd]; // Possible directions    
+const randomIndex2 = Math.floor(Math.random() * rare.length);
+let  lords = rare[randomIndex2];
+            lords.push({x:x, y:y})
 }
     }
 }
