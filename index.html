@@ -2906,7 +2906,7 @@ if (score >= maxscore / 2) {
             }
     }
 
-if (reflector.length === 12 && kamek.length === 0 && kamekappears === false && firelord.length ===0) {
+if (reflector.length === 12 && kamek.length === 0 && kamekappears === false && firelord.length === 0) {
     let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
     let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
     isPaused = true
@@ -3059,9 +3059,9 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             otype.push({x:x, y:y})
 
         }else if (randomValue < 0.2!&& kamek.length === 0){
-const rare = [firelord,lightninglotd]; // Possible directions    
-const randomIndex2 = Math.floor(Math.random() * rare.length);
-let  lords = rare[randomIndex2];
+const lord = [firelord,lightninglord]; // Possible directions    
+const randomIndex2 = Math.floor(Math.random() * lord.length);
+let  lords = lord[randomIndex2];
             lords.push({x:x, y:y})
 }
     }
