@@ -132,6 +132,7 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
+        let icelord = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -156,6 +157,7 @@ let magictype = 'bolt'
         let lava = []
         let lavacolor = '#f14e2380'
         let electric = []
+        let ice =[]
         let icecolor = '#77A0F280'
         let electriccolor = '#CFFF0480'
 function addLavaArea(x, y, size, countdown) {
@@ -186,6 +188,22 @@ function lightningArea(x, y, size, countdown) {
     }
     
 }
+
+function iceArea(x, y, size, countdown) {
+    let offset = Math.floor(size / 2);
+
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            ice.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
+        }
+    }
+    
+}
+        
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -1324,6 +1342,82 @@ ctx.strokeStyle = electriccolor
     return boundingBox;
 }
 
+function drawIceLord(x, y) {
+    // Scale the coordinates by gridSize
+    x = x * gridSize;
+    y = y * gridSize;
+
+    // Draw the body (a red pentagon)
+    drawFlatPolygon(x, y, gridSize, 5, icecolor);
+
+    // Draw the head (an orange triangle) connected to the body
+    drawFlatPolygon(x, y - gridSize * 0.8, gridSize, 3, 'blue');
+
+    // Draw the crown (a yellow pentagon) on the head
+    
+    // Draw the eyes (two white circles) on the head
+    let eyeRadius = gridSize * 0.2;
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the pupils (two black circles)
+    let pupilRadius = gridSize * 0.1;
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+let mouthWidth = gridSize * 0.8;
+    let mouthHeight = gridSize * 0.15;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x, y, mouthWidth, mouthHeight);
+
+
+    ctx.fillStyle = 'black';
+    
+ctx.fillRect(x - mouthWidth / 2, y + gridSize * 0.8, mouthWidth, mouthHeight);
+    
+    // Draw the robe (a black rectangle) covering the lower part of the body
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - gridSize * 0.7, y, gridSize * 1.4, gridSize);
+
+ctx.strokeStyle = 'white'
+    ctx.lineWidth = gridSize * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + gridSize);
+    ctx.stroke();
+        
+    // Draw the arms (small black rectangles) connected to the body
+    let armWidth = gridSize * 0.2;
+    let armHeight = gridSize * 0.6;
+    ctx.fillRect(x - gridSize * 0.9, y - gridSize * 0.2, armWidth, armHeight);
+    ctx.fillRect(x + gridSize * 0.7, y - gridSize * 0.2, armWidth, armHeight);
+
+    // Draw the feet (black rectangles) touching the body and robe
+    let footWidth = gridSize * 0.4;
+    let footHeight = gridSize * 0.4;
+    ctx.fillRect(x - gridSize * 0.5, y + gridSize * 0.8, footWidth, footHeight);
+    ctx.fillRect(x + gridSize * 0.1, y + gridSize * 0.8, footWidth, footHeight);
+
+    // Bounding box calculation
+    let boundingBox = {
+        xMin: x - gridSize * 0.9,
+        yMin: y - gridSize * 1.4,
+        xMax: x + gridSize * 0.9,
+        yMax: y + gridSize * 1.2
+    };
+
+    
+
+
+    return boundingBox;
+}
+
 // Collision detection function
 function isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY) {
     return pointX >= fireLordBoundingBox.xMin && pointX <= fireLordBoundingBox.xMax &&
@@ -1369,6 +1463,45 @@ lightninglordInMotion = true;
 }
 }
 }
+let icemahic = 0
+        let icelordInMotion = false;
+let iceLordBoundingBox = drawIceLord(5, 5);
+function manageiceLord(){
+if (icelord.length !== 0){
+iceArea(icelord[0].x,icelord[0].y,2,1)
+
+    if (icelordInMotion === false){
+    const targetX = snake[0].x * gridSize;
+    const targetY = snake[0].y * gridSize;
+     langle = Math.atan2(targetY - lightninglord[0].y * gridSize, targetX - lightninglord[0].x * gridSize);
+    }
+    let velocityX = Math.cos(langle);
+    let velocityY = Math.sin(langle);
+
+    if (icelord.length > 1) {
+        icelord.length = 1;
+    }
+if (icelordInMotion === false){
+    const magic = ['launch'];
+    const randomIndex = Math.floor(Math.random() * magic.length);
+    icemahic = magic[randomIndex];
+}
+    if (icemahic === 'launch') {
+        icelord[0].x += velocityX;
+        icelord[0].y += velocityY;
+icelordInMotion = true;
+        iceLordBoundingBox = drawIceLord(lightninglord[0].x,lightninglord[0].y);
+
+        // Check if the FireLord's bounding box touches any edge of the canvas
+        if (iceLordBoundingBox.xMin < 0 || iceLordBoundingBox.yMin < 0 ||
+            iceLordBoundingBox.xMax > canvas.width || iceLordBoundingBox.yMax > canvas.height) {
+            // Stop the FireLord
+            icelordInMotion = false;
+        }
+}
+}
+}
+        
         
         let firelordmagic = 0
         let firelordInMotion = false;
@@ -2137,6 +2270,9 @@ timezone.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gr
 ctx.fillStyle = electriccolor;
 electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+ctx.fillStyle = icecolor;
+ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
@@ -2146,6 +2282,10 @@ drawFireLord(firelord.x, firelord.y)
 
 lightninglord.forEach((firelord) =>{
 drawLightningLord(firelord.x, firelord.y)
+})
+
+icelord.forEach((firelord) =>{
+drawIceLord(firelord.x, firelord.y)
 })
 
 ctx.fillStyle = wellcolor;
@@ -2317,6 +2457,11 @@ function HaHaNoCollision(duration) {
             if (!isPaused && firelord.length !== 0){
             manageFireLord()
             }
+
+if (!isPaused && icelord.length !== 0){
+            manageiceLord()
+            }
+            
 if (!isPaused && lightninglord.length !== 0){
             manageLightningLord()
 }
@@ -2443,6 +2588,11 @@ checkCollisions(thwomps, true);
 if(kamek.length === 0){
 isParalyzed = electric.some((electric) => {
     return electric.x === head.x && electric.y === head.y;
+});
+}
+
+let isIced = ice.some((ice) => {
+    return ice.x === head.x && ice.y === head.y;
 });
 }
             
@@ -2725,7 +2875,8 @@ if (Math.random() < itemSpawn()) {
 symbiote.forEach((symbiote, index) => {
     if (symbiote.x === snake[1].x && symbiote.y === snake[1].y) {
         if (symbiote.type === 'magnet') {
-     let startNode = { x: food.x, y: food.y };
+   if (isPaused === false){
+            let startNode = { x: food.x, y: food.y };
     // End node is the head of the player snake (snake[0])
     let endNode = { x: (track[0].x), y: (track[0].y) };
 
@@ -2751,6 +2902,7 @@ symbiote.forEach((symbiote, index) => {
             food.y = (food.y + enemymovementspeed) % (canvas.height / gridSize);
         }
     }
+   }
 }else if (symbiote.type === 'wave'){
             pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
@@ -2813,6 +2965,10 @@ checkForEffects()
         if (!isParalyzed){
         snake.pop();
         snake.unshift(head);
+        if (isIced){
+snake.pop();
+        snake.unshift(head);
+        }
         }
 if (!freeze) {
         // Move Dynamic Obstacles
