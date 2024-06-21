@@ -1715,7 +1715,7 @@ createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dy
 }
 })
 
-icelord.forEach((firelord,findex) => {
+icelord.forEach((icelord,findex) => {
 let icrlordhit = isCollidingWithFireLord(iceLordBoundingBox, projectile.x, projectile.y)
 if (icrlordhit === true){
     icelord.splice(findex,1)
