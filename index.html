@@ -2490,6 +2490,13 @@ for (let index = electric.length - 1; index >= 0; index--) {
             electric.splice(index, 1);
         }
     }
+
+
+        if (isIced){
+changeInterval(50) 
+        }else if (!isIced && !isBurned&& !isFast){
+changeInterval(100)
+        }
             
             // Update Snake position
             const head = { ...snake[0] };
@@ -2967,12 +2974,6 @@ checkForEffects()
         if (!isParalyzed){
         snake.pop();
         snake.unshift(head);
-        if (isIced){
-snake.pop();
-        snake.unshift(head);
-            snake.pop();
-        snake.unshift(head);
-        }
         }
 if (!freeze) {
         // Move Dynamic Obstacles
