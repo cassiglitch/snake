@@ -2503,21 +2503,34 @@ previousDirection = direction;
 switch (direction) {
     case 'up':
         head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+if (isIced){
+head.y = (head.y - 1 + canvas.height / gridSize) % (canvas.height / gridSize);
+}
         track = []
         track = [{x:head.x, y:head.y + 1}]
         break;
     case 'down':
         head.y = (head.y + 1) % (canvas.height / gridSize);
+        if (isIced){
+        head.y = (head.y + 1) % (canvas.height / gridSize)
+        }
         track = []
         track = [{x:head.x, y:head.y - 1}]
         break;
     case 'left':
         head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize);
+        if (isIced){
+head.x = (head.x - 1 + canvas.width / gridSize) % (canvas.width / gridSize)
+        }
+            
         track = []
         track = [{x:head.x + 1, y:head.y}]
         break;
     case 'right':
         head.x = (head.x + 1) % (canvas.width / gridSize);
+        if (isIced){
+head.x = (head.x + 1) % (canvas.width / gridSize);
+        }
         track = []
         track = [{x:head.x - 1, y:head.y}]
         break;
