@@ -133,7 +133,7 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
-        let icelord = []
+        let icelord = [{x:3,y:3}]
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -205,7 +205,6 @@ function iceArea(x, y, size, countdown) {
     
 }
 
-        iceArea(2,2,6,9)
         
 function kamekUpdate(){
             if (kamek.length > 1) {
@@ -1715,6 +1714,15 @@ createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dy
                         projectiles.splice(index, 1);
 }
 })
+
+icelord.forEach((firelord,findex) => {
+let icrlordhit = isCollidingWithFireLord(iceLordBoundongBox, projectile.x, projectile.y)
+if (icrlordhit === true){
+    firelord.splice(findex,1)
+createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
+                        projectiles.splice(index, 1);
+}
+})
 mirrors.forEach((mirror) => {
     if (projectile.x >= mirror.x * gridSize && projectile.x <= (mirror.x + 1) * gridSize &&
         projectile.y >= mirror.y * gridSize && projectile.y <= (mirror.y + 1) * gridSize) {
@@ -2096,6 +2104,11 @@ let islightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, x, y)
 if (islightninglordhit === true) {
 lightninglord = []
 }
+
+  let isicelordhit = isCollidingWithFireLord(iceLordBoundingBox, x, y)
+if (isicelordhit === true) {
+icelord = []
+}          
             
             timezone.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
