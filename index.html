@@ -1480,8 +1480,8 @@ function manageIceLord() {
     let angle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
 
     // Increase velocity for noticeable movement
-    const velocityX = Math.cos(angle) * 2; // Adjust the multiplier for desired speed
-    const velocityY = Math.sin(angle) * 2; // Adjust the multiplier for desired speed
+    const velocityX = Math.cos(angle); // Adjust the multiplier for desired speed
+    const velocityY = Math.sin(angle); // Adjust the multiplier for desired speed
 
     if (icelord.length > 1) {
         icelord.length = 1; // Ensure only one icelord
