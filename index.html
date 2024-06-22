@@ -59,6 +59,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
+let isSlow = false
         let lavacoords = []
         let goombadirection = 'left'
         let goombaoffset = 1.00
@@ -132,7 +133,7 @@
 let thwomps = []
 let pX = 0;
 let firelord = []
-     let lightninglord = [{x:3,y:4}]
+     let lightninglord = []
         let icelord = []
         let earthlord = []
 let pY = 0;
@@ -223,7 +224,7 @@ function iceArea(x, y, size, countdown) {
     }
     
 }
-iceArea(2,2,1,0.1)
+earthArea(0,0,1,19)
         
 function kamekUpdate(){
             if (kamek.length > 1) {
@@ -2772,7 +2773,9 @@ for (let index = ice.length - 1; index >= 0; index--) {
     return ice.x === head.x && ice.y === head.y;
 });
 
-
+isSlow = earth.some((earth) => {
+    return earth.x === head.x && earth.y === head.y;
+});
             
 // Store the current direction as the previous direction
 previousDirection = direction;
@@ -3116,9 +3119,11 @@ cancelEffects()
 
             }else if(food.type === 'slow') {
                     cancelEffects()
+                    isSlow = true
                       changeInterval(150)   
                 setTimeout(function() {
     changeInterval(100);
+    isSlow = false
 }, 6000);           
                 }else if(food.type === 'fast'){
                     cancelEffects()
@@ -3661,9 +3666,13 @@ symbioteAi(symbiote, canvas, gridSize)
             }}
             if (isBurned === true || isIced === true){
                     changeInterval(50)
-} else if (isBurned === false && currentInterval === 0.5 && isFast === false) {
+} else if (isBurned === false && currentInterval === 0.5 && isFast === false && isSlow === false) {
     changeInterval(100)
             }
+if (isSlow){
+changeInterval(150)
+}
+    
 // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
