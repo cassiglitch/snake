@@ -131,8 +131,8 @@
         let track = []
 let thwomps = []
 let pX = 0;
-let firelord = [{x:3,y:4}]
-     let lightninglord = []
+let firelord = []
+     let lightninglord = [{x:3,y:4}]
         let icelord = []
         let earthlord = []
 let pY = 0;
@@ -1540,7 +1540,7 @@ lightningArea(lightninglord[0].x,lightninglord[0].y,2,1)
         lightninglord.length = 1;
     }
 if (lightninglordInMotion === false){
-    const magic = ['launch'];
+    const magic = ['launch','bolt'];
     const randomIndex = Math.floor(Math.random() * magic.length);
     lightningmagic = magic[randomIndex];
 }
@@ -1556,7 +1556,9 @@ lightninglordInMotion = true;
             // Stop the FireLord
             lightninglordInMotion = false;
         }
-}
+}else if (lightningmagic === 'bolt') {
+shootWaveOfProjectiles(lightninglord[0].x * gridSize, lightninglord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,lightninglord)
+    }
 }
 }
 let earthVelocityX;
@@ -2040,6 +2042,9 @@ if (projectile.shooter === icelord){
                         }
     if (projectile.shooter === firelord){
                     addLavaArea(projectile.x/gridSize,projectile.y/gridSize, 3,2)
+    }
+    if (projectile.shooter === lightninglord){
+                    lightningArea(projectile.x/gridSize,projectile.y/gridSize, 3,1)
                         }
                     createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                     projectiles.splice(index, 1);
