@@ -133,7 +133,8 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
-        let icelord = [{x:2,y:3}]
+        let icelord = []
+        let earthlord = [{x:2,y:3}]
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -1191,7 +1192,83 @@ function drawKamek(x, y){
     ctx.fill();
 }
   
-    function drawFireLord(x, y) {
+    function drawEarthLord(x, y) {
+    // Scale the coordinates by gridSize
+    x = x * gridSize;
+    y = y * gridSize;
+
+    // Draw the body (a red pentagon)
+    drawFlatPolygon(x, y, gridSize, 5, 'brown');
+
+    // Draw the head (an orange triangle) connected to the body
+    drawFlatPolygon(x, y - gridSize * 0.8, gridSize, 3, lightbrown);
+
+    // Draw the crown (a yellow pentagon) on the head
+    
+    // Draw the eyes (two white circles) on the head
+    let eyeRadius = gridSize * 0.2;
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the pupils (two black circles)
+    let pupilRadius = gridSize * 0.1;
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+let mouthWidth = gridSize * 0.8;
+    let mouthHeight = gridSize * 0.15;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x, y, mouthWidth, mouthHeight);
+
+
+    ctx.fillStyle = 'black';
+    
+ctx.fillRect(x - mouthWidth / 2, y + gridSize * 0.8, mouthWidth, mouthHeight);
+    
+    // Draw the robe (a black rectangle) covering the lower part of the body
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - gridSize * 0.7, y, gridSize * 1.4, gridSize);
+
+ctx.strokeStyle = 'brown';
+    ctx.lineWidth = gridSize * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + gridSize);
+    ctx.stroke();
+        
+    // Draw the arms (small black rectangles) connected to the body
+    let armWidth = gridSize * 0.2;
+    let armHeight = gridSize * 0.6;
+    ctx.fillRect(x - gridSize * 0.9, y - gridSize * 0.2, armWidth, armHeight);
+    ctx.fillRect(x + gridSize * 0.7, y - gridSize * 0.2, armWidth, armHeight);
+
+    // Draw the feet (black rectangles) touching the body and robe
+    let footWidth = gridSize * 0.4;
+    let footHeight = gridSize * 0.4;
+    ctx.fillRect(x - gridSize * 0.5, y + gridSize * 0.8, footWidth, footHeight);
+    ctx.fillRect(x + gridSize * 0.1, y + gridSize * 0.8, footWidth, footHeight);
+
+    // Bounding box calculation
+    let boundingBox = {
+        xMin: x - gridSize * 0.9,
+        yMin: y - gridSize * 1.4,
+        xMax: x + gridSize * 0.9,
+        yMax: y + gridSize * 1.2
+    };
+
+    
+
+
+    return boundingBox;
+}
+
+function drawFireLord(x, y) {
     // Scale the coordinates by gridSize
     x = x * gridSize;
     y = y * gridSize;
@@ -2317,6 +2394,11 @@ lightninglord.forEach((firelord) =>{
 drawLightningLord(firelord.x, firelord.y)
 })
 
+earthlord.forEach((firelord) =>{
+drawEarthLord(firelord.x, firelord.y)
+})
+
+    
 icelord.forEach((firelord) =>{
 drawIceLord(firelord.x, firelord.y)
 })
