@@ -78,7 +78,7 @@ let isSlow = false
         let flaming = false
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
-        let food = { x: 0, y: 0};
+        let food = { x: 0, y: 0, type:'slow'};
         let obstacles = [];
         let kamekappears = false
         let firstControlSchemeSet = false;
@@ -224,7 +224,7 @@ function iceArea(x, y, size, countdown) {
     }
     
 }
-earthArea(0,0,1,19)
+earthArea(0,0,5,19)
         
 function kamekUpdate(){
             if (kamek.length > 1) {
@@ -3676,7 +3676,7 @@ symbioteAi(symbiote, canvas, gridSize)
             }
 if (isSlow === true){
 changeInterval(150)
-}else{
+}else if (currentInterval === 1.5 && isSlow === false){
 changeInterval(100)
 }
     
