@@ -2570,7 +2570,7 @@ ctx.fillStyle = 'black';
     });
         // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay')
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}<br> ${isSlow}`;
     drawLaser();
 }
 
@@ -3666,7 +3666,7 @@ symbioteAi(symbiote, canvas, gridSize)
             }}
             if (isBurned === true || isIced === true){
                     changeInterval(50)
-} else if (isBurned === false && currentInterval === 0.5 && isFast === false && isSlow === false) {
+} else if (isBurned === false && currentInterval === 0.5 && isFast === false && isSlow === false){
     changeInterval(100)
             }
 if (isSlow){
