@@ -1468,7 +1468,7 @@ lightninglordInMotion = true;
 let  icemahic = 0;
 let icelordInMotion = false;
 let iceLordBoundingBox = drawIceLord(5,5)
-manageIceLord()
+        
 function manageIceLord() {
     if (icelord.length === 0) return;
 
@@ -2479,7 +2479,7 @@ function HaHaNoCollision(duration) {
             }
 
 if (!isPaused && icelord.length !== 0){
-            
+            manageIceLord()
             }
             
 if (!isPaused && lightninglord.length !== 0){
