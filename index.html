@@ -1478,7 +1478,7 @@ function manageIceLord() {
     if (!icelordInMotion) {
         const targetX = snake[0].x * gridSize;
         const targetY = snake[0].y * gridSize;
-        const langle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
+        let langle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
 
         const velocityX = Math.cos(langle);
         const velocityY = Math.sin(langle);
