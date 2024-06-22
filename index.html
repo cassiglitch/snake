@@ -1547,39 +1547,54 @@ let earthmagic = ''
         let earthlordInMotion = false;
 let earthLordBoundingBox = drawEarthLord(5, 5);
 function manageEarthLord(){
-if (earthlord.length !== 0){
+if (earthlord.length === 0) return;
 
+    // Perform actions if icelord is present
+    iceArea(earthlord[0].x, earthlord[0].y, 2, 2);
 
-    if (earthlordInMotion === false){
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
-     earthangle = Math.atan2(targetY - earthlord[0].y * gridSize, targetX - earthlord[0].x * gridSize);
-    }
-    let velocityX = Math.cos(earthangle);
-    let velocityY = Math.sin(earthangle);
-
-    if (earthlord.length > 1) {
-        earthlord.length = 1;
-    }
-if (earthlordInMotion === false){
-    const magic = ['launch'];
-    const randomIndex = Math.floor(Math.random() * magic.length);
-    earthmagic = magic[randomIndex];
+    earthangle = Math.atan2(targetY - earthlord[0].y * gridSize, targetX - earthlord[0].x * gridSize);
+if (!earthlordInMotion){
+    // Increase velocity for noticeable movement
+    const stepSize = 0.3; // Adjust step size for smoother movement
+    const velocityX = Math.cos(angle) * stepSize;
+    const velocityY = Math.sin(angle) * stepSize;
 }
+    if (earthlord.length > 1) {
+        earthlord.length = 1; // Ensure only one icelord
+    }
+
+    // Assign magic action
+    earthmagic = 'launch';
+
     if (earthmagic === 'launch') {
         earthlord[0].x += velocityX;
         earthlord[0].y += velocityY;
-earthlordInMotion = true;
-        earthLordBoundingBox = drawLightningLord(lightninglord[0].x,lightninglord[0].y);
+        earthlordInMotion = true;
+        earthLordBoundingBox = drawEarthLord(earthlord[0].x, earthlord[0].y);
 
-        // Check if the FireLord's bounding box touches any edge of the canvas
+        // Check if the IceLord's bounding box touches any edge of the canvas
         if (earthLordBoundingBox.xMin < 0 || earthLordBoundingBox.yMin < 0 ||
             earthLordBoundingBox.xMax > canvas.width || earthLordBoundingBox.yMax > canvas.height) {
-            // Stop the FireLord
+            // Stop the IceLord
             earthlordInMotion = false;
         }
-}
-}
+    }
+
+    // Continue moving if in motion
+    if (earthlordInMotion) {
+        earthlord[0].x += velocityX;
+        earthlord[0].y += velocityY;
+        earthLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
+
+        // Check if the IceLord's bounding box touches any edge of the canvas
+        if (earthLordBoundingBox.xMin < 0 || earthLordBoundingBox.yMin < 0 ||
+            earthLordBoundingBox.xMax > canvas.width || earthLordBoundingBox.yMax > canvas.height) {
+            // Stop the IceLord
+            icelordInMotion = false;
+        }
+    }
 }
 
 let  icemahic = 0;
@@ -1595,12 +1610,12 @@ function manageIceLord() {
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
     let angle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
-
+if (!icelordInMotion){
     // Increase velocity for noticeable movement
     const stepSize = 0.3; // Adjust step size for smoother movement
     const velocityX = Math.cos(angle) * stepSize;
     const velocityY = Math.sin(angle) * stepSize;
-
+}
     if (icelord.length > 1) {
         icelord.length = 1; // Ensure only one icelord
     }
@@ -2611,7 +2626,7 @@ function HaHaNoCollision(duration) {
                 kamekUpdate()
             }
 if (!isPaused && earthlord.length !== 0){
-            
+          manageEarthLord()  
 }
             if (!isPaused && firelord.length !== 0){
             manageFireLord()
