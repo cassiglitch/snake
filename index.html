@@ -1542,27 +1542,29 @@ lightninglordInMotion = true;
 }
 }
 }
-let earthVelocityX
-let earthVelocityY
-let earthangle = 0
-let earthmagic = ''
-        let earthlordInMotion = false;
+let earthVelocityX;
+let earthVelocityY;
+let earthangle = 0;
+let earthmagic = '';
+let earthlordInMotion = false;
 let earthLordBoundingBox = drawEarthLord(5, 5);
-function manageEarthLord(){
-if (earthlord.length === 0) return;
 
+function manageEarthLord() {
+    if (earthlord.length === 0) return;
 
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
     earthangle = Math.atan2(targetY - earthlord[0].y * gridSize, targetX - earthlord[0].x * gridSize);
-if (!earthlordInMotion){
-    // Increase velocity for noticeable movement
-    const stepSize = 0.3; // Adjust step size for smoother movement
-    earthVelocityX = Math.cos(earthangle) * stepSize;
-    earthVelocityY = Math.sin(earthangle) * stepSize;
-}
+
+    if (!earthlordInMotion) {
+        // Increase velocity for noticeable movement
+        const stepSize = 0.3; // Adjust step size for smoother movement
+        earthVelocityX = Math.cos(earthangle) * stepSize;
+        earthVelocityY = Math.sin(earthangle) * stepSize;
+    }
+
     if (earthlord.length > 1) {
-        earthlord.length = 1; // Ensure only one icelord
+        earthlord.length = 1; // Ensure only one earthlord
     }
 
     // Assign magic action
@@ -1574,28 +1576,29 @@ if (!earthlordInMotion){
         earthlordInMotion = true;
         earthLordBoundingBox = drawEarthLord(earthlord[0].x, earthlord[0].y);
 
-        // Check if the IceLord's bounding box touches any edge of the canvas
+        // Check if the Earth Lord's bounding box touches any edge of the canvas
         if (earthLordBoundingBox.xMin < 0 || earthLordBoundingBox.yMin < 0 ||
             earthLordBoundingBox.xMax > canvas.width || earthLordBoundingBox.yMax > canvas.height) {
-            // Stop the IceLord
+            // Stop the Earth Lord
             earthlordInMotion = false;
         }
     }
 
     // Continue moving if in motion
     if (earthlordInMotion) {
-        earthlord[0].x += velocityX;
-        earthlord[0].y += velocityY;
-        earthLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
+        earthlord[0].x += earthVelocityX;
+        earthlord[0].y += earthVelocityY;
+        earthLordBoundingBox = drawEarthLord(earthlord[0].x, earthlord[0].y);
 
-        // Check if the IceLord's bounding box touches any edge of the canvas
+        // Check if the Earth Lord's bounding box touches any edge of the canvas
         if (earthLordBoundingBox.xMin < 0 || earthLordBoundingBox.yMin < 0 ||
             earthLordBoundingBox.xMax > canvas.width || earthLordBoundingBox.yMax > canvas.height) {
-            // Stop the IceLord
+            // Stop the Earth Lord
             earthlordInMotion = false;
         }
     }
 }
+
 
 let  icemahic = 0;
 let icelordInMotion = false;
