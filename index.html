@@ -156,6 +156,7 @@ let kamekcanteleport = true
 let sideshield = 6
         let shield = false
 let magictype = 'bolt'
+        let lightningboltcolor = '#f0fb3e'
         let lava = []
         let lavacolor = '#f14e2380'
         let electric = []
@@ -1557,7 +1558,7 @@ lightninglordInMotion = true;
             lightninglordInMotion = false;
         }
 }else if (lightningmagic === 'bolt') {
-shootWaveOfProjectiles(lightninglord[0].x * gridSize, lightninglord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,lightninglord)
+shootWaveOfProjectiles(lightninglord[0].x * gridSize, lightninglord[0].y * gridSize, 1, 1, 0.5,lightningboltcolor, obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,lightninglord)
     }
 }
 }
@@ -1607,7 +1608,7 @@ earthArea(earthlord[0].x,earthlord[0].y,2,3)
             earthlordInMotion = false;
         }
     } else if (earthmagic === 'bolt') {
-shootWaveOfProjectiles(earthlord[0].x * gridSize, earthlord[0].y * gridSize, 1, 1, 0.5, earthcolor, obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,earthlord);
+shootWaveOfProjectiles(earthlord[0].x * gridSize, earthlord[0].y * gridSize, 1, 1, 0.5, 'brown', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,earthlord);
     }
 
     // Continue moving if in motion
