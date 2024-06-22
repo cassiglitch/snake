@@ -136,7 +136,7 @@ let pX = 0;
 let firelord = []
      let lightninglord = []
         let icelord = []
-        let earthlord = [{x:0,y:0}]
+        let earthlord = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -2576,7 +2576,7 @@ ctx.fillStyle = 'black';
     });
         // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay')
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}<br> ${isSlow}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
 }
 
@@ -3489,7 +3489,7 @@ const id = Math.random() < 0.5 ? 1 : 2;
     } else if (randomValue < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
         }else if (randomValue < 0.2 && kamek.length === 0){
-const lord = [firelord,lightninglord,icelord]; // Possible directions    
+const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
 const randomIndex2 = Math.floor(Math.random() * lord.length);
 let  lords = lord[randomIndex2];
             lords.push({x:x, y:y})
