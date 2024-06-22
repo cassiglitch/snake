@@ -1820,7 +1820,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                 ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
 
                 if (increase === false || projectile.count <= 5) {
-                    if (projectile.homing && flaming === false) {
+                    if (projectile.homing && flaming === false && projectile.shooter === kamek) {
                         // Adjust velocity to home in on the target
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
