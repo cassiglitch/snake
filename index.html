@@ -2023,7 +2023,15 @@ if (projectile.shooter === earthlord){
                             
                         }
                     });
-}
+if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
+if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
+                    createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
+                    projectiles.splice(index, 1);
+                }
+
+                }
             });
 
             if (projectiles.length === 0) {
