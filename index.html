@@ -162,6 +162,8 @@ let magictype = 'bolt'
         let ice =[]
         let icecolor = '#77A0F280'
         let electriccolor = '#CFFF0480'
+        let earthcolor = '#BD978E'
+        let earth = []
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -191,6 +193,21 @@ function lightningArea(x, y, size, countdown) {
     
 }
 
+function earthArea(x, y, size, countdown) {
+    let offset = Math.floor(size / 2);
+
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            earth.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
+        }
+    }
+    
+}
+        
 function iceArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -1551,6 +1568,7 @@ let earthLordBoundingBox = drawEarthLord(5, 5);
 
 function manageEarthLord() {
     if (earthlord.length === 0) return;
+earthArea(earthlord[0].x,earthlord[0].y,2,3)
 
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
@@ -2348,6 +2366,10 @@ function pauseGame() {
 function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+ctx.fillStyle = earthcolor;
+earth.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    
 if (kamek.length !== 0) {
         kamek.forEach((kamek, index) => {
     drawKamek(kamek.x, kamek.y)
