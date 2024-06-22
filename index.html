@@ -131,9 +131,9 @@
         let track = []
 let thwomps = []
 let pX = 0;
-let firelord = []
+let firelord = [{x:3,y:4}]
      let lightninglord = []
-        let icelord = [{x:3,y:4}]
+        let icelord = []
         let earthlord = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
@@ -1709,7 +1709,7 @@ addLavaArea(firelord[0].x,firelord[0].y,2,2)
         firelord.length = 1;
     }
 if (firelordInMotion === false){
-    const magic = ['launch'];
+    const magic = ['launch','bolt'];
     const randomIndex = Math.floor(Math.random() * magic.length);
     firelordmagic = magic[randomIndex];
 }
@@ -1725,7 +1725,9 @@ firelordInMotion = true;
             // Stop the FireLord
             firelordInMotion = false;
         }
-}
+}else if (firelordmagic === 'bolt') {
+shootWaveOfProjectiles(firelord[0].x * gridSize, firelord[0].y * gridSize, 1, 1, 0.5, 'orange', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,firelord)
+    }
 }
 }
 function getDirectionToSnakeHead(x, y, snake) {
@@ -1884,9 +1886,6 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                     }
                 });
 
-if (flaming === true && projectile.homing === true && projectile.shooter === firelord){
-addLavaArea(projectile.x,projectile.y,4,2)
-}
 let reflecttime = 0; // Move this line outside of the loop
 let colldown = 1000
 
@@ -2039,7 +2038,9 @@ if (projectile.shooter === earthlord){
 if (projectile.shooter === icelord){
                     iceArea(projectile.x/gridSize,projectile.y/gridSize, 4,3)
                         }
-    
+    if (projectile.shooter === firelord){
+                    addLavaArea(projectile.x/gridSize,projectile.y/gridSize, 3,2)
+                        }
                     createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                     projectiles.splice(index, 1);
                 }
