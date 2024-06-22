@@ -2338,7 +2338,11 @@ lightninglord = []
 if (isicelordhit === true) {
 icelord = []
 }          
-            
+let isearthlordhit = isCollidingWithFireLord(earthLordBoundingBox, x, y)
+if (isearthlordhit === true) {
+earthlord = []
+}
+    
             timezone.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
                     y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize && hascollided === false) {
