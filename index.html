@@ -1627,6 +1627,9 @@ shootWaveOfProjectiles(earthlord[0].x * gridSize, earthlord[0].y * gridSize, 1, 
 let  icemahic = 0;
 let icelordInMotion = false;
 let iceLordBoundingBox = drawIceLord(5,5)
+let iceangle
+let IcevelocityX
+let IcevelocityY
         
 function manageIceLord() {
     if (icelord.length === 0) return;
@@ -1636,12 +1639,12 @@ function manageIceLord() {
 
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
-    let angle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
+     iceangle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
 if (!icelordInMotion){
     // Increase velocity for noticeable movement
     const stepSize = 0.3; // Adjust step size for smoother movement
-    const velocityX = Math.cos(angle) * stepSize;
-    const velocityY = Math.sin(angle) * stepSize;
+    IcevelocityX = Math.cos(iceangle) * stepSize;
+    IcevelocityY = Math.sin(iceangle) * stepSize;
 }
     if (icelord.length > 1) {
         icelord.length = 1; // Ensure only one icelord
@@ -1655,8 +1658,8 @@ if (!icelordInMotion){
 }
 
     if (icemahic === 'launch') {
-        icelord[0].x += velocityX;
-        icelord[0].y += velocityY;
+        icelord[0].x += IcevelocityX;
+        icelord[0].y += IcevelocityY;
         icelordInMotion = true;
         iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
 
@@ -1667,13 +1670,13 @@ if (!icelordInMotion){
             icelordInMotion = false;
         }
     }else if (icemahic === 'bolt') {
-shootWaveOfProjectiles(icelord[0].x * gridSize, icelord[0].y * gridSize, 1, 1, 0.5, icecolor, obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,icelord)
+shootWaveOfProjectiles(icelord[0].x * gridSize, icelord[0].y * gridSize, 1, 1, 0.5, 'blue', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,icelord)
     }
 
     // Continue moving if in motion
     if (icelordInMotion) {
-        icelord[0].x += velocityX;
-        icelord[0].y += velocityY;
+        icelord[0].x += IcevelocityX;
+        icelord[0].y += IcevelocityY;
         iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
 
         // Check if the IceLord's bounding box touches any edge of the canvas
