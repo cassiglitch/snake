@@ -3124,12 +3124,15 @@ cancelEffects()
                     for (let i = 1; i <= 5999; i++) {
   setTimeout(() => {
     isSlow = true;
+    changeInterval(150);
   }, i);
 }
-                setTimeout(function() {
-    changeInterval(100);
-    isSlow = false
-}, 6000);           
+
+// Set timeout to reset the interval back to 100ms after 6000 milliseconds
+setTimeout(() => {
+  changeInterval(100);
+  isSlow = false;
+}, 6000); 
                 }else if(food.type === 'fast'){
                     cancelEffects()
                     isFast = true
