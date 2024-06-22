@@ -3120,7 +3120,12 @@ cancelEffects()
             }else if(food.type === 'slow') {
                     cancelEffects()
                     isSlow = true
-                      changeInterval(150)   
+                      changeInterval(150)
+                    for (let i = 1; i <= 5999; i++) {
+  setTimeout(() => {
+    isSlow = true;
+  }, i);
+}
                 setTimeout(function() {
     changeInterval(100);
     isSlow = false
@@ -3666,11 +3671,13 @@ symbioteAi(symbiote, canvas, gridSize)
             }}
             if (isBurned === true || isIced === true){
                     changeInterval(50)
-} else if (isBurned === false && currentInterval === 0.5 && isFast === false && isSlow === false){
+} else if (isBurned === false && currentInterval === 0.5 && isFast === false){
     changeInterval(100)
             }
 if (isSlow === true){
 changeInterval(150)
+}else{
+changeInterval(100)
 }
     
 // Handle eating animation
