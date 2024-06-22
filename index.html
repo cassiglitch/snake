@@ -1475,35 +1475,49 @@ function manageIceLord() {
     // Perform actions if icelord is present
     iceArea(icelord[0].x, icelord[0].y, 2, 2);
 
-    if (!icelordInMotion) {
-        const targetX = snake[0].x * gridSize;
-        const targetY = snake[0].y * gridSize;
-        let langle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
+    const targetX = snake[0].x * gridSize;
+    const targetY = snake[0].y * gridSize;
+    let angle = Math.atan2(targetY - icelord[0].y * gridSize, targetX - icelord[0].x * gridSize);
 
-        const velocityX = Math.cos(langle);
-        const velocityY = Math.sin(langle);
+    // Increase velocity for noticeable movement
+    const velocityX = Math.cos(angle) * 2; // Adjust the multiplier for desired speed
+    const velocityY = Math.sin(angle) * 2; // Adjust the multiplier for desired speed
 
-        if (icelord.length > 1) {
-            icelord.length = 1;
-        }
-
-        // Assign magic action
-        icemahic = 'launch';
+    if (icelord.length > 1) {
+        icelord.length = 1; // Ensure only one icelord
     }
-        if (icemahic === 'launch') {
-            icelord[0].x += velocityX;
-            icelord[0].y += velocityY;
-            icelordInMotion = true;
-            iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
 
-            // Check if the IceLord's bounding box touches any edge of the canvas
-            if (iceLordBoundingBox.xMin < 0 || iceLordBoundingBox.yMin < 0 ||
-                iceLordBoundingBox.xMax > canvas.width || iceLordBoundingBox.yMax > canvas.height) {
-                // Stop the IceLord
-                icelordInMotion = false;
-            }
+    // Assign magic action
+    icemahic = 'launch';
+
+    if (icemahic === 'launch') {
+        icelord[0].x += velocityX;
+        icelord[0].y += velocityY;
+        icelordInMotion = true;
+        iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
+
+        // Check if the IceLord's bounding box touches any edge of the canvas
+        if (iceLordBoundingBox.xMin < 0 || iceLordBoundingBox.yMin < 0 ||
+            iceLordBoundingBox.xMax > canvas.width || iceLordBoundingBox.yMax > canvas.height) {
+            // Stop the IceLord
+            icelordInMotion = false;
         }
     }
+
+    // Continue moving if in motion
+    if (icelordInMotion) {
+        icelord[0].x += velocityX;
+        icelord[0].y += velocityY;
+        iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
+
+        // Check if the IceLord's bounding box touches any edge of the canvas
+        if (iceLordBoundingBox.xMin < 0 || iceLordBoundingBox.yMin < 0 ||
+            iceLordBoundingBox.xMax > canvas.width || iceLordBoundingBox.yMax > canvas.height) {
+            // Stop the IceLord
+            icelordInMotion = false;
+        }
+    }
+}
 
         
         
