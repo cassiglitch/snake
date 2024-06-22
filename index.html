@@ -2018,7 +2018,16 @@ if (projectile.shooter === earthlord){
                         if ((projectile.x >= snakePart.x * gridSize && projectile.x <= (snakePart.x + 1) * gridSize &&
                             projectile.y >= snakePart.y * gridSize && projectile.y <= (snakePart.y + 1) * gridSize) && !isInvincible) {
                             if (projectile.shooter === earthlord){
-                    earthArea(projectile.x,projectile.y, 3,3)
+                    earthArea(projectile.x/gridSize,projectile.y/gridSize, 3,3)
+                        }
+if (projectile.shooter === icelord){
+                    iceArea(projectile.x/gridSize,projectile.y/gridSize, 4,3)
+                        }
+    if (projectile.shooter === firelord){
+                    addLavaArea(projectile.x/gridSize,projectile.y/gridSize, 3,2)
+    }
+    if (projectile.shooter === lightninglord){
+                    lightningArea(projectile.x/gridSize,projectile.y/gridSize, 3,1)
                         }
                             createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                             projectiles.splice(index, 1);
