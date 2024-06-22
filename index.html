@@ -2705,6 +2705,16 @@ if (!isPaused && lightninglord.length !== 0){
         }
     }
 
+for (let index = earth.length - 1; index >= 0; index--) {
+        let earthElement = earth[index];
+        if (earthElement.countdown > 0) {
+            earthElement.countdown -= 0.1;
+        }
+        if (earthElement.countdown <= 0) {
+            earth.splice(index, 1);
+        }
+    }
+            
 for (let index = electric.length - 1; index >= 0; index--) {
         let lightningElement = electric[index];
         if (lightningElement.countdown > 0) {
