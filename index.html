@@ -133,8 +133,8 @@ let thwomps = []
 let pX = 0;
 let firelord = []
      let lightninglord = []
-        let icelord = []
-        let earthlord = [{x:2,y:3}]
+        let icelord = [{x:3,y:4}]
+        let earthlord = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -1648,7 +1648,11 @@ if (!icelordInMotion){
     }
 
     // Assign magic action
-    icemahic = 'launch';
+        if (icelordInMotion === false){
+    const magic = ['launch', 'bolt'];
+    const randomIndex = Math.floor(Math.random() * magic.length);
+    icemahic = magic[randomIndex];
+}
 
     if (icemahic === 'launch') {
         icelord[0].x += velocityX;
@@ -1662,6 +1666,8 @@ if (!icelordInMotion){
             // Stop the IceLord
             icelordInMotion = false;
         }
+    }else if (icemahic === 'bolt') {
+shootWaveOfProjectiles(icelord[0].x * gridSize, icelord[0].y * gridSize, 1, 1, 0.5, icecolor, obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,icelord)
     }
 
     // Continue moving if in motion
@@ -2027,6 +2033,10 @@ if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || proje
 if (projectile.shooter === earthlord){
                     earthArea(projectile.x/gridSize,projectile.y/gridSize, 3,3)
                         }
+if (projectile.shooter === icelord){
+                    iceArea(projectile.x/gridSize,projectile.y/gridSize, 4,3)
+                        }
+    
                     createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                     projectiles.splice(index, 1);
                 }
