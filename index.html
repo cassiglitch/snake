@@ -135,7 +135,7 @@ let pX = 0;
 let firelord = []
      let lightninglord = []
         let icelord = []
-        let earthlord = []
+        let earthlord = [{x:0,y:0}]
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -225,7 +225,7 @@ function iceArea(x, y, size, countdown) {
     }
     
 }
-earthArea(0,0,5,19)
+
         
 function kamekUpdate(){
             if (kamek.length > 1) {
