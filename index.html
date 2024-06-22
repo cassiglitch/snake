@@ -1586,7 +1586,11 @@ earthArea(earthlord[0].x,earthlord[0].y,2,3)
     }
 
     // Assign magic action
-    earthmagic = 'launch';
+    if (earthlordInMotion === false){
+    const magic = ['launch', 'bolt'];
+    const randomIndex = Math.floor(Math.random() * magic.length);
+    earthmagic = magic[randomIndex];
+}
 
     if (earthmagic === 'launch') {
         earthlord[0].x += earthVelocityX;
@@ -1600,6 +1604,8 @@ earthArea(earthlord[0].x,earthlord[0].y,2,3)
             // Stop the Earth Lord
             earthlordInMotion = false;
         }
+    } else if (earthmagic === 'bolt') {
+shootWaveOfProjectiles(earthlord[0].x * gridSize, earthlord[0].y * gridSize, 1, 1, 0.5, earthcolor, obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,earthlord);
     }
 
     // Continue moving if in motion
@@ -1932,7 +1938,9 @@ mirrors.forEach((mirror) => {
                     if (projectile.x >= dynamicObstacle.x * gridSize && projectile.x <= (dynamicObstacle.x + 2) * gridSize &&
                         projectile.y >= dynamicObstacle.y * gridSize && projectile.y <= (dynamicObstacle.y + 2) * gridSize) {
                         dynamicObstacles.splice(dynamicObstacleIndex, 1);
-                        
+                        if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                     }
@@ -1942,7 +1950,9 @@ mirrors.forEach((mirror) => {
                     if (projectile.x >= thwomp.x * gridSize && projectile.x <= (thwomp.x + 2) * gridSize &&
                         projectile.y >= thwomp.y * gridSize && projectile.y <= (thwomp.y + 2) * gridSize) {
                         thwomps.splice(thwompindex, 1);
-                        
+                        if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                     }
@@ -1951,7 +1961,9 @@ mirrors.forEach((mirror) => {
                 esnake.forEach((esnake) => {
                     if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
                         projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
-                    
+                    if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                         Dieenemy();
@@ -1961,7 +1973,9 @@ mirrors.forEach((mirror) => {
         kamek.forEach((esnake) => {
                     if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
                         projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
-                        
+                        if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
                         kamekDeath()
@@ -1982,7 +1996,9 @@ mirrors.forEach((mirror) => {
                 }, snakeprojectilecollisiontime);
 
                 if (projectile.x < 0 || projectile.x > canvas.width || projectile.y < 0 || projectile.y > canvas.height) {
-
+if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
                     createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                     projectiles.splice(index, 1);
                 }
@@ -1990,6 +2006,9 @@ mirrors.forEach((mirror) => {
                 snake.forEach((snakePart) => {
                         if ((projectile.x >= snakePart.x * gridSize && projectile.x <= (snakePart.x + 1) * gridSize &&
                             projectile.y >= snakePart.y * gridSize && projectile.y <= (snakePart.y + 1) * gridSize) && !isInvincible) {
+                            if (projectile.shooter === earthlord){
+                    earthArea(projectile.x,projectile.y, 3,3)
+                        }
                             createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                             projectiles.splice(index, 1);
                             const numSegmentsToRemove = Math.ceil(snake.length * 0.01);
