@@ -1542,6 +1542,46 @@ lightninglordInMotion = true;
 }
 }
 }
+
+let earthmagic = 0
+        let earthlordInMotion = false;
+let earthLordBoundingBox = drawEarthLord(5, 5);
+function manageEarthLord(){
+if (earthlord.length !== 0){
+
+
+    if (earthlordInMotion === false){
+    const targetX = snake[0].x * gridSize;
+    const targetY = snake[0].y * gridSize;
+     langle = Math.atan2(targetY - earthlord[0].y * gridSize, targetX - earthlord[0].x * gridSize);
+    }
+    let velocityX = Math.cos(langle);
+    let velocityY = Math.sin(langle);
+
+    if (earthlord.length > 1) {
+        earthlord.length = 1;
+    }
+if (earthlordInMotion === false){
+    const magic = ['launch'];
+    const randomIndex = Math.floor(Math.random() * magic.length);
+    earthmagic = magic[randomIndex];
+}
+    if (earthmagic === 'launch') {
+        earthlord[0].x += velocityX;
+        earthlord[0].y += velocityY;
+earthlordInMotion = true;
+        earthLordBoundingBox = drawLightningLord(lightninglord[0].x,lightninglord[0].y);
+
+        // Check if the FireLord's bounding box touches any edge of the canvas
+        if (earthLordBoundingBox.xMin < 0 || earthLordBoundingBox.yMin < 0 ||
+            earthLordBoundingBox.xMax > canvas.width || earthLordBoundingBox.yMax > canvas.height) {
+            // Stop the FireLord
+            earthlordInMotion = false;
+        }
+}
+}
+}
+
 let  icemahic = 0;
 let icelordInMotion = false;
 let iceLordBoundingBox = drawIceLord(5,5)
@@ -2570,6 +2610,9 @@ function HaHaNoCollision(duration) {
             if (kamek.length !== 0){
                 kamekUpdate()
             }
+if (!isPaused && earthlord.length !== 0){
+            manageEarthLord()
+}
             if (!isPaused && firelord.length !== 0){
             manageFireLord()
             }
