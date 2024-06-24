@@ -93,7 +93,7 @@ let isSlow = false
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = []
+        let kamek = [{x:2,y:3}]
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
@@ -1845,19 +1845,12 @@ function kamekDeath() {
     if (!iskamekdead) {
         const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
         const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
-        const randomX2 = Math.floor(Math.random() * (canvas.width / gridSize));
-        const randomY2 = Math.floor(Math.random() * (canvas.height / gridSize));
-        const randomX3 = Math.floor(Math.random() * (canvas.width / gridSize));
-        const randomY3 = Math.floor(Math.random() * (canvas.height / gridSize));
-        const randomX4 = Math.floor(Math.random() * (canvas.width / gridSize));
-        const randomY4 = Math.floor(Math.random() * (canvas.height / gridSize));
+        
         
         let gridOffset = ((2 * gridSize) + (gridSize / 2)) / 2;
 
         createPortalAnimation(randomX * gridSize, randomY * gridSize, 50, 2000);
-        createPortalAnimation(randomX2 * gridSize, randomY2 * gridSize, 50, 2000);
-        createPortalAnimation(randomX3 * gridSize, randomY3 * gridSize, 50, 2000);
-        createPortalAnimation(randomX4 * gridSize, randomY4 * gridSize, 50, 2000);
+        
 
         turrets.forEach((turret) => {
             createPortalAnimation(turret.x * gridSize, turret.y * gridSize, 30, 2000);
@@ -1876,10 +1869,10 @@ function kamekDeath() {
             kamek = [];
             turrets = [];
             goombas = [];
-            firelord.push({ x: randomX, y: randomY });
-            lightninglord.push({ x: randomX2, y: randomY2 });
-            icelord.push({ x: randomX3, y: randomY3 });
-            earthlord.push({ x: randomX4, y: randomY4 });
+            const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
+const randomIndex2 = Math.floor(Math.random() * lord.length);
+let  lords = lord[randomIndex2];
+            lords.push({x:randomX, y:randomY})
         }, 1100);
 
         setTimeout(() => {
@@ -3645,12 +3638,7 @@ const id = Math.random() < 0.5 ? 1 : 2;
         formrandomshape(4)            
     } else if (randomValue < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
-        }else if (randomValue < 0.2 && kamek.length === 0){
-const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
-const randomIndex2 = Math.floor(Math.random() * lord.length);
-let  lords = lord[randomIndex2];
-            lords.push({x:x, y:y})
-} else {
+        } else {
            let otype = 0
 if (controltype === 'arrow'){
 const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
