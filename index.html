@@ -168,6 +168,7 @@ let magictype = 'bolt'
         let earthcolor = '#BD978E'
         let earth = []
         let isEarthed = false
+        let scoreArea = []
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -226,6 +227,20 @@ function iceArea(x, y, size, countdown) {
     }
     
 }
+function scoreArea(x, y, size) {
+    let offset = Math.floor(size / 2);
+
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            scoreArea.push({ x: Math.floor(x + i), y: Math.floor(y + j)});
+        }
+    }
+    
+}
 
 function getMiddleXCoordinate(element) {
   if (!(element instanceof Element)) {
@@ -244,7 +259,7 @@ function getMiddleXCoordinate(element) {
 // 
 let middleX = getMiddleXCoordinate(scoreDisplay)
         
-iceArea(middleX,1,6,900)
+scoreArea(middleX,1,6)
         
 function kamekUpdate(){
             if (kamek.length > 1) {
@@ -2547,6 +2562,11 @@ ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSiz
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+ctx.fillStyle = '#FF000080';
+scoreArea.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+
+
+    
 firelord.forEach((firelord) =>{
 drawFireLord(firelord.x, firelord.y)
 })
