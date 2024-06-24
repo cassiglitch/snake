@@ -582,8 +582,8 @@ document.addEventListener('keypress', function(event) {
         }
 function manageSpawningOfElementalLords(x,y) {
     let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
-    spawnLord()
-    function spawnLord() {
+    spawnLord(x,y)
+    function spawnLord(x,y) {
         if (lords.length === 0) {
             console.log("All lords have been spawned.");
             return;
@@ -606,7 +606,7 @@ createPortalAnimation(x * gridSize, y * gridSize, 50, 100);
         console.log("Remaining lords:", lords);
         
         // Continue spawning until all lords have been spawned
-        spawnLord();
+        spawnLord(x,y);
     }
 }
 function spawnTurrets(x,y){
