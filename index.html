@@ -241,16 +241,7 @@ function getMiddleXCoordinate(element) {
   return middleX;
 }
 
-// Example usage
-window.addEventListener('DOMContentLoaded', (event) => {
-  const element = document.querySelector('.your-css-class');
-  if (element) {
-    const middleX = getMiddleXCoordinate(element);
-    console.log(`The middle X coordinate of the element is: ${middleX}px`);
-  } else {
-    console.error("Element not found.");
-  }
-});
+// 
 let middleX = getMiddleXCoordinate(scoreDisplay)
         
 iceArea(middleX,1,6,900)
@@ -2603,7 +2594,7 @@ ctx.fillStyle = 'black';
     });
         // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay')
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount} <br> ${middleX}`;
     drawLaser();
 }
 
