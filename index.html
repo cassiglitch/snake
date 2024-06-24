@@ -255,12 +255,12 @@ function getMiddleXCoordinate(element) {
 
   return middleX;
 }
-
-// 
+function displaycheck(){
+scoreAreaArray = []
 let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,6)
-        
+}
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -2920,7 +2920,28 @@ isParalyzed = electric.some((electric) => {
 });
 }
 
+const checkIfInScoreArea = (obstacles, isDynamic) => {
+    obstacles.forEach((obstacle, index) => {
+        scoreAreaArray.forEach((lava) => {
+            if (
+                (isDynamic
+                    ? lava.x >= obstacle.x && lava.x < obstacle.x + 2 &&
+                      lava.y >= obstacle.y && lava.y < obstacle.y + 2
+                    : lava.x === obstacle.x && lava.y === obstacle.y)
+            ) {
+                obstacles.splice(index, 1);
+            }
+        });
+    });
+}
 
+    checkIfInScoreArea(obstacles, false);
+checkIfInScoreArea(mirrors, false);
+checkIfInScoreArea(wells, false);
+
+// Dynamic obstacles
+checkIfInScoreArea(dynamicObstacles, true);
+checkIfInScoreArea(thwomps, true);
             
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
@@ -3696,6 +3717,7 @@ function animateExplosion() {
             resizeCanvasHeight();
             update();
             draw();
+            displaycheck()
             if (isGravityWellActive === true && wells.length !== 0){
             checkDistance(snake)
             }
