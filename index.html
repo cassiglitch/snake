@@ -133,6 +133,7 @@ let isSlow = false
         let track = []
 let thwomps = []
 let pX = 0;
+let wellStrength = 4
 let firelord = []
      let lightninglord = []
         let icelord = []
@@ -285,7 +286,7 @@ removeDuplicatesWithSameCoordinates(wellWarning)
 
 function manageWellsWarningZone(){
 wells.forEach((well) => {
-wellWarningArea(well.x, well.y, 7)
+wellWarningArea(well.x, well.y, 8)
 removeDuplicateWellWarnings()
 })
 }
@@ -714,7 +715,7 @@ function ManageTurrets() {
   }
 }
 
-let wellStrength = 5
+
 function checkDistance(snake) {
     wells.forEach((well) => {
       const distance = Math.abs(snake[0].x - well.x) + Math.abs(snake[0].y - well.y);
