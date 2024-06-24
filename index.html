@@ -226,7 +226,34 @@ function iceArea(x, y, size, countdown) {
     }
     
 }
-iceArea((canvas.width/gridSize)/2,1,6,900)
+
+function getMiddleXCoordinate(element) {
+  if (!(element instanceof Element)) {
+    throw new Error("Invalid argument: element must be a DOM element.");
+  }
+
+  // Get the bounding rectangle of the element
+  const rect = element.getBoundingClientRect();
+  
+  // Calculate the middle X coordinate
+  const middleX = rect.left + (rect.width / 2);
+
+  return middleX;
+}
+
+// Example usage
+window.addEventListener('DOMContentLoaded', (event) => {
+  const element = document.querySelector('.your-css-class');
+  if (element) {
+    const middleX = getMiddleXCoordinate(element);
+    console.log(`The middle X coordinate of the element is: ${middleX}px`);
+  } else {
+    console.error("Element not found.");
+  }
+});
+let middleX = getMiddleXCoordinate(scoreDisplay)
+        
+iceArea(middleX,1,6,900)
         
 function kamekUpdate(){
             if (kamek.length > 1) {
