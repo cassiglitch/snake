@@ -577,6 +577,7 @@ document.addEventListener('keypress', function(event) {
             // Start animation
             requestAnimationFrame(drawPortal);
         }
+        let lordcanspawn = true
    let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
     function spawnLord(x,y) {
         if (lords.length === 0) {
@@ -586,14 +587,16 @@ document.addEventListener('keypress', function(event) {
         
         const randomIndex = Math.floor(Math.random() * lords.length);
         let selectedLord = lords[randomIndex];
-        
+        if (lordcanspawn === true){
         // Spawn the lord at a random position
         selectedLord.push({ x: x, y: y });
-        
+        lordcanspawn = false
+        }
         // Check if the selected lord is empty after spawning
         if (selectedLord.length === 0) {
             // Remove the selected lord from the array
             lords.splice(randomIndex, 1);
+            lordcanspawn = true
         }
         
         console.log("Spawned:", selectedLord);
@@ -1871,9 +1874,7 @@ function kamekDeath() {
         const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
         
         
-        let gridOffset = ((2 * gridSize) + (gridSize / 2)) / 2;
-
-        createPortalAnimation(randomX * gridSize, randomY * gridSize, 50, 2000);
+        let gridOffset = ((2 * gridSize) + (gridSize / 2)) / 2
         
 
         turrets.forEach((turret) => {
