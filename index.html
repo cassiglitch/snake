@@ -80,7 +80,7 @@ let isSlow = false
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
-        let obstacles = [];
+        let obstacles = [{x:7,y:0}]
         let kamekappears = false
         let firstControlSchemeSet = false;
         let dynamicObstacles = [];
@@ -159,7 +159,7 @@ let sideshield = 6
         let shield = false
 let magictype = 'bolt'
         let lightningboltcolor = '#d5ff03'
-        let lava = [{x:5,y:0}]
+        let lava = []
         let lavacolor = '#ffa50080'
         let electric = []
         let ice =[]
