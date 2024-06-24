@@ -168,7 +168,7 @@ let magictype = 'bolt'
         let earthcolor = '#BD978E'
         let earth = []
         let isEarthed = false
-        let scoreArea = []
+        let scoreAreaArray = []
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -236,7 +236,7 @@ function scoreArea(x, y, size) {
     
     for (let i = -offset; i <= offset; i++) {
         for (let j = -offset; j <= offset; j++) {
-            scoreArea.push({ x: Math.floor(x + i), y: Math.floor(y + j)});
+            scoreAreaArray.push({ x: Math.floor(x + i), y: Math.floor(y + j)});
         }
     }
     
@@ -2563,7 +2563,7 @@ ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 ctx.fillStyle = '#FF000080';
-scoreArea.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+scoreAreaArray.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 
     
