@@ -80,7 +80,7 @@ let isSlow = false
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
-        let obstacles = [{x:7,y:0}]
+        let obstacles = []
         let kamekappears = false
         let firstControlSchemeSet = false;
         let dynamicObstacles = [];
@@ -261,6 +261,7 @@ function getMiddleXCoordinate(element) {
   return middleX;
 }
 displaycheck()
+gameLoop()
 function displaycheck(){
 scoreAreaArray = []
 let middleX = getMiddleXCoordinate(scoreDisplay)
