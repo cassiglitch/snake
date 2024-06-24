@@ -93,7 +93,7 @@ let isSlow = false
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = [{x:2,y:3}]
+        let kamek = []
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
@@ -310,9 +310,6 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
-
-
-    
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -580,8 +577,7 @@ document.addEventListener('keypress', function(event) {
             // Start animation
             requestAnimationFrame(drawPortal);
         }
-    let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
-    spawnLord(x,y)
+   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
     function spawnLord(x,y) {
         if (lords.length === 0) {
             console.log("All lords have been spawned.");
@@ -1898,6 +1894,9 @@ function kamekDeath() {
             kamek = [];
             turrets = [];
             goombas = [];
+            spawnLord(randomX,randomY)
+        }, 1100);
+
         setTimeout(() => {
             isPaused = false;
             kamekappears = false;
@@ -1905,7 +1904,7 @@ function kamekDeath() {
         }, 2000);
     }
 }
-}
+
         function addCoordsToArray(lavax,lavay){
 lavacoords.push({x:lavax,y:lavay})
         }
