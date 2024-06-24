@@ -145,7 +145,7 @@ const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
     let wellcolor = '#00000080'
-let wells = []
+let wells = [{x:3,y:4}]
 let polygons = []
 let isGravityWellActive = true;
 let effectApplied = 0
@@ -167,6 +167,7 @@ let magictype = 'bolt'
         let electriccolor = '#CFFF0480'
         let earthcolor = '#BD978E'
         let earth = []
+        let wellWarning = []
         let isEarthed = false
         let scoreAreaArray = []
         let scorecolornoalpha = '#FF0000'
@@ -247,6 +248,47 @@ function scoreArea(x, y, size) {
     
 }
 
+function wellWarningArea(x, y, size) {
+    let offset = Math.floor(size / 2);
+
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            wellWarning.push({ x: Math.floor(x + i), y: Math.floor(y + j)});
+        }
+    }
+    
+}
+
+function removeDuplicatesWithSameCoordinates(arr) {
+    // Iterate through the array
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+            // Check if both items have the same coordinates
+            if (arr[i].x === arr[j].x && arr[i].y === arr[j].y) {
+                // Remove one of the items (splice the array)
+                arr.splice(j, 1);
+                // Since we removed an element, adjust j to stay in sync with the array length
+                j--;
+            }
+        }
+    }
+    return arr;
+}
+
+function removeDuplicateWellWarnings() {
+removeDuplicatesWithSameCoordinates(wellWarning)
+        }
+
+function manageWellsWarningZone(){
+wells.forEach((well) => {
+wellWarningArea(well.x, well.y, 5)
+removeDuplicateWellWarnings()
+})
+}
 function getMiddleXCoordinate(element) {
   if (!(element instanceof Element)) {
     throw new Error("Invalid argument: element must be a DOM element.");
@@ -2586,7 +2628,7 @@ drawIceLord(firelord.x, firelord.y)
 })
 
 ctx.fillStyle = scorecolor;
-scoreAreaArray.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+wellWarning.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 
 ctx.fillStyle = wellcolor;
@@ -3722,6 +3764,7 @@ function animateExplosion() {
             update();
             draw();
             displaycheck()
+            manageWellsWarningZone()
             if (isGravityWellActive === true && wells.length !== 0){
             checkDistance(snake)
             }
