@@ -2628,9 +2628,10 @@ icelord.forEach((firelord) =>{
 drawIceLord(firelord.x, firelord.y)
 })
 
+if (isGravityWellActive === true) {
 ctx.fillStyle = scorecolor;
 wellWarning.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-
+}
 
 ctx.fillStyle = wellcolor;
   wells.forEach((well) => {
