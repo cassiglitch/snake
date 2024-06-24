@@ -2567,11 +2567,6 @@ ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSiz
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
-ctx.fillStyle = scorecolor;
-scoreAreaArray.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-
-
-    
 firelord.forEach((firelord) =>{
 drawFireLord(firelord.x, firelord.y)
 })
@@ -2588,6 +2583,9 @@ drawEarthLord(firelord.x, firelord.y)
 icelord.forEach((firelord) =>{
 drawIceLord(firelord.x, firelord.y)
 })
+
+ctx.fillStyle = scorecolor;
+scoreAreaArray.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 
 ctx.fillStyle = wellcolor;
