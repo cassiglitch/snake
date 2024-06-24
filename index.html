@@ -577,34 +577,44 @@ document.addEventListener('keypress', function(event) {
             // Start animation
             requestAnimationFrame(drawPortal);
         }
-        let lordcanspawn = true
-   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
-    function spawnLord(x,y) {
-        if (lords.length === 0) {
-            console.log("All lords have been spawned.");
-            return;
-        }
-        
+        let lordcanspawn = true;
+let lords = [firelord, lightninglord, icelord, earthlord]; // Example array of lord types
+
+function spawnLord(x, y) {
+    if (lords.length === 0) {
+        console.log("All lords have been spawned.");
+        return;
+    }
+    
+    if (lordcanspawn) {
         const randomIndex = Math.floor(Math.random() * lords.length);
         let selectedLord = lords[randomIndex];
-        if (lordcanspawn === true){
-        // Spawn the lord at a random position
-        selectedLord.push({ x: x, y: y });
-        lordcanspawn = false
-        }
-        // Check if the selected lord is empty after spawning
-        if (selectedLord.length === 0) {
-            // Remove the selected lord from the array
-            lords.splice(randomIndex, 1);
-            lordcanspawn = true
-        }
         
-        console.log("Spawned:", selectedLord);
-        console.log("Remaining lords:", lords);
+        // Spawn the lord at position (x, y)
+        console.log(`Spawned ${selectedLord} at (${x}, ${y})`);
         
-        // Continue spawning until all lords have been spawned
-        spawnLord(x,y);
+        // Remove the selected lord from the array
+        lords.splice(randomIndex, 1);
+        lordcanspawn = false;
+    } else {
+        console.log("Cannot spawn more lords right now.");
     }
+    
+    console.log("Remaining lords:", lords);
+    
+    // Ensure we only make a recursive call if there are lords left to spawn
+    if (lords.length > 0) {
+        // Reset lordcanspawn for the next spawn
+        lordcanspawn = true;
+        // Recursive call to spawn the next lord
+        spawnLord(x, y);
+    } else {
+        console.log("All lords have been spawned.");
+    }
+}
+
+
+
 function spawnTurrets(x,y){
             createPortalAnimation((x* gridSize + gridSize/2), (y * gridSize + gridSize/2), 30, 500);
     setTimeout(() => {
