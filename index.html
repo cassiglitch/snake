@@ -169,6 +169,11 @@ let magictype = 'bolt'
         let earth = []
         let isEarthed = false
         let scoreAreaArray = []
+        let scorecolornoalpha = '#FF0000'
+        let alphacolor = 'CC'
+        const scorecolorarray = [scorecolornoalpha, alphacolor];
+const fruitString = scorecolorarray.join("");
+let scorecolor = 'fruitString'
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -2562,7 +2567,7 @@ ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSiz
 ctx.fillStyle = lavacolor;
 lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
-ctx.fillStyle = '#FF000080';
+ctx.fillStyle = scorecolor;
 scoreAreaArray.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
 
