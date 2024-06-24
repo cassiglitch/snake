@@ -580,7 +580,6 @@ document.addEventListener('keypress', function(event) {
             // Start animation
             requestAnimationFrame(drawPortal);
         }
-function manageSpawningOfElementalLords(x,y) {
     let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
     spawnLord(x,y)
     function spawnLord(x,y) {
@@ -608,7 +607,6 @@ createPortalAnimation(x * gridSize, y * gridSize, 50, 100);
         // Continue spawning until all lords have been spawned
         spawnLord(x,y);
     }
-}
 function spawnTurrets(x,y){
             createPortalAnimation((x* gridSize + gridSize/2), (y * gridSize + gridSize/2), 30, 500);
     setTimeout(() => {
@@ -1900,8 +1898,7 @@ function kamekDeath() {
             kamek = [];
             turrets = [];
             goombas = [];
-            manageSpawningOfElementalLords(randomX,randomY) 
-
+            spawnLord(randomX,randomY) 
         setTimeout(() => {
             isPaused = false;
             kamekappears = false;
