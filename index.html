@@ -310,6 +310,36 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
+
+function manageSpawningOfElementalLords(x,y) {
+    let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
+    
+    function spawnLord() {
+        if (lords.length === 0) {
+            console.log("All lords have been spawned.");
+            return;
+        }
+        
+        const randomIndex = Math.floor(Math.random() * lords.length);
+        let selectedLord = lords[randomIndex];
+        
+        // Spawn the lord at a random position
+createPortalAnimation(x * gridSize, y * gridSize, 50, 100);
+        selectedLord.push({ x: x, y: y });
+        
+        // Check if the selected lord is empty after spawning
+        if (selectedLord.length === 0) {
+            // Remove the selected lord from the array
+            lords.splice(randomIndex, 1);
+        }
+        
+        console.log("Spawned:", selectedLord);
+        console.log("Remaining lords:", lords);
+        
+        // Continue spawning until all lords have been spawned
+        spawnLord();
+    }
+    
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -1869,11 +1899,7 @@ function kamekDeath() {
             kamek = [];
             turrets = [];
             goombas = [];
-            const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
-const randomIndex2 = Math.floor(Math.random() * lord.length);
-let  lords = lord[randomIndex2];
-            lords.push({x:randomX, y:randomY})
-        }, 1100);
+            manageSpawningOfElementalLords(randomX,randomY) 
 
         setTimeout(() => {
             isPaused = false;
