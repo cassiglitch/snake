@@ -236,7 +236,7 @@ function getMiddleXCoordinate(element) {
   const rect = element.getBoundingClientRect();
   
   // Calculate the middle X coordinate
-  const middleX = rect.left + (rect.width / 2);
+  const middleX = (rect.left + (rect.width / 2)) / gridSize;
 
   return middleX;
 }
