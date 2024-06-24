@@ -156,7 +156,7 @@ let isTaxed = false
 let magicstatus = 0
 let lightbrown = '#C4A484'
 let kamekcanteleport = true
-let sideshield = 6
+let sideshield = 2
         let shield = false
 let magictype = 'bolt'
         let lightningboltcolor = '#d5ff03'
@@ -1606,7 +1606,7 @@ function isCollidingWithFireLord(fireLordBoundingBox, pointX, pointY) {
            pointY >= fireLordBoundingBox.yMin && pointY <= fireLordBoundingBox.yMax;
 }
 
-        let langle = 0
+        let lightningangle = 0
         let lightningmagic = 0
         let lightninglordInMotion = false;
 let lightningLordBoundingBox = drawLightningLord(5, 5);
@@ -1617,10 +1617,10 @@ lightningArea(lightninglord[0].x,lightninglord[0].y,2,1)
     if (lightninglordInMotion === false){
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
-     langle = Math.atan2(targetY - lightninglord[0].y * gridSize, targetX - lightninglord[0].x * gridSize);
+     lightningangle = Math.atan2(targetY - lightninglord[0].y * gridSize, targetX - lightninglord[0].x * gridSize);
     }
-    let velocityX = Math.cos(langle);
-    let velocityY = Math.sin(langle);
+    let velocityX = Math.cos(lightningangle);
+    let velocityY = Math.sin(lightningangle);
 
     if (lightninglord.length > 1) {
         lightninglord.length = 1;
@@ -1777,7 +1777,7 @@ shootWaveOfProjectiles(icelord[0].x * gridSize, icelord[0].y * gridSize, 1, 1, 0
 }
 
         
-        
+        let fireangle = 0
         let firelordmagic = 0
         let firelordInMotion = false;
 let fireLordBoundingBox = drawFireLord(5, 5);
@@ -1788,10 +1788,10 @@ addLavaArea(firelord[0].x,firelord[0].y,2,2)
     if (firelordInMotion === false){
     const targetX = snake[0].x * gridSize;
     const targetY = snake[0].y * gridSize;
-     langle = Math.atan2(targetY - firelord[0].y * gridSize, targetX - firelord[0].x * gridSize);
+     fireangle = Math.atan2(targetY - firelord[0].y * gridSize, targetX - firelord[0].x * gridSize);
     }
-    let velocityX = Math.cos(langle);
-    let velocityY = Math.sin(langle);
+    let velocityX = Math.cos(fireangle);
+    let velocityY = Math.sin(fireangle);
 
     if (firelord.length > 1) {
         firelord.length = 1;
@@ -1837,27 +1837,59 @@ function getDirectionToSnakeHead(x, y, snake) {
 
     return direction;
 }
-function kamekDeath(){
-    isPaused = true
-    let gridOffset = ((2*gridSize) + (gridSize / 2))/2
-    turrets.forEach((turret, index) =>{
-createPortalAnimation(turret.x* gridSize, turret.y * gridSize, 30, 2000);
-    })
-    goombas.forEach((turret, index) =>{
-createPortalAnimation(turret.x* gridSize, (turret.y * gridSize) + gridSize /2, 75, 2000);
-    })
-    createExplosion(ctx, kamek[0].x* gridSize, (kamek[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90)
-createPortalAnimation(kamek[0].x* gridSize, (kamek[0].y * gridSize) + gridOffset, 100, 2000);
-    setTimeout(() => {
-    kamek=[]
-    turrets = []
-    goombas = []
-}, 1100);
-setTimeout(() => {
-    isPaused = false
-    kamekappears = false
-}, 2000);
+let iskamekdead = false;
+
+function kamekDeath() {
+    isPaused = true;
+
+    if (!iskamekdead) {
+        const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
+        const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
+        const randomX2 = Math.floor(Math.random() * (canvas.width / gridSize));
+        const randomY2 = Math.floor(Math.random() * (canvas.height / gridSize));
+        const randomX3 = Math.floor(Math.random() * (canvas.width / gridSize));
+        const randomY3 = Math.floor(Math.random() * (canvas.height / gridSize));
+        const randomX4 = Math.floor(Math.random() * (canvas.width / gridSize));
+        const randomY4 = Math.floor(Math.random() * (canvas.height / gridSize));
+        
+        let gridOffset = ((2 * gridSize) + (gridSize / 2)) / 2;
+
+        createPortalAnimation(randomX * gridSize, randomY * gridSize, 50, 2000);
+        createPortalAnimation(randomX2 * gridSize, randomY2 * gridSize, 50, 2000);
+        createPortalAnimation(randomX3 * gridSize, randomY3 * gridSize, 50, 2000);
+        createPortalAnimation(randomX4 * gridSize, randomY4 * gridSize, 50, 2000);
+
+        turrets.forEach((turret) => {
+            createPortalAnimation(turret.x * gridSize, turret.y * gridSize, 30, 2000);
+        });
+
+        goombas.forEach((goomba) => {
+            createPortalAnimation(goomba.x * gridSize, (goomba.y * gridSize) + (gridSize / 2), 75, 2000);
+        });
+
+        createExplosion(ctx, kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90);
+        createPortalAnimation(kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 100, 2000);
+
+        iskamekdead = true;
+
+        setTimeout(() => {
+            kamek = [];
+            turrets = [];
+            goombas = [];
+            firelord.push({ x: randomX, y: randomY });
+            lightninglord.push({ x: randomX2, y: randomY2 });
+            icelord.push({ x: randomX3, y: randomY3 });
+            earthlord.push({ x: randomX4, y: randomY4 });
+        }, 1100);
+
+        setTimeout(() => {
+            isPaused = false;
+            kamekappears = false;
+            iskamekdead = false;
+        }, 2000);
+    }
 }
+
         function addCoordsToArray(lavax,lavay){
 lavacoords.push({x:lavax,y:lavay})
         }
@@ -1982,6 +2014,24 @@ firelord.forEach((firelord,findex) => {
 let firelordhit = isCollidingWithFireLord(fireLordBoundingBox, projectile.x, projectile.y)
 if (firelordhit === true){
     firelord.splice(findex,1)
+createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
+                        projectiles.splice(index, 1);
+}
+})
+
+earthlord.forEach((firelord,findex) => {
+let earthlordhit = isCollidingWithFireLord(earthLordBoundingBox, projectile.x, projectile.y)
+if (earthlordhit === true){
+    earthlord.splice(findex,1)
+createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
+                        projectiles.splice(index, 1);
+}
+})
+
+lightninglord.forEach((firelord,findex) => {
+let lightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, projectile.x, projectile.y)
+if (lightninglordhit === true){
+    lightninglord.splice(findex,1)
 createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
 }
@@ -3644,6 +3694,12 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             lava = []
             lavacoords = []
             firelord = []
+            ice = []
+            electric = []
+            earth = []
+            lightninglord = []
+            icelord = []
+            earthlord = []
             isInvincible = false;
             eatingAnimationFrames = 0;
             lives = 0.5;
