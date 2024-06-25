@@ -157,6 +157,8 @@ let magicstatus = 0
 let lightbrown = '#C4A484'
 let kamekcanteleport = true
 let sideshield = 2
+        let startX
+        let startY
         let shield = false
 let magictype = 'bolt'
         let lightningboltcolor = '#d5ff03'
@@ -1664,6 +1666,8 @@ if (lightninglordInMotion === false){
     if (lightningmagic === 'launch') {
         lightninglord[0].x += velocityX;
         lightninglord[0].y += velocityY;
+        startX =lightninglord[0].x
+        startY = lightninglord[0].y
 lightninglordInMotion = true;
         lightningLordBoundingBox = drawLightningLord(lightninglord[0].x,lightninglord[0].y);
 
@@ -1713,7 +1717,9 @@ earthArea(earthlord[0].x,earthlord[0].y,2,3)
 
     if (earthmagic === 'launch') {
         earthlord[0].x += earthVelocityX;
-        earthlord[0].y += earthVelocityY;
+        earthlord[0].y += earthVelocityY
+        startX =earthlord[0].x
+        startY = earthlord[0].y
         earthlordInMotion = true;
         earthLordBoundingBox = drawEarthLord(earthlord[0].x, earthlord[0].y);
 
@@ -1779,6 +1785,8 @@ if (!icelordInMotion){
     if (icemahic === 'launch') {
         icelord[0].x += IcevelocityX;
         icelord[0].y += IcevelocityY;
+        startX =icelord[0].x
+        startY = icelord[0].y
         icelordInMotion = true;
         iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
 
@@ -1835,6 +1843,8 @@ if (firelordInMotion === false){
     if (firelordmagic === 'launch') {
         firelord[0].x += velocityX;
         firelord[0].y += velocityY;
+        startX =firelord[0].x
+        startY = firelord[0].y
 firelordInMotion = true;
         fireLordBoundingBox = drawFireLord(firelord[0].x, firelord[0].y);
 
@@ -3868,13 +3878,13 @@ changeInterval(150)
 changeInterval(100)
 }
 if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(2,3)
+spawnLord(startX,startY)
 }
 if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(2,3)
+spawnLord(startX,startY)
 }
 if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(2,3)
+spawnLord(startX,startY)
 }            
 // Handle eating animation
             if (isEating) {
