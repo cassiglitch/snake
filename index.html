@@ -1910,7 +1910,11 @@ function kamekDeath() {
             kamek = [];
             turrets = [];
             goombas = [];
-            spawnLord(randomX, randomY)
+            const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+        selectedLord.push({ x: randomX, y: randomY });
+        
+    lords.splice(randomIndex, 1);
         }, 1100);
 
         setTimeout(() => {
