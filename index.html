@@ -1990,7 +1990,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         // Adjust velocity to home in on the target
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
-                        projectile.angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
+                        angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
                         projectile.velocityX = Math.cos(angle) * projectile.speed;
                         projectile.velocityY = Math.sin(angle) * projectile.speed;
                     }
@@ -2291,7 +2291,7 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
 function enemyshootmagic() {
     if (kamek.length !== 0) {
         kamek.forEach((kamek, index) => {
-            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,kamek);
+            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, kamek);
         });
     }
 }
