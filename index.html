@@ -81,6 +81,7 @@ let isSlow = false
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
         let obstacles = []
+        let test = 0
         let kamekappears = false
         let firstControlSchemeSet = false;
         let dynamicObstacles = [];
@@ -729,7 +730,7 @@ function ManageTurrets() {
     
     const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
-    
+    test =selectedLord
     if (lordcanspawn === true) {
         // Spawn the lord at a random position
         selectedLord.push({ x: x, y: y });
@@ -2742,7 +2743,7 @@ ctx.fillStyle = 'black';
     });
         // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay')
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}<br>${lords.length}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}<br>${lords.length} ${test}`;
     drawLaser();
 }
 
@@ -3877,13 +3878,13 @@ changeInterval(150)
 }else if (currentInterval === 1.5 && isSlow === false && isEarthed === false){
 changeInterval(100)
 }
-if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(startX,startY)
-}
 if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
 spawnLord(startX,startY)
 }
 if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+spawnLord(startX,startY)
+}
+if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
 spawnLord(startX,startY)
 }            
 // Handle eating animation
