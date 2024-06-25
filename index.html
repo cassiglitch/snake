@@ -1990,7 +1990,7 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         // Adjust velocity to home in on the target
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
-                        angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
+                        projectile.angle = Math.atan2(targetY - projectile.y, targetX - projectile.x);
                         projectile.velocityX = Math.cos(angle) * projectile.speed;
                         projectile.velocityY = Math.sin(angle) * projectile.speed;
                     }
