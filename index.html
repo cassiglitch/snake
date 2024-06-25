@@ -93,7 +93,7 @@ let isSlow = false
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = [{x:3,y:3}]
+        let kamek = []
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
@@ -572,41 +572,11 @@ document.addEventListener('keypress', function(event) {
                 if (portalRadius > 0 || elapsedTime < duration) {
                     requestAnimationFrame(drawPortal);
                 }
+            }
 
             // Start animation
             requestAnimationFrame(drawPortal);
         }
-        let lordcanspawn = true
-   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
-    function spawnLord(x,y) {
-        if (lords.length === 0) {
-            console.log("All lords have been spawned.");
-            return;
-        }
-        
-        const randomIndex = Math.floor(Math.random() * lords.length);
-        let selectedLord = lords[randomIndex];
-        if (lordcanspawn === true){
-        // Spawn the lord at a random position
-        selectedLord.push({ x: x, y: y });
-        lordcanspawn = false
-        }
-        // Check if the selected lord is empty after spawning
-        if (selectedLord.length === 0) {
-            // Remove the selected lord from the array
-            lords.splice(randomIndex, 1);
-            lordcanspawn = true
-        }
-        
-        console.log("Spawned:", selectedLord);
-        console.log("Remaining lords:", lords);
-        
-        // Continue spawning until all lords have been spawned
-        spawnLord(x,y);
-    }
-
-
-spawnLord(2,3)
 
 function spawnTurrets(x,y){
             createPortalAnimation((x* gridSize + gridSize/2), (y * gridSize + gridSize/2), 30, 500);
@@ -744,7 +714,38 @@ function ManageTurrets() {
     turrets.length = 5;
   }
 }
+        let lordcanspawn = true
+   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
 
+
+
+ function spawnLord(x, y) {
+    if (lords.length === 0) {
+        console.log("All lords have been spawned.");
+        return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+    
+    if (lordcanspawn === true) {
+        // Spawn the lord at a random position
+        selectedLord.push({ x: x, y: y });
+        lordcanspawn = false;
+    }
+    
+    console.log("Spawned:", selectedLord);
+    console.log("Remaining lords:", lords);
+    
+    // Wait until selectedLord is empty before proceeding
+
+    
+    // Remove the selected lord from the array
+    lords.splice(randomIndex, 1);
+    lordcanspawn = true;
+
+    // Recursively call spawnLord if there are still lords to spawn
+}
 
 function checkDistance(snake) {
     wells.forEach((well) => {
@@ -1876,9 +1877,10 @@ function kamekDeath() {
         const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
         const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
         
-        
-        let gridOffset = ((2 * gridSize) + (gridSize / 2)) / 2
-        
+        let gridOffset = ((2 * gridSize) + (gridSize / 2)) / 2;
+
+        createPortalAnimation(randomX * gridSize, randomY * gridSize, 50, 2000);
+    
 
         turrets.forEach((turret) => {
             createPortalAnimation(turret.x * gridSize, turret.y * gridSize, 30, 2000);
@@ -1897,7 +1899,7 @@ function kamekDeath() {
             kamek = [];
             turrets = [];
             goombas = [];
-            spawnLord(randomX,randomY)
+            spawnLord(randomX, randomY)
         }, 1100);
 
         setTimeout(() => {
@@ -3663,7 +3665,12 @@ const id = Math.random() < 0.5 ? 1 : 2;
         formrandomshape(4)            
     } else if (randomValue < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
-        } else {
+        }else if (randomValue < 0.2 && kamek.length === 0){
+const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
+const randomIndex2 = Math.floor(Math.random() * lord.length);
+let  lords = lord[randomIndex2];
+            lords.push({x:x, y:y})
+} else {
            let otype = 0
 if (controltype === 'arrow'){
 const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
@@ -3860,7 +3867,15 @@ changeInterval(150)
 }else if (currentInterval === 1.5 && isSlow === false && isEarthed === false){
 changeInterval(100)
 }
-    
+if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+spawnLord(2,3)
+}
+if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+spawnLord(2,3)
+}
+if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+spawnLord(2,3)
+}            
 // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
