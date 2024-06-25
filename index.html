@@ -3879,14 +3879,27 @@ changeInterval(150)
 changeInterval(100)
 }
 if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(startX,startY)
+const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+        selectedLord.push({ x: startX, y: startY });
+        
+    lords.splice(randomIndex, 1);
 }
 if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(startX,startY)
+const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord2 = lords[randomIndex];
+        selectedLord2.push({ x: startX, y: startY });
+        
+    lords.splice(randomIndex, 1);
 }
 if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-spawnLord(startX,startY)
-}            
+const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord3 = lords[randomIndex];
+        selectedLord3.push({ x: startX, y: startY });
+        
+    lords.splice(randomIndex, 1);
+}   
+            
 // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
