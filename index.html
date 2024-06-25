@@ -3885,21 +3885,21 @@ changeInterval(100)
 if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
-        selectedLord.push({ x: startX, y: startY });
+        selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
         
     lords.splice(randomIndex, 1);
 }
 if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord2 = lords[randomIndex];
-        selectedLord2.push({ x: startX, y: startY });
+        selectedLord2.push({ x: startX/gridSize, y: startY/gridSize });
         
     lords.splice(randomIndex, 1);
 }
 if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord3 = lords[randomIndex];
-        selectedLord3.push({ x: startX, y: startY });
+        selectedLord3.push({ x: startX/gridSize, y: startY/gridSize });
         
     lords.splice(randomIndex, 1);
 }   
