@@ -364,7 +364,8 @@ function kamekMagic() {
 
         // Perform the action based on the type of magic
         if (magictype === 'bolt') {
-            enemyshootmagic();
+            shootWaveOfProjectiles(kamek[0].x * gridSize, kamek[0].y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true,kamek)
+                enemyshootmagic();
         } else if (magictype === 'port' && kamekcanteleport === true) {
             const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
             const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
