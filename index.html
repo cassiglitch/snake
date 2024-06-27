@@ -315,6 +315,39 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
+                let lordcanspawn = true
+   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
+
+
+
+ function spawnLord(x, y) {
+    if (lords.length === 0) {
+        console.log("All lords have been spawned.");
+        return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+    
+    if (lordcanspawn === true) {
+        // Spawn the lord at a random position
+        selectedLord.push({ x: x, y: y });
+        lordcanspawn = false;
+    }
+    
+    console.log("Spawned:", selectedLord);
+    console.log("Remaining lords:", lords);
+    
+    // Wait until selectedLord is empty before proceeding
+
+    
+    // Remove the selected lord from the array
+    lords.splice(randomIndex, 1);
+    lordcanspawn = true;
+
+    // Recursively call spawnLord if there are still lords to spawn
+}
+
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -1883,13 +1916,13 @@ function kamekDeath() {
             turrets = [];
             goombas = [];
             timezone = []
-            if (lords.length === 4){
+            
             const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
         selectedLord.push({ x: randomX, y: randomY });
         
     lords.splice(randomIndex, 1);
-            }
+
         }, 1100);
 
         setTimeout(() => {
