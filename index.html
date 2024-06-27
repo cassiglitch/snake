@@ -1900,13 +1900,6 @@ function kamekDeath() {
             turrets = [];
             goombas = [];
             timezone = []
-            if (lords.length === 4){
-            const randomIndex = Math.floor(Math.random() * lords.length);
-    let selectedLord = lords[randomIndex];
-        selectedLord.push({ x: randomX, y: randomY });
-        
-    lords.splice(randomIndex, 1);
-            }
         }, 1100);
 
         setTimeout(() => {
@@ -3895,7 +3888,7 @@ const randomIndex = Math.floor(Math.random() * lords.length);
         
     lords.splice(randomIndex, 1);
 }   
-            if (iskamekdead === true && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && lords.length === 4){
+            if (iskamekdead === true && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
         selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
