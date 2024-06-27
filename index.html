@@ -2732,7 +2732,7 @@ ctx.fillStyle = 'black';
     });
         // Draw Score
     const scoreDisplay = document.getElementById('scoreDisplay')
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount} <br>${lords.length}<br> ${startX/gridSize} <br> ${startY/gridSize}`;
     drawLaser();
 }
 
@@ -3693,6 +3693,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             shield = false
             inverted = false
             turrets = []
+            lords = [firelord, lightninglord, icelord, earthlord]
             goombas = []
             TaxFormGot = false
             createParticles('red');
@@ -3882,6 +3883,7 @@ const randomIndex = Math.floor(Math.random() * lords.length);
     lords.splice(randomIndex, 1);
 }
 if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+    lords = [firelord, lightninglord, icelord, earthlord]
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord3 = lords[randomIndex];
         selectedLord3.push({ x: startX/gridSize, y: startY/gridSize });
