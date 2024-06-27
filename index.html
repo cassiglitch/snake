@@ -1869,11 +1869,11 @@ function getDirectionToSnakeHead(x, y, snake) {
     return direction;
 }
 let iskamekdead = false;
-
+let onlyoneportal = false
 function kamekDeath() {
     isPaused = true;
 
-    if (!iskamekdead) {
+    if (!onlyoneportal) {
         const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
         const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
         
@@ -1892,7 +1892,7 @@ function kamekDeath() {
 
         createExplosion(ctx, kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90);
         createPortalAnimation(kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 100, 2000);
-
+onlyoneportal = true
     
 
         setTimeout(() => {
