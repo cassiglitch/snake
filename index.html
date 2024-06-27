@@ -78,11 +78,9 @@ let isSlow = false
         let gridSize = 20;
         let flaming = false
         let startingLength = 5;
-           let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
         let obstacles = []
-        let test = 0
         let kamekappears = false
         let firstControlSchemeSet = false;
         let dynamicObstacles = [];
@@ -95,7 +93,7 @@ let isSlow = false
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = []
+        let kamek = [{x:3,y:3}]
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
@@ -121,7 +119,6 @@ let isSlow = false
         let controlsinverted = false
         let hasBeenTaxed = false
         let laserTimer = 45
-        let laserCooldown2 = 45
         let controltype = 'set'
         let goombas = []
         let magic = []
@@ -159,9 +156,7 @@ let isTaxed = false
 let magicstatus = 0
 let lightbrown = '#C4A484'
 let kamekcanteleport = true
-let sideshield = 6
-        let startX = 0
-        let startY = 0
+let sideshield = 2
         let shield = false
 let magictype = 'bolt'
         let lightningboltcolor = '#d5ff03'
@@ -315,39 +310,6 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
-                let lordcanspawn = true
-   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
-
-
-
- function spawnLord(x, y) {
-    if (lords.length === 0) {
-        console.log("All lords have been spawned.");
-        return;
-    }
-    
-    const randomIndex = Math.floor(Math.random() * lords.length);
-    let selectedLord = lords[randomIndex];
-    
-    if (lordcanspawn === true) {
-        // Spawn the lord at a random position
-        selectedLord.push({ x: x, y: y });
-        lordcanspawn = false;
-    }
-    
-    console.log("Spawned:", selectedLord);
-    console.log("Remaining lords:", lords);
-    
-    // Wait until selectedLord is empty before proceeding
-
-    
-    // Remove the selected lord from the array
-    lords.splice(randomIndex, 1);
-    lordcanspawn = true;
-
-    // Recursively call spawnLord if there are still lords to spawn
-}
-
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -399,8 +361,7 @@ function kamekMagic() {
 
         // Perform the action based on the type of magic
         if (magictype === 'bolt') {
-            shootWaveOfProjectiles(kamek[0].x * gridSize, kamek[0].y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true,kamek)
-            
+            enemyshootmagic();
         } else if (magictype === 'port' && kamekcanteleport === true) {
             const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
             const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
@@ -753,7 +714,38 @@ function ManageTurrets() {
     turrets.length = 5;
   }
 }
+        let lordcanspawn = true
+   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
 
+
+
+ function spawnLord(x, y) {
+    if (lords.length === 0) {
+        console.log("All lords have been spawned.");
+        return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+    
+    if (lordcanspawn === true) {
+        // Spawn the lord at a random position
+        selectedLord.push({ x: x, y: y });
+        lordcanspawn = false;
+    }
+    
+    console.log("Spawned:", selectedLord);
+    console.log("Remaining lords:", lords);
+    
+    // Wait until selectedLord is empty before proceeding
+
+    
+    // Remove the selected lord from the array
+    lords.splice(randomIndex, 1);
+    lordcanspawn = true;
+
+    // Recursively call spawnLord if there are still lords to spawn
+}
 
 function checkDistance(snake) {
     wells.forEach((well) => {
@@ -1672,8 +1664,6 @@ if (lightninglordInMotion === false){
     if (lightningmagic === 'launch') {
         lightninglord[0].x += velocityX;
         lightninglord[0].y += velocityY;
-        startX =lightninglord[0].x
-        startY = lightninglord[0].y
 lightninglordInMotion = true;
         lightningLordBoundingBox = drawLightningLord(lightninglord[0].x,lightninglord[0].y);
 
@@ -1723,9 +1713,7 @@ earthArea(earthlord[0].x,earthlord[0].y,2,3)
 
     if (earthmagic === 'launch') {
         earthlord[0].x += earthVelocityX;
-        earthlord[0].y += earthVelocityY
-        startX =earthlord[0].x
-        startY = earthlord[0].y
+        earthlord[0].y += earthVelocityY;
         earthlordInMotion = true;
         earthLordBoundingBox = drawEarthLord(earthlord[0].x, earthlord[0].y);
 
@@ -1791,8 +1779,6 @@ if (!icelordInMotion){
     if (icemahic === 'launch') {
         icelord[0].x += IcevelocityX;
         icelord[0].y += IcevelocityY;
-        startX =icelord[0].x
-        startY = icelord[0].y
         icelordInMotion = true;
         iceLordBoundingBox = drawIceLord(icelord[0].x, icelord[0].y);
 
@@ -1849,8 +1835,6 @@ if (firelordInMotion === false){
     if (firelordmagic === 'launch') {
         firelord[0].x += velocityX;
         firelord[0].y += velocityY;
-        startX =firelord[0].x
-        startY = firelord[0].y
 firelordInMotion = true;
         fireLordBoundingBox = drawFireLord(firelord[0].x, firelord[0].y);
 
@@ -1916,13 +1900,13 @@ function kamekDeath() {
             turrets = [];
             goombas = [];
             timezone = []
-            
+            if (lords.length === 4){
             const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
         selectedLord.push({ x: randomX, y: randomY });
         
     lords.splice(randomIndex, 1);
-
+            }
         }, 1100);
 
         setTimeout(() => {
@@ -2046,7 +2030,6 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                         projectile.homing = true;
                         projectile.color = 'purple'
                         projectile.speed = 0.5
-                        projectile.shooter = kamek
                     }
                 });
 
@@ -2300,7 +2283,7 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
 function enemyshootmagic() {
     if (kamek.length !== 0) {
         kamek.forEach((kamek, index) => {
-            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, kamek);
+            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,kamek);
         });
     }
 }
@@ -2579,7 +2562,7 @@ if (kamekappears === true && laserTimer < 11.25){
         laserTimer = laserTimer/2
            laserCooldown = laserTimer * 1000 
 }else if (kamekappears === false){
-    laserTimer = laserCooldown2
+    laserTimer = 45
            laserCooldown = laserTimer * 1000 
 
 }
@@ -3675,7 +3658,7 @@ function spawnObstacle() {
                     (food.x === x && food.y === y)
 const randomValue = Math.random()
     if (!occupied) {
-        if ((randomValue <= 0.1) && esnake.length === 0){
+        if ((randomValue < 0.1) && esnake.length === 0){
             let etype = 0
         const etypes = ['base', 'IRS']; // Possible directions
     const randomIndex = Math.floor(Math.random() * etypes.length);
@@ -3685,11 +3668,16 @@ const randomValue = Math.random()
 const id = Math.random() < 0.5 ? 1 : 2;
             dynamicObstacles.push({ x: x, y: y, id: id });
             }
-        else if (randomValue <= 0.3){
+        else if (randomValue < 0.3){
         formrandomshape(4)            
-    } else if (randomValue >= 0.4){
+    } else if (randomValue < 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
-        }else{
+        }else if (randomValue < 0.2 && kamek.length === 0){
+const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
+const randomIndex2 = Math.floor(Math.random() * lord.length);
+let  lords = lord[randomIndex2];
+            lords.push({x:x, y:y})
+} else {
            let otype = 0
 if (controltype === 'arrow'){
 const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
@@ -3709,7 +3697,6 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
         function restartGame() {
             cancelEffects()
             pauseGame();
-            lords = [firelord, lightninglord, icelord, earthlord]
             shield = false
             inverted = false
             turrets = []
@@ -3736,7 +3723,6 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             firelord = []
             ice = []
             electric = []
-            lords = [firelord, lightninglord, icelord, earthlord];
             earth = []
             lightninglord = []
             icelord = []
@@ -3857,7 +3843,7 @@ function animateExplosion() {
 }
 
 
-        function gameLoop() {
+                function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
@@ -3909,6 +3895,13 @@ const randomIndex = Math.floor(Math.random() * lords.length);
         
     lords.splice(randomIndex, 1);
 }   
+            if (iskamekdead === true && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && lords.length === 4){
+const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+        selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
+        
+    lords.splice(randomIndex, 1);
+}
 // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
