@@ -1893,13 +1893,14 @@ function kamekDeath() {
         createExplosion(ctx, kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90);
         createPortalAnimation(kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 100, 2000);
 
-        iskamekdead = true;
+    
 
         setTimeout(() => {
             kamek = [];
             turrets = [];
             goombas = [];
             timezone = []
+            iskamekdead = true;
             startX = randomX * gridSize
             startY = randomY * gridSize
         }, 1100);
