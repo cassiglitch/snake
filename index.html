@@ -78,6 +78,7 @@ let isSlow = false
         let gridSize = 20;
         let flaming = false
         let startingLength = 5;
+           let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
         let obstacles = []
@@ -719,18 +720,7 @@ function ManageTurrets() {
     turrets.length = 5;
   }
 }
-        let lordcanspawn = true
-   let lords = [firelord, lightninglord, icelord, earthlord]; // Possible directions
 
-
-
- function spawnLord(x, y) {
-    const randomIndex = Math.floor(Math.random() * lords.length);
-    let selectedLord = lords[randomIndex];
-        selectedLord.push({ x: x, y: y });
-        
-    lords.splice(randomIndex, 1);
-}
 
 function checkDistance(snake) {
     wells.forEach((well) => {
@@ -1893,11 +1883,13 @@ function kamekDeath() {
             turrets = [];
             goombas = [];
             timezone = []
+            if (lords.length === 4){
             const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
         selectedLord.push({ x: randomX, y: randomY });
         
     lords.splice(randomIndex, 1);
+            }
         }, 1100);
 
         setTimeout(() => {
@@ -3650,7 +3642,7 @@ function spawnObstacle() {
                     (food.x === x && food.y === y)
 const randomValue = Math.random()
     if (!occupied) {
-        if ((randomValue < 0.1) && esnake.length === 0){
+        if ((randomValue <= 0.1) && esnake.length === 0){
             let etype = 0
         const etypes = ['base', 'IRS']; // Possible directions
     const randomIndex = Math.floor(Math.random() * etypes.length);
@@ -3660,16 +3652,11 @@ const randomValue = Math.random()
 const id = Math.random() < 0.5 ? 1 : 2;
             dynamicObstacles.push({ x: x, y: y, id: id });
             }
-        else if (randomValue < 0.3){
+        else if (randomValue <= 0.3){
         formrandomshape(4)            
-    } else if (randomValue < 0.4){
+    } else if (randomValue >= 0.4){
             thwomps.push({ x: x, y: 0, state: 1 });
-        }else if (randomValue < 0.2 && kamek.length === 0){
-const lord = [firelord,lightninglord,icelord,earthlord]; // Possible directions    
-const randomIndex2 = Math.floor(Math.random() * lord.length);
-let  lords = lord[randomIndex2];
-            lords.push({x:x, y:y})
-} else {
+        }else{
            let otype = 0
 if (controltype === 'arrow'){
 const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
@@ -3689,6 +3676,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
         function restartGame() {
             cancelEffects()
             pauseGame();
+            lords = [firelord, lightninglord, icelord, earthlord]
             shield = false
             inverted = false
             turrets = []
@@ -3888,7 +3876,13 @@ const randomIndex = Math.floor(Math.random() * lords.length);
         
     lords.splice(randomIndex, 1);
 }   
-            
+            if (iskamekdead === true && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && lords.length === 4){
+const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+        selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
+        
+    lords.splice(randomIndex, 1);
+}
 // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
