@@ -3204,6 +3204,8 @@ projectiles.forEach((projectile, index) => { esnake.forEach((esnake, obstacleInd
                     gamefoods.push('teleport')
     // Teleport the snake to a random location
     cancelEffects()
+        score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
     const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
     const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
     head.x = randomX;
@@ -3227,6 +3229,8 @@ HaHaNoCollision(100);
 
                 } else if (food.type === 'ice') {
                     cancelEffects()
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                     gamefoods.push('ice')
                     let pcolor = 'lightblue';
  if (freeze === false){                    
@@ -3239,6 +3243,8 @@ HaHaNoCollision(100);
  }
                 } else if (food.type === 'earth'){
                     cancelEffects()
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                     gamefoods.push('earth')
                     let x = getSnakeHeadX()
                     let y = getSnakeHeadY()
@@ -3246,6 +3252,8 @@ HaHaNoCollision(100);
                     shockwaveAnimation(x, y)
                 } else if (food.type === 'fire'){
                     cancelEffects()
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                     isBurned = true
                     gamefoods.push('fire')
                 pX = snake[0].x * gridSize + gridSize / 2;
@@ -3267,16 +3275,22 @@ HaHaNoCollision(100);
                 } else if (food.type === 'air'){
 cancelEffects()
     let pcolourr = 'lightgrey'
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false, 20, 1, false,snake)
                 }else if (food.type === 'morph'){
                 cancelEffects()
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
                 shootWaveOfProjectiles(pX, pY, 1, 1, 30, neoncolor, obstacles, dynamicObstacles, gridSize, direction, 30, 70, true, 3, true, 100, 2, false,snake)
                 }else if (food.type === 'breath'){
                     cancelEffects()
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
     let repeat = 30; // Initial size
     let timeInteger = 1;
     // Define a function for shooting projectiles with a delay
@@ -3306,6 +3320,8 @@ cancelEffects()
             }else if(food.type === 'slow') {
                     cancelEffects()
                     isSlow = true
+                    score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                       changeInterval(150)
                     
 // Set timeout to reset the interval back to 100ms after 6000 milliseconds
@@ -3316,6 +3332,8 @@ setTimeout(() => {
                 }else if(food.type === 'fast'){
                     cancelEffects()
                     isFast = true
+                        score += 1;
+                    snake.unshift({ ...snake[0], color: 'green' });
                     changeInterval(50)   
                 setTimeout(function() {
     changeInterval(100);
