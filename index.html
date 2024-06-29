@@ -3716,10 +3716,10 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
         }
             }
             
-            const numSegmentsToRemovefrommirrorarray = Math.ceil(mirror.length * 0.01);
-            if (mirror.length !== 0){
-            if (mirror.length > numSegmentsToRemovefrommirrorarray) {
-            mirror.splice(0, numSegmentsToRemovefrommirrorarray);
+            const numSegmentsToRemovefrommirrorarray = Math.ceil(mirrors.length * 0.01);
+            if (mirrors.length !== 0){
+            if (mirrors.length > numSegmentsToRemovefrommirrorarray) {
+            mirrors.splice(0, numSegmentsToRemovefrommirrorarray);
         }
             }
             inverted = false
@@ -3773,7 +3773,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
         function declareVictory() {
             pauseGame()
             reflector = []
-            mirror = []
+            mirrors = []
             createParticles('gold');
             animateExplosion();
             createParticles('green');
