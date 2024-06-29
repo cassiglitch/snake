@@ -3709,6 +3709,19 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             cancelEffects()
             pauseGame();
             shield = false
+            const numSegmentsToRemove = Math.ceil(reflector.length * 0.01);
+            if (reflector.length !== 0){
+        if (reflector.length > numSegmentsToRemove) {
+            reflector.splice(0, numSegmentsToRemove);
+        }
+            }
+            
+            const numSegmentsToRemovefrommirrorarray = Math.ceil(mirror.length * 0.01);
+            if (mirror.length !== 0){
+            if (mirror.length > numSegmentsToRemovefrommirrorarray) {
+            mirror.splice(0, numSegmentsToRemovefrommirrorarray);
+        }
+            }
             inverted = false
             turrets = []
             lords = [firelord, lightninglord, icelord, earthlord]
@@ -3759,6 +3772,8 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
 
         function declareVictory() {
             pauseGame()
+            reflector = []
+            mirror = []
             createParticles('gold');
             animateExplosion();
             createParticles('green');
