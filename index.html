@@ -113,12 +113,13 @@ let isSlow = false
         let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
+        let LaserCooldownReset = 35
         let esnake = [];
         let turrets = []
         let symbiote = [];
         let controlsinverted = false
         let hasBeenTaxed = false
-        let laserTimer = 45
+        let laserTimer = 35
         let controltype = 'set'
         let goombas = []
         let magic = []
@@ -153,6 +154,7 @@ let effectApplied = 0
 let isConfused = false
 let isBurned = false
 let isTaxed = false
+let GravityApplied = true
 let magicstatus = 0
 let lightbrown = '#C4A484'
 let kamekcanteleport = true
@@ -176,6 +178,17 @@ let magictype = 'bolt'
         const scorecolorarray = [scorecolornoalpha, alphacolor];
 const fruitString = scorecolorarray.join("");
 let scorecolor = fruitString
+
+function checkAndToggleGravity() {
+    if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused) { 
+        GravityApplied = !GravityApplied;
+    } else {
+        GravityApplied = false;
+    }
+}
+
+setInterval(checkAndToggleGravity, 30000);
+        
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -310,6 +323,41 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
+function shouldStopGravity() {
+  const maxY = (canvas.height / gridSize) - 1;
+  const maxX = (canvas.width / gridSize) - 1
+
+  // Check if any segment of the snake is in the non-affected areas
+  for (let segment of snake) {
+    if (segment.x === 0 || segment.x === maxX || segment.y === 0) {
+      return true;
+    }
+  }
+
+  // Check if the last segment of the snake is in the non-affected areas
+  let lastSegment = snake[snake.length - 1];
+  if (lastSegment.y === maxY) {
+    return true;
+  }
+
+  return false;
+}
+
+// Function to apply gravity to the snake
+function applyGravity() {
+  const maxY = (canvas.height / gridSize) - 1;
+  
+  // Check if any element of the snake has reached the bottom
+  let stopGravity = snake.some(segment => segment.y === maxY) || shouldStopGravity();
+  
+  // If no element has reached the bottom and no segment is in the non-affected areas, apply gravity
+  if (!stopGravity && GravityApplied === true) {
+    for (let i = 0; i < snake.length; i++) {
+      snake[i].y += 1;
+    }
+  }
+}
+
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
@@ -339,7 +387,7 @@ if (kamek.length === 0){
     timezone = []
 }
 }
-        
+
 function kamekMagic() {
     if (!isPaused) {
         // Determine the type of magic
@@ -427,7 +475,7 @@ function checkForEffects(){
     if (isConfused === true){
         applyStatus(1000, 'confuse')
     }
-    if (isBurned === true){
+    if (isBurned === true && GravityApplied === false && isPaused === false){
         applyStatus(800, 'burn')
     }
     if (isTaxed === true){
@@ -436,7 +484,7 @@ function checkForEffects(){
     if (controltype === 'mobile'){
     applyStatus(1000, 'well')
     }
-    }
+}
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
 
@@ -467,6 +515,10 @@ if (effect === 'magic' && kamek.length !== 0){
     kamekMagic()
     effectApplied = currentTime
 }
+        if (effect === 'gravity' && kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
+    GravityApplied = !GravityApplied;
+            effectApplied = currentTime
+        }
     }
 }
 document.addEventListener('keypress', function(event) {
@@ -2561,7 +2613,7 @@ if (kamekappears === true && laserTimer < 11.25){
         laserTimer = laserTimer/2
            laserCooldown = laserTimer * 1000 
 }else if (kamekappears === false){
-    laserTimer = 45
+    laserTimer = LaserCooldownReset
            laserCooldown = laserTimer * 1000 
 
 }
@@ -3534,7 +3586,7 @@ goombas.forEach((obstacle, index) => {
 }}
 
     // Randomize the direction
-    const types = ['magnet', 'wave']; // Possible directions
+    const types = ['magnet']; // Possible directions
     const randomIndex = Math.floor(Math.random() * types.length);
     type = types[randomIndex];
 
@@ -3742,6 +3794,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             thwomps = []
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
+            gravityApplied = false
             gamefoods = [];
             dynamicObstacles = [];
             score = 0;
@@ -3880,7 +3933,14 @@ function animateExplosion() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
-            draw();
+            draw()
+                        if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
+    applyStatus(5000, 'gravity');
+} else {
+    GravityApplied = false;
+}
+
+            applyGravity()
             displaycheck()
             manageWellsWarningZone()
             if (isGravityWellActive === true && wells.length !== 0){
