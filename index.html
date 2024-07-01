@@ -351,13 +351,21 @@ function applyGravity() {
   let stopGravity = snake.some(segment => segment.y === maxY) || shouldStopGravity();
   
   // If no element has reached the bottom and no segment is in the non-affected areas, apply gravity
-  if (!stopGravity && GravityApplied === true) {
+    if (!inverted){
+  if (!stopGravity && GravityApplied === true && direction !== 'down') {
     for (let i = 0; i < snake.length; i++) {
       snake[i].y += 1;
     }
   }
 }
-
+if (inverted){
+  if (!stopGravity && GravityApplied === true && direction !== 'up') {
+    for (let i = 0; i < snake.length; i++) {
+      snake[i].y += 1;
+    }
+  }
+}
+}
 function kamekUpdate(){
             if (kamek.length > 1) {
     kamek.length = 1;
