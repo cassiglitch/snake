@@ -354,6 +354,9 @@ function applyGravity() {
     if (!inverted){
   if (!stopGravity && GravityApplied === true && direction !== 'down') {
     for (let i = 0; i < snake.length; i++) {
+    if (direction === 'up'){
+  snake[i].y += 1;
+    }
       snake[i].y += 1;
     }
   }
@@ -362,6 +365,9 @@ if (inverted){
   if (!stopGravity && GravityApplied === true && direction !== 'up') {
     for (let i = 0; i < snake.length; i++) {
       snake[i].y += 1;
+        if (direction === 'down'){
+  snake[i].y += 1;
+    }
     }
   }
 }
@@ -2674,7 +2680,9 @@ if (goombas.length !== 0){
     }, 1000);
  }
 
-
+if (GravityApplied){
+drawInvincibilityAura('magenta');
+}
 
 if (isFoodOrange === true) {
                     drawInvincibilityAura('green');
@@ -2808,6 +2816,7 @@ function drawInvincibilityAura(colorName) {
         'red': 'rgba(255, 0, 0, 0.3)',
         'green': 'rgba(0, 255, 0, 0.3)',
         'blue': 'rgba(0, 0, 255, 0.3)',
+        'magenta': 'rgba(255, 8, 232, 0.3)',
         // Add more colors as needed
     };
     
