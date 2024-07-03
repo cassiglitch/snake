@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -2651,164 +2651,193 @@ function pauseGame() {
 
 
 function draw() {
-    // Clear the canvas
+    // Function to clear a specific area
+    function clearArea(x, y, width, height) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
+        ctx.clip();
+        ctx.clearRect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
+        ctx.restore();
+    }
+
+    // Clear and update the areas that need to be redrawn
+    function clearAndDrawObstacles(obstacles, color) {
+        ctx.fillStyle = color;
+        obstacles.forEach(obstacle => {
+            clearArea(obstacle.x, obstacle.y, 1, 1);
+            ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
+        });
+    }
+
+    // Clear the entire background
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.clip();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
 
-ctx.fillStyle = earthcolor;
-earth.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-    
-if (kamek.length !== 0) {
-        kamek.forEach((kamek, index) => {
-    drawKamek(kamek.x, kamek.y)
-        })
-}
+    // Draw the earth obstacles
+    ctx.fillStyle = earthcolor;
+    earth.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
-if (goombas.length !== 0){
-        goombas.forEach((goomba, index) => {
-    drawGoomba(goomba.x, goomba.y)
-        })
-}
-    // Layer 1: Draw Invincibility Aura
+    // Draw Kamek
+    if (kamek.length !== 0) {
+        kamek.forEach(kamek => {
+            clearArea(kamek.x, kamek.y, 1, 1);
+            drawKamek(kamek.x, kamek.y);
+        });
+    }
+
+    // Draw Goombas
+    if (goombas.length !== 0) {
+        goombas.forEach(goomba => {
+            clearArea(goomba.x, goomba.y, 1, 1);
+            drawGoomba(goomba.x, goomba.y);
+        });
+    }
+
+    // Draw invincibility auras
     if (isInvincible) {
         drawInvincibilityAura('orange');
     }
     const currentTime = new Date().getTime();
- if (charging === true & !(currentTime - lastLaserShot < laserCooldown)){
-     drawInvincibilityAura('red');
-     setTimeout(() => {
-    charging = false;
-    }, 1000);
- }
+    if (charging && !(currentTime - lastLaserShot < laserCooldown)) {
+        drawInvincibilityAura('red');
+        setTimeout(() => { charging = false; }, 1000);
+    }
 
-if (GravityApplied){
-drawInvincibilityAura('magenta');
-}
+    if (GravityApplied) {
+        drawInvincibilityAura('magenta');
+    }
 
-if (isFoodOrange === true) {
-                    drawInvincibilityAura('green');
-setTimeout(() => {
-    isFoodOrange = false;
-            }, 400);
+    if (isFoodOrange) {
+        drawInvincibilityAura('green');
+        setTimeout(() => { isFoodOrange = false; }, 400);
+    }
 
-}
+    if (freeze) {
+        drawInvincibilityAura('blue');
+        setTimeout(() => { freeze = false; }, freezetimer * 1000);
+    }
 
-if (freeze === true) {
-                    drawInvincibilityAura('blue');
-setTimeout(() => {
-    freeze = false;
-            },freezetimer * 1000);
-
-}
-    // Layer 2: Draw Snake Body
-    snake.forEach((segment, index) => {
+    // Draw the snake
+    snake.forEach(segment => {
+        clearArea(segment.x, segment.y, 1, 1);
         ctx.fillStyle = segment.color;
         ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
     });
 
+    // Draw enemy snake
     if (esnake.length !== 0) {
-    // Layer 2: Draw Snake Body
-            ctx.fillStyle = getenemycolor(esnake[0].type);
-        esnake.forEach(esnake => ctx.fillRect(esnake.x * gridSize, esnake.y * gridSize, gridSize, gridSize));
-     }
+        ctx.fillStyle = getenemycolor(esnake[0].type);
+        esnake.forEach(esnake => {
+            clearArea(esnake.x, esnake.y, 1, 1);
+            ctx.fillRect(esnake.x * gridSize, esnake.y * gridSize, gridSize, gridSize);
+        });
+    }
 
-if (symbiote.length !== 0) {
-    // Layer 2: Draw Snake Body
-    symbiote.forEach((symbiote, index) => {
-        ctx.fillStyle = getVenomColor(symbiote.type);
-        ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize);
-    });
-}
+    // Draw symbiote
+    if (symbiote.length !== 0) {
+        symbiote.forEach(symbiote => {
+            clearArea(symbiote.x, symbiote.y, 1, 1);
+            ctx.fillStyle = getVenomColor(symbiote.type);
+            ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize);
+        });
+    }
+
+    // Draw the snake's head
     const head = snake[0];
-    ctx.fillStyle = 'lightgreen'; // Head color
+    clearArea(head.x, head.y, 1, 1);
+    ctx.fillStyle = 'lightgreen';
     ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
-if (item.length !== 0){
-ctx.fillStyle = getitem(item[0].type); 
-ctx.fillRect(item[0].x * gridSize, item[0].y * gridSize, gridSize, gridSize);
-}
 
-    // Draw Food
-            ctx.fillStyle = getFoodColor(food.type);
-            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+    // Draw item
+    if (item.length !== 0) {
+        item.forEach(it => {
+            clearArea(it.x, it.y, 1, 1);
+            ctx.fillStyle = getitem(it.type);
+            ctx.fillRect(it.x * gridSize, it.y * gridSize, gridSize, gridSize);
+        });
+    }
 
-    // Layer 4: Draw Eating Animation
+    // Draw food
+    clearArea(food.x, food.y, 1, 1);
+    ctx.fillStyle = getFoodColor(food.type);
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+    // Draw eating animation
     if (isEating) {
         drawEatingAnimation();
     }
 
-    // Layer 5: Draw Obstacles
-    ctx.fillStyle = 'black';
-    obstacles.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    // Draw other obstacles
+    clearAndDrawObstacles(obstacles, 'black');
+    clearAndDrawObstacles(timezone, 'lightgreen');
+    clearAndDrawObstacles(reflector, '#5B8DFF');
+    clearAndDrawObstacles(electric, electriccolor);
+    clearAndDrawObstacles(ice, icecolor);
+    clearAndDrawObstacles(lava, lavacolor);
 
-    ctx.fillStyle = 'lightgreen';
-timezone.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    // Draw special entities
+    firelord.forEach(firelord => {
+        clearArea(firelord.x, firelord.y, 1, 1);
+        drawFireLord(firelord.x, firelord.y);
+    });
+    lightninglord.forEach(firelord => {
+        clearArea(firelord.x, firelord.y, 1, 1);
+        drawLightningLord(firelord.x, firelord.y);
+    });
+    earthlord.forEach(firelord => {
+        clearArea(firelord.x, firelord.y, 1, 1);
+        drawEarthLord(firelord.x, firelord.y);
+    });
+    icelord.forEach(firelord => {
+        clearArea(firelord.x, firelord.y, 1, 1);
+        drawIceLord(firelord.x, firelord.y);
+    });
 
-    // Draw Food
-            ctx.fillStyle = '#5B8DFF';
-            reflector.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize))
+    // Draw gravity well warning
+    if (isGravityWellActive) {
+        ctx.fillStyle = scorecolor;
+        wellWarning.forEach(obstacle => {
+            clearArea(obstacle.x, obstacle.y, 1, 1);
+            ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
+        });
+    }
 
-ctx.fillStyle = electriccolor;
-electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    // Draw wells with pulsating effect
+    ctx.fillStyle = wellcolor;
+    wells.forEach(well => {
+        const pulse = Math.sin(Date.now() / 200) * 5;
+        clearArea(well.x, well.y, 1, 1);
+        ctx.fillRect(well.x * gridSize - pulse / 2, well.y * gridSize - pulse / 2, gridSize + pulse, gridSize + pulse);
+    });
 
-ctx.fillStyle = icecolor;
-ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-    
-ctx.fillStyle = lavacolor;
-lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    // Draw mirrors
+    clearAndDrawObstacles(mirrors, 'darkgrey');
+    clearAndDrawObstacles(turrets, '#6ec485');
 
-firelord.forEach((firelord) =>{
-drawFireLord(firelord.x, firelord.y)
-})
-
-lightninglord.forEach((firelord) =>{
-drawLightningLord(firelord.x, firelord.y)
-})
-
-earthlord.forEach((firelord) =>{
-drawEarthLord(firelord.x, firelord.y)
-})
-
-    
-icelord.forEach((firelord) =>{
-drawIceLord(firelord.x, firelord.y)
-})
-
-if (isGravityWellActive === true) {
-ctx.fillStyle = scorecolor;
-wellWarning.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-}
-
-ctx.fillStyle = wellcolor;
-  wells.forEach((well) => {
-    const pulse = Math.sin(Date.now() / 200) * 5; // Adjust pulsating effect
-    ctx.fillRect(
-      well.x * gridSize - pulse / 2,
-      well.y * gridSize - pulse / 2,
-      gridSize + pulse,
-      gridSize + pulse
-    );
-  })
-
-    ctx.fillStyle = 'darkgrey';
-mirrors.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-
-ctx.fillStyle = '#6ec485';
-turrets.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-
-ctx.fillStyle = 'black';
+    // Draw thwomps and dynamic obstacles
     thwomps.forEach(obstacle => {
+        clearArea(obstacle.x, obstacle.y, 2, 2);
+        ctx.fillStyle = 'black';
         ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
     });
 
-    // Draw Dynamic Obstacles
-    ctx.fillStyle = 'grey';
     dynamicObstacles.forEach(obstacle => {
+        clearArea(obstacle.x, obstacle.y, 2, 2);
+        ctx.fillStyle = 'grey';
         ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
     });
-        // Draw Score
-    const scoreDisplay = document.getElementById('scoreDisplay')
+
+    // Draw score
+    const scoreDisplay = document.getElementById('scoreDisplay');
     scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
 }
+
 
 function drawInvincibilityAura(colorName) {
     // Mapping of color names to RGBA values
