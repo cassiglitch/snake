@@ -96,6 +96,7 @@ let isSlow = false
         let invincibilityDuration = 0;
         let isColliding = false;
         let kamek = []
+        let DoDisplayCheck = false
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
@@ -4090,8 +4091,10 @@ function animateExplosion() {
 }
 
             applyGravity()
+                    if (DoDisplayCheck){
             displaycheck()
             manageWellsWarningZone()
+                    }
             if (isGravityWellActive === true && wells.length !== 0){
             checkDistance(snake)
             }
