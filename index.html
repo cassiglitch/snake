@@ -3918,6 +3918,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             cancelEffects()
             pauseGame();
             shield = false
+            GravityApplied = false
             const numSegmentsToRemove2 = Math.ceil(reflector.length * 0.01);
             if (reflector.length !== 0){
         if (reflector.length > numSegmentsToRemove2) {
@@ -3944,6 +3945,7 @@ const randomIndex2 = Math.floor(Math.random() * rare.length);
             symbiotes = []
             thwomps = []
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
+            snake2 = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
             gravityApplied = false
             gamefoods = [];
