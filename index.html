@@ -3871,50 +3871,53 @@ function spawnObstacle() {
     const x = Math.floor(Math.random() * (canvas.width / gridSize));
     const y = Math.floor(Math.random() * (canvas.height / gridSize));
 
-
     // Check if the coordinates are already occupied by something else
     const occupied = obstacles.some(obstacle => obstacle.x === x && obstacle.y === y) ||
                      mirrors.some(mirror => mirror.x === x && mirror.y === y) ||
-                     dynamicObstacles.some(dynamic => dynamic.x === x && dynamic.y === y)||
-                    (food.x === x && food.y === y)
-const randomValue = Math.random()
-    let Special = ['snake', 'polygon', 'dynamic', 'squares', 'thwomp']; // Possible directions
-                
-    const randomIndex2 = Math.floor(Math.random() * Special.length);
-    const special2 = randomIndex2
-    if (!occupied) {
-        if ((special2 === 'snake') && esnake.length === 0){
-            let etype = 0
-        const etypes = ['base', 'IRS']; // Possible directions
-    const randomIndex = Math.floor(Math.random() * etypes.length);
-    etype = etypes[randomIndex];
-           esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false, type:etype })) 
-        } else if (special2 === 'polygon'){
-        formrandomshape(4)            
-    } else if (special2 === 'thwomp'){
-            thwomps.push({ x: x, y: 0, state: 1 });
-        }
-        else if (special2 === 'dynamic') {
-const id = Math.random() < 0.5 ? 1 : 2;
-            dynamicObstacles.push({ x: x, y: y, id: id });
-            }
-         else if (special2 === 'square'){
-           let otype = 0
-if (controltype === 'arrow'){
-const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
-const randomIndex2 = Math.floor(Math.random() * rare.length);
-    otype = rare[randomIndex2];
-}else if (controltype === 'mobile'){
-const rare = [obstacles, mirrors, reflector, reflector]; // Possible directions    
-const randomIndex2 = Math.floor(Math.random() * rare.length);
-    otype = rare[randomIndex2];
-            otype.push({x:x, y:y})
+                     dynamicObstacles.some(dynamic => dynamic.x === x && dynamic.y === y) ||
+                     (food.x === x && food.y === y);
 
+    if (occupied) {
+        return; // Exit the function if the position is already occupied
+    }
+
+    const specialTypes = ['snake', 'polygon', 'dynamic', 'square', 'thwomp'];
+    const randomIndex2 = Math.floor(Math.random() * specialTypes.length);
+    const special2 = specialTypes[randomIndex2];
+
+    if (special2 === 'snake' && esnake.length === 0) {
+        const etypes = ['base', 'IRS']; // Possible types
+        const randomIndex = Math.floor(Math.random() * etypes.length);
+        const etype = etypes[randomIndex];
+        esnake = Array.from({ length: startingLength }, (_, index) => ({
+            x: 1,
+            y: 10 - index,
+            color: timespeed,
+            damage: false,
+            type: etype
+        }));
+    } else if (special2 === 'polygon') {
+        formrandomshape(4);
+    } else if (special2 === 'thwomp') {
+        thwomps.push({ x: x, y: 0, state: 1 });
+    } else if (special2 === 'dynamic') {
+        const id = Math.random() < 0.5 ? 1 : 2;
+        dynamicObstacles.push({ x: x, y: y, id: id });
+    } else if (special2 === 'square') {
+        let otype = 0;
+        if (controltype === 'arrow') {
+            const rare = [obstacles, mirrors, wells, reflector, reflector];
+            const randomIndex2 = Math.floor(Math.random() * rare.length);
+            otype = rare[randomIndex2];
+        } else if (controltype === 'mobile') {
+            const rare = [obstacles, mirrors, reflector, reflector];
+            const randomIndex2 = Math.floor(Math.random() * rare.length);
+            otype = rare[randomIndex2];
         }
+        otype.push({ x: x, y: y });
     }
 }
 
-}
         function restartGame() {
             cancelEffects()
             pauseGame();
