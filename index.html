@@ -189,7 +189,7 @@ function checkAndToggleGravity() {
         GravityApplied = false;
     }
 }
-spawnObstacle()
+
 setInterval(checkAndToggleGravity, 30000);
         
 function addLavaArea(x, y, size, countdown) {
@@ -3880,12 +3880,12 @@ function spawnObstacle() {
     if (occupied) {
         return; // Exit the function if the position is already occupied
     }
-
+const randomValue = Math.random()
     const specialTypes = ['snake', 'polygon', 'dynamic', 'square', 'thwomp'];
     const randomIndex2 = Math.floor(Math.random() * specialTypes.length);
     const special2 = specialTypes[randomIndex2];
 
-    if (special2 === 'snake' && esnake.length === 0) {
+    if (special2 === 'snake' && esnake.length === 0 && randomValue <= 0.2) {
         const etypes = ['base', 'IRS']; // Possible types
         const randomIndex = Math.floor(Math.random() * etypes.length);
         const etype = etypes[randomIndex];
