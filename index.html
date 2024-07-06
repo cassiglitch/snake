@@ -96,7 +96,7 @@ let isSlow = false
         let invincibilityDuration = 0;
         let isColliding = false;
         let kamek = []
-        let DoDisplayCheck = false
+        let DoDisplayCheck = true
         let collisionAnimationFrames = 10;
         let isPaused = false;
         let charging = false;
@@ -3241,7 +3241,6 @@ checkIfInScoreArea(wells, false);
 
 // Dynamic obstacles
 checkIfInScoreArea(dynamicObstacles, true);
-checkIfInScoreArea(thwomps, true);
             
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
