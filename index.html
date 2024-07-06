@@ -3883,22 +3883,22 @@ const randomValue = Math.random()
     const randomIndex2 = Math.floor(Math.random() * Special.length);
     const special2 = randomIndex2
     if (!occupied) {
-        if ((special2 = 'snake') && esnake.length === 0){
+        if ((special2 === 'snake') && esnake.length === 0){
             let etype = 0
         const etypes = ['base', 'IRS']; // Possible directions
     const randomIndex = Math.floor(Math.random() * etypes.length);
     etype = etypes[randomIndex];
            esnake = Array.from({ length: startingLength }, (_, index) => ({ x: 1, y: 10 - index, color: timespeed, damage: false, type:etype })) 
-        } else if (special2 = 'polygon'){
+        } else if (special2 === 'polygon'){
         formrandomshape(4)            
-    } else if (special2 = 'thwomp'){
+    } else if (special2 === 'thwomp'){
             thwomps.push({ x: x, y: 0, state: 1 });
         }
-        else if (special2 = 'dynamic') {
+        else if (special2 === 'dynamic') {
 const id = Math.random() < 0.5 ? 1 : 2;
             dynamicObstacles.push({ x: x, y: y, id: id });
             }
-         else if (special2 = 'square'){
+         else if (special2 === 'square'){
            let otype = 0
 if (controltype === 'arrow'){
 const rare = [obstacles, mirrors, wells, reflector, reflector]; // Possible directions
