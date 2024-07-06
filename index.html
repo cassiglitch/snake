@@ -3896,20 +3896,26 @@ function spawnObstacle() {
             damage: false,
             type: etype
         }));
-    } else if (special2 === 'polygon') {
+        
+    } 
+    if (special2 === 'polygon') {
         formrandomshape(4);
-    } else if (special2 === 'thwomp') {
+    } 
+    if (special2 === 'thwomp') {
         thwomps.push({ x: x, y: 0, state: 1 });
-    } else if (special2 === 'dynamic') {
+    } 
+    if (special2 === 'dynamic') {
         const id = Math.random() < 0.5 ? 1 : 2;
         dynamicObstacles.push({ x: x, y: y, id: id });
-    } else if (special2 === 'square') {
+    } 
+    if (special2 === 'square') {
         let otype = 0;
         if (controltype === 'arrow') {
             const rare = [obstacles, mirrors, wells, reflector, reflector];
             const randomIndex2 = Math.floor(Math.random() * rare.length);
             otype = rare[randomIndex2];
-        } else if (controltype === 'mobile') {
+        } 
+        if (controltype === 'mobile' || controltype === 'set') {
             const rare = [obstacles, mirrors, reflector, reflector];
             const randomIndex2 = Math.floor(Math.random() * rare.length);
             otype = rare[randomIndex2];
