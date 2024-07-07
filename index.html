@@ -3880,7 +3880,7 @@ function spawnObstacle() {
         return; // Exit the function if the position is already occupied
     }
 const randomValue = Math.random()
-    const specialTypes = ['snake', 'polygon', 'dynamic', 'square', 'thwomp'];
+    const specialTypes = ['snake', 'polygon', 'dynamic', 'square', 'square','thwomp'];
     const randomIndex2 = Math.floor(Math.random() * specialTypes.length);
     const special2 = specialTypes[randomIndex2];
 
@@ -3898,7 +3898,7 @@ const randomValue = Math.random()
         
     } 
     if (special2 === 'polygon') {
-        formrandomshape(4);
+        formrandomshape(2);
     } 
     if (special2 === 'thwomp') {
         thwomps.push({ x: x, y: 0, state: 1 });
