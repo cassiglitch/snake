@@ -61,6 +61,7 @@
         const ctx = canvas.getContext('2d');
 
 let isSlow = false
+        let gravitycount = 0
         let snakecutgravity = false
         let lavacoords = []
         let goombadirection = 'left'
@@ -185,6 +186,7 @@ let scorecolor = fruitString
 function checkAndToggleGravity() {
     if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused) { 
         GravityApplied = !GravityApplied;
+        gravitycount += 1
     } else {
         GravityApplied = false;
     }
@@ -2760,7 +2762,7 @@ function draw() {
         setTimeout(() => { charging = false; }, 1000);
     }
 
-    if (GravityApplied) {
+    if (GravityApplied && gravitycount > 0) {
         drawInvincibilityAura('magenta');
     }
 
