@@ -370,7 +370,7 @@ scoreArea(middleX,1,4)
         const walls = mirrors.concat(obstacles, reflector);
 
         for (let wall of walls) {
-            if (Math.abs(segment.x - wall.x) === 2 && Math.abs(segment.y - wall.y) === 2) {
+            if (Math.abs(segment.x - wall.x) === 1 && Math.abs(segment.y - wall.y) === 2) {
                 return true;
             }
         }
