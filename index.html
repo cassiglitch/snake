@@ -83,7 +83,7 @@ let isSlow = false
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let snake2 = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
-        let obstacles = [{x:12,y:11}]
+        let obstacles = []
         let kamekappears = false
         let firstControlSchemeSet = false;
         let dynamicObstacles = [];
@@ -436,7 +436,7 @@ isStunnedFrFall = false
           setTimeout(function() {
   fallingVelociy = 0;
   isParalyzed = false
-}, fallingVelociy * 1000);
+}, fallingVelociy * 500);
 
             
             }
