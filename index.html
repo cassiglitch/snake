@@ -61,7 +61,7 @@
         const ctx = canvas.getContext('2d');
 
 let isSlow = false
-        let gravitycount = 1
+        let gravitycount = 0
         let snakecutgravity = false
         let lavacoords = []
         let goombadirection = 'left'
@@ -186,7 +186,8 @@ let magictype = 'bolt'
 const fruitString = scorecolorarray.join("");
 let scorecolor = fruitString
 let physicsActive = false;  // Flag to activate physics on collision
-        
+
+
 function checkAndToggleGravity() {
     if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused) { 
         GravityApplied = !GravityApplied;
@@ -430,8 +431,9 @@ isStunnedFrFall = false
                 }
             }
         }
-
-        
+if (physicsActive){
+    applyRopePhysics()
+}
         }
     
 
@@ -2962,7 +2964,7 @@ function draw() {
 
     // Draw score
     const scoreDisplay = document.getElementById('scoreDisplay');
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount} <br> ${direction}`;
     drawLaser();
 }
 
@@ -4171,6 +4173,7 @@ function animateExplosion() {
             resizeCanvasHeight();
             update();
             draw()
+            physicsActive = false;
                         if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
     applyStatus(5000, 'gravity');
 } else {
@@ -4178,6 +4181,7 @@ function animateExplosion() {
 }
 
             applyGravity()
+                    physicsActive = false;
                     if (DoDisplayCheck){
             displaycheck()
             manageWellsWarningZone()
