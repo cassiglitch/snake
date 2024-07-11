@@ -61,7 +61,7 @@
         const ctx = canvas.getContext('2d');
 
 let isSlow = false
-        let gravitycount = 0
+        let gravitycount = 1
         let snakecutgravity = false
         let lavacoords = []
         let goombadirection = 'left'
@@ -74,6 +74,7 @@ let isSlow = false
         let lives = 0.5;
         let gamefoods = [];
         let maxscore = 100;
+        let isPossessed = false
         let psize = 20;
         let item = []
         let startingGridSize = 20;
@@ -109,6 +110,7 @@ let isSlow = false
         let pausetimer = 900;
         let TaxFormGot = false
         let isParalyzed = false
+        let choseobject = false
         let snakeprojectilecollisiontime = 2000
         let originalSnakeColor = '#00FF00';
         let neoncolor = '#39ff14';
@@ -143,6 +145,7 @@ let firelord = []
      let lightninglord = []
         let icelord = []
         let earthlord = []
+        let ghost = []
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -178,6 +181,7 @@ let magictype = 'bolt'
         let earthcolor = '#BD978E'
         let earth = []
         let wellWarning = []
+        let ectoplasm = []
         let isEarthed = false
         let scoreAreaArray = []
         let scorecolornoalpha = '#FF0000'
@@ -186,6 +190,7 @@ let magictype = 'bolt'
 const fruitString = scorecolorarray.join("");
 let scorecolor = fruitString
 let physicsActive = false;  // Flag to activate physics on collision
+let ghostcolor = '#1F635780'
 
 
 function checkAndToggleGravity() {
@@ -194,8 +199,8 @@ function checkAndToggleGravity() {
         gravitycount += 1
     } else {
         GravityApplied = false;
+        }
     }
-}
 
         
 setInterval(checkAndToggleGravity, 30000);
@@ -245,6 +250,22 @@ function earthArea(x, y, size, countdown) {
     }
     
 }
+
+        function ghostArea(x, y, size, countdown) {
+    let offset = Math.floor(size / 2);
+
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+    
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            ectoplasm.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
+        }
+    }
+    
+}
+
         
 function iceArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
@@ -395,6 +416,7 @@ if (!physicsActive){
 isStunnedFrFall = false
 }
         if (GravityApplied && !stopGravity && disconnected) {
+            isPossessed = false
             for (let i = 0; i < snake.length; i++) {
                 if (!isTouchingOrOneAway(snake[i])) {
                     fallingVelociy += 1
@@ -605,7 +627,73 @@ if (spawner !== goombas){
         }
     }
 }
+function findClosestItem(snake, ...arrays) {
+    // Helper function to calculate the Euclidean distance between two points
+    function calculateDistancePossess(point1, point2) {
+        return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
+    }
 
+    const snakeHead = snake[0];
+    let closestItem = null;
+    let minDistance = Infinity;
+
+    // Iterate over each array and their items
+    arrays.forEach(array => {
+        array.forEach(item => {
+            const distance = calculateDistancePossess(snakeHead, item);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestItem = item;
+            }
+        });
+    });
+
+    return closestItem
+}
+function possessionmove(){
+let object = {x:3,y:3}
+if (!choseobject){
+    if (obstacles.length !== 0 ||  dynamicObstacles.length !== 0 || thwomps.length !== 0){
+object = findClosestItem(snake, obstacles, dynamicObstacles, thwomps)
+choseobject = true
+}
+}
+    if (choseobject){
+    if (snake[0].x < object.x) {
+if(inverted === false){
+direction = 'right'
+}else{
+direction = 'left'
+}
+}else if (snake[0].x > object.x) {
+if(inverted === false){
+direction = 'left'
+}else{
+direction = 'right';
+}
+        } 
+          if (snake[0].y < object.y) {
+         if(inverted === false){
+direction = 'down'
+}else{
+direction = 'up'
+}        } else if (snake[0].y > object.y) {
+          if(inverted === false){
+direction = 'up'
+}else{
+direction = 'down'
+}
+          }
+}else if (snake[0].x === object.x && snake[0].y === object.y){
+choseobject = false
+        isPossessed = false
+    }
+    if (obstacles.length === 0 ||  dynamicObstacles.length === 0 || thwomps.length === 0){
+choseobject = false
+isPossessed = false
+    }
+}
+        
 function cancelEffects(){
     isConfused = false
     isBurned = false
@@ -2812,6 +2900,15 @@ function draw() {
     ctx.fillStyle = earthcolor;
     earth.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+    clearAndDrawObstacles(ectoplasm, ghostcolor)
+    ctx.fillStyle = electriccolor;
+    electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    
+    ctx.fillStyle = icecolor;
+    ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
+    // Draw the earth obstacles
+    ctx.fillStyle = lavacolor;
+    lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
     // Draw Kamek
     if (kamek.length !== 0) {
         kamek.forEach(kamek => {
@@ -2906,10 +3003,8 @@ function draw() {
     clearAndDrawObstacles(obstacles, 'black');
     clearAndDrawObstacles(timezone, 'lightgreen');
     clearAndDrawObstacles(reflector, '#5B8DFF');
-    clearAndDrawObstacles(electric, electriccolor);
-    clearAndDrawObstacles(ice, icecolor);
-    clearAndDrawObstacles(lava, lavacolor);
 
+    
     // Draw special entities
     firelord.forEach(firelord => {
         clearArea(firelord.x, firelord.y, 1, 1);
@@ -3091,6 +3186,9 @@ function HaHaNoCollision(duration) {
     timezone.type = types[randomIndex];
         }
         function update() {
+            if (isPossessed && !GravityApplied){
+            possessionmove()
+            }
             // If the snake is invincible, decrement the invincibility duration
             if (isInvincible) {
                 invincibilityDuration--;
@@ -3171,7 +3269,15 @@ for (let index = ice.length - 1; index >= 0; index--) {
         }
     }
         
-            
+            for (let index = ectoplasm.length - 1; index >= 0; index--) {
+        let ectoplasmElement = ectoplasm[index];
+        if (ectoplasmElement.countdown > 0) {
+            ectoplasmElement.countdown -= 0.1;
+        }
+        if (ectoplasmElement.countdown <= 0) {
+            ectoplasm.splice(index, 1);
+        }
+    }
             // Update Snake position
             const head = { ...snake[0] };
             const head2 = { ...snake2[0] };
@@ -3297,7 +3403,9 @@ isParalyzed = electric.some((electric) => {
     return electric.x === head.x && electric.y === head.y;
 });
 }
-
+isPossessed = ectoplasm.some((ectoplasm) => {
+    return ectoplasm.x === head.x && ectoplasm.y === head.y;
+});
 const checkIfInScoreArea = (obstacles, isDynamic) => {
     obstacles.forEach((obstacle, index) => {
         scoreAreaArray.forEach((lava) => {
