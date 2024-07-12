@@ -359,6 +359,16 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
 scoreArea(middleX,1,4)
 }
 
+function isObjectEqual(obj1, obj2) {
+  return JSON.stringify(obj1) === JSON.stringify(obj2);
+}
+
+// Function to check if an object exists within a set of arrays
+function objectExistsInArrays(object, arrayOfArrays) {
+  return arrayOfArrays.some(array => 
+    array.some(item => isObjectEqual(item, object))
+  );
+}
 
 
     function isNextItemTwoAway() {
@@ -658,7 +668,9 @@ object = findClosestItem(snake, obstacles, dynamicObstacles, thwomps)
 choseobject = true
 }
 }
-    if (choseobject){
+   const exists = objectExistsInArrays(object, obstacles)||objectExistsInArrays(object, thwomps)||objectExistsInArrays(object, dynamicObstacles)
+
+    if (choseobject && exists){
     if (snake[0].x < object.x) {
 if(inverted === false){
 direction = 'right'
@@ -684,10 +696,10 @@ direction = 'up'
 direction = 'down'
 }
           }
-}else if (snake[0].x === object.x && snake[0].y === object.y){
-choseobject = false
-        isPossessed = false
-    }
+}else if ((snake[0].x === object.x && snake[0].y === object.y) || !exists) {
+    choseobject = false;
+    isPossessed = false;
+}
     if (obstacles.length === 0 ||  dynamicObstacles.length === 0 || thwomps.length === 0){
 choseobject = false
 isPossessed = false
