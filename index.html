@@ -128,6 +128,7 @@ let isSlow = false
         let laserTimer = 35
         let controltype = 'set'
         let goombas = []
+        let chaosdefeated = false
         let magic = []
         let isIced= false
         var deviceWidth, landscape = Math.abs(window.orientation) == 90
@@ -146,6 +147,7 @@ let firelord = []
         let icelord = []
         let earthlord = []
         let ghostLord = []
+         let chaosLord = [];
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -181,6 +183,7 @@ let magictype = 'bolt'
         let earthcolor = '#BD978E'
         let earth = []
         let wellWarning = []
+        let isghostdead = false
         let ectoplasm = []
         let isEarthed = false
         let scoreAreaArray = []
@@ -757,7 +760,7 @@ if (effect === 'magic' && kamek.length !== 0){
     kamekMagic()
     effectApplied = currentTime
 }
-        if (effect === 'gravity' && kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && ghostLord.length === 0) {
+        if (effect === 'gravity' && kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && ghostLord.length === 0 && chaosLord.length === 0) {
     GravityApplied = !GravityApplied;
             effectApplied = currentTime
         }
@@ -1587,7 +1590,152 @@ function drawKamek(x, y){
     ctx.arc(eyeBaseX + gridSize / 4, eyeBaseY - gridSize / 2, gridSize / 8, 0, Math.PI * 2); // Right pupil
     ctx.fill();
 }
-  
+        function drawChaosLord(x, y) {
+    // Scale the coordinates by gridSize
+    x = x * gridSize;
+    y = y * gridSize;
+
+    // Draw the body (a purple pentagon)
+    drawFlatPolygon(x, y, gridSize, 5, 'purple');
+
+    // Draw the head (a green triangle) connected to the body
+    drawFlatPolygon(x, y - gridSize * 0.8, gridSize, 3, 'green');
+
+    // Draw the eyes (two white circles) on the head
+    let eyeRadius = gridSize * 0.2;
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, eyeRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the pupils (two black circles)
+    let pupilRadius = gridSize * 0.1;
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(x - gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.arc(x + gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw the mouth (a black rectangle) on the head
+    let mouthWidth = gridSize * 0.8;
+    let mouthHeight = gridSize * 0.15;
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - mouthWidth / 2, y + gridSize * 0.8, mouthWidth, mouthHeight);
+
+    // Draw the robe (a black rectangle) covering the lower part of the body
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - gridSize * 0.7, y, gridSize * 1.4, gridSize);
+
+    // Draw the arms (small black rectangles) connected to the body
+    let armWidth = gridSize * 0.2;
+    let armHeight = gridSize * 0.6;
+    ctx.fillRect(x - gridSize * 0.9, y - gridSize * 0.2, armWidth, armHeight);
+    ctx.fillRect(x + gridSize * 0.7, y - gridSize * 0.2, armWidth, armHeight);
+
+    // Draw the feet (black rectangles) touching the body and robe
+    let footWidth = gridSize * 0.4;
+    let footHeight = gridSize * 0.4;
+    ctx.fillRect(x - gridSize * 0.5, y + gridSize * 0.8, footWidth, footHeight);
+    ctx.fillRect(x + gridSize * 0.1, y + gridSize * 0.8, footWidth, footHeight);
+
+    // Draw a lightgray stroke around the ChaosLord
+    ctx.strokeStyle = 'lightgray';
+    ctx.lineWidth = gridSize * 0.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + gridSize);
+    ctx.stroke();
+
+    // Bounding box calculation
+    let boundingBox = {
+        xMin: x - gridSize * 0.9,
+        yMin: y - gridSize * 1.4,
+        xMax: x + gridSize * 0.9,
+        yMax: y + gridSize * 1.2
+    };
+
+    return boundingBox;
+}
+       
+let chaosAngle = 0;
+let movingchaosMagic = 0;
+let chaosMagic = 0;
+let chaosLordInMotion = false;
+let chaosLordBoundingBox = drawChaosLord(5, 5);
+let canTeleport = false;
+  function manageChaosLord() {
+    if (chaosLord.length !== 0) {
+        applyStatus(1000, 'magic');
+        const functions = [
+    lightningArea,
+    ghostArea,
+    earthArea,
+    iceArea,
+    addLavaArea
+];
+
+// Choose a random function
+const randomFunction = functions[Math.floor(Math.random() * functions.length)];
+
+randomFunction(chaosLord[0].x, chaosLord[0].y, 2, 1.8);
+        if (chaosLord[0].health === undefined) {
+            chaosLord[0].health = 100;
+        }
+
+        if (chaosLordInMotion === false) {
+            const targetX = snake[0].x * gridSize;
+            const targetY = snake[0].y * gridSize;
+            chaosAngle = Math.atan2(targetY - chaosLord[0].y * gridSize, targetX - chaosLord[0].x * gridSize);
+        }
+
+        let velocityX = Math.cos(chaosAngle);
+        let velocityY = Math.sin(chaosAngle);
+
+        if (chaosLord.length > 1) {
+            chaosLord.length = 1;
+        }
+
+
+        if (chaosLordInMotion === false) {
+            const magicOptions = ['launch', 'bolt', 'port']
+            const randomIndex = Math.floor(Math.random() * magicOptions.length);
+            chaosMagic = magicOptions[randomIndex];
+        }
+        if (chaosLordInMotion === true) {
+            const magicOptions = ['launch', 'bolt', 'port', 'bolt', 'port']
+            const randomIndex = Math.floor(Math.random() * magicOptions.length);
+            movingchaosMagic = magicOptions[randomIndex];
+        }
+
+        if ((chaosMagic === 'launch') || movingchaosMagic === 'launch' && chaosLordInMotion ) {
+            if (movingchaosMagic === 'launch' && chaosLordInMotion){
+                targetX = snake[0].x * gridSize;
+             targetY = snake[0].y * gridSize;
+            chaosAngle = Math.atan2(targetY - chaosLord[0].y * gridSize, targetX - chaosLord[0].x * gridSize);
+            }
+
+                
+            chaosLord[0].x += velocityX;
+            chaosLord[0].y += velocityY;
+            chaosLordInMotion = true;
+            chaosLordBoundingBox = drawChaosLord(chaosLord[0].x, chaosLord[0].y);
+
+            if (chaosLordBoundingBox.xMin < 0 || chaosLordBoundingBox.yMin < 0 ||
+                chaosLordBoundingBox.xMax > canvas.width || chaosLordBoundingBox.yMax > canvas.height) {
+                chaosLordInMotion = false;
+            }
+        } else if ((chaosMagic === 'bolt' && !chaosLordInMotion ) || movingchaosMagic === 'bolt' && chaosLordInMotion ) {
+            canTeleport = true
+            shootWaveOfProjectiles(chaosLord[0].x * gridSize, chaosLord[0].y * gridSize, 1, 1, 0.5, 'blue', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, chaosLord);
+        } else if ((chaosMagic === 'port' && !chaosLordInMotion  && canTeleport === true) || movingchaosMagic === 'port' && chaosLordInMotion  && canTeleport === true) {
+            const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
+            const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
+            chaosLord[0].x = randomX;
+            chaosLord[0].y = randomY;
+        } 
+            }
+        }
     function drawEarthLord(x, y) {
     // Scale the coordinates by gridSize
     x = x * gridSize;
@@ -2452,9 +2600,22 @@ if (ghostlordhit === true){
     ghostLord.splice(findex,1)
 createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
+    isghostdead = true
 }
 })
-            
+
+chaosLord.forEach((firelord,findex) => {
+let chaoslordhit = isCollidingWithFireLord(chaosLordBoundingBox, projectile.x, projectile.y)
+if (chaoslordhit === true){
+    chaosLord.splice(findex,1)
+createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
+                        projectiles.splice(index, 1);
+    chaosdefeated = true
+}
+})
+                    
+
+
 lightninglord.forEach((firelord,findex) => {
 let lightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, projectile.x, projectile.y)
 if (lightninglordhit === true){
@@ -2894,9 +3055,17 @@ if (isfirelordhit === true) {
 firelord = []
 }
 
+let chaoslordhit = isCollidingWithFireLord(chaosLordBoundingBox, x, y)
+if (chaoslordhit === true) {
+chaosLord = []
+chaosdefeated = true
+}
+
+            
 let isghostlordhit = isCollidingWithFireLord(ghostLordBoundingBox, x, y)
 if (isghostlordhit === true) {
 ghostLord = []
+    isghostdead = true
 }
             
 let islightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, x, y)
@@ -3132,6 +3301,10 @@ function draw() {
     clearAndDrawObstacles(timezone, 'lightgreen');
     clearAndDrawObstacles(reflector, '#5B8DFF');
 
+    chaosLord.forEach(firelord => {
+        clearArea(firelord.x, firelord.y, 1, 1);
+        drawChaosLord(firelord.x, firelord.y);
+    });
     
     // Draw special entities
     firelord.forEach(firelord => {
@@ -3360,6 +3533,11 @@ if (!isPaused && icelord.length !== 0){
 if (!isPaused && lightninglord.length !== 0){
             manageLightningLord()
 }
+
+if (!isPaused && chaosLord.length !== 0){
+            manageChaosLord()
+}
+            
             lavacoords.forEach((coords, index) => {
             addLavaArea(coords.x, coords.y, 4,4)
             lavacoords.splice(index,1)
@@ -4064,7 +4242,7 @@ goombas.forEach((obstacle, index) => {
 
 
             // Check for victory
-if (score >= maxscore) {
+if (score >= maxscore || chaosdefeated === true) {
     declareVictory();
 }
 if (score >= maxscore / 2) {
@@ -4290,6 +4468,11 @@ const randomValue = Math.random()
             ice = []
             electric = []
             earth = []
+            ghostLord = []
+            chaosdefeated = false
+            ectoplasm = []
+            chaosLord = []
+            isghostdead = false
             lightninglord = []
             icelord = []
             earthlord = []
@@ -4316,8 +4499,6 @@ const randomValue = Math.random()
             reflector = []
             mirrors = []
             createParticles('gold');
-            animateExplosion();
-            createParticles('green');
             animateExplosion();
             pauseGame()
             restartGame();
@@ -4422,7 +4603,7 @@ function animateExplosion() {
 } else {
     GravityApplied = false;
 }
-if (firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || kamek.length !== 0 || ghostLord.length !== 0){
+if (firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || kamek.length !== 0 || ghostLord.length !== 0 || chaosLord.length !== 0){
 GravityApplied = false;
 }
             applyGravity()
@@ -4487,6 +4668,9 @@ const randomIndex = Math.floor(Math.random() * lords.length);
 if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
         ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
 }
+                    if (isghostdead === true && ghostLord.length === 0){
+chaosLord.push({ x: startX/gridSize, y: startY/gridSize });
+                    }
 // Handle eating animation
             if (isEating) {
                 eatingAnimationFrames--;
