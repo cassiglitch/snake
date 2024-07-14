@@ -147,7 +147,7 @@ let firelord = []
         let icelord = []
         let earthlord = []
         let ghostLord = []
-         let chaosLord = [];
+         let chaosLord = [{x:3,y:6}];
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -1666,7 +1666,7 @@ let chaosLordBoundingBox = drawChaosLord(5, 5);
 let canTeleport = false;
   function manageChaosLord() {
     if (chaosLord.length !== 0) {
-        applyStatus(1000, 'magic');
+        
         const functions = [
     lightningArea,
     ghostArea,
@@ -1698,12 +1698,12 @@ randomFunction(chaosLord[0].x, chaosLord[0].y, 2, 1.8);
 
 
         if (chaosLordInMotion === false) {
-            const magicOptions = ['launch', 'bolt', 'port']
+            const magicOptions = ['launch', 'bolt', 'port' ,'obstacle']
             const randomIndex = Math.floor(Math.random() * magicOptions.length);
             chaosMagic = magicOptions[randomIndex];
         }
         if (chaosLordInMotion === true) {
-            const magicOptions = ['launch', 'bolt', 'port', 'bolt', 'port']
+            const magicOptions = ['launch', 'bolt', 'port', 'bolt', 'port','obstacle']
             const randomIndex = Math.floor(Math.random() * magicOptions.length);
             movingchaosMagic = magicOptions[randomIndex];
         }
@@ -1733,9 +1733,33 @@ randomFunction(chaosLord[0].x, chaosLord[0].y, 2, 1.8);
             const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
             chaosLord[0].x = randomX;
             chaosLord[0].y = randomY;
-        } 
+        } else if ((chaosMagic === 'obstacle' && !chaosLordInMotion) || movingchaosMagic === 'obstacle' && chaosLordInMotion) {
+          
+// Assume obstacles and mirrors are defined arrays
+
+
+// Calculate random coordinates within the grid
+let x = Math.floor(Math.random() * (canvas.width / gridSize));
+let y = Math.floor(Math.random() * (canvas.height / gridSize));
+
+    
+        
+const functions2 = [
+    lightningArea,
+    ghostArea,
+    earthArea,
+    iceArea,
+    addLavaArea
+];
+
+// Choose a random function
+const randomArea = functions2[Math.floor(Math.random() * functions2.length)];
+
+randomArea(x/gridSize,y/gridSize, 2, 3);
             }
         }
+    }
+       
     function drawEarthLord(x, y) {
     // Scale the coordinates by gridSize
     x = x * gridSize;
