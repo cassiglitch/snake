@@ -147,7 +147,7 @@ let firelord = []
         let icelord = []
         let earthlord = []
         let ghostLord = []
-         let chaosLord = [{x:3,y:6}];
+         let chaosLord = [];
 let pY = 0;
 let numberOfProjectiles = 10; // Number of projectiles in the wave
 const waveSpreadAngle = 180; // Spread angle of the wave (in degrees)
@@ -236,7 +236,6 @@ function lightningArea(x, y, size, countdown) {
             electric.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
         }
     }
-    
 }
 
 function earthArea(x, y, size, countdown) {
@@ -251,7 +250,6 @@ function earthArea(x, y, size, countdown) {
             earth.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
         }
     }
-    
 }
 
         function ghostArea(x, y, size, countdown) {
@@ -266,10 +264,8 @@ function earthArea(x, y, size, countdown) {
             ectoplasm.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
         }
     }
-    
 }
 
-    
 function iceArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -282,7 +278,6 @@ function iceArea(x, y, size, countdown) {
             ice.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown});
         }
     }
-    
 }
         
 function scoreArea(x, y, size) {
@@ -297,7 +292,6 @@ function scoreArea(x, y, size) {
             scoreAreaArray.push({ x: Math.floor(x + i), y: Math.floor(y + j)});
         }
     }
-    
 }
 
 function wellWarningArea(x, y, size) {
@@ -312,7 +306,28 @@ function wellWarningArea(x, y, size) {
             wellWarning.push({ x: Math.floor(x + i), y: Math.floor(y + j)});
         }
     }
+}
+        
+function addRandomArea(x, y, size, countdown) {
+    let offset = Math.floor(size / 2);
+
+    // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+    let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+    let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+
+    // Array of possible area types
+    let areaTypes = [lava, ice, earth, electric, ectoplasm];
     
+    // Randomly select an area type
+    let selectedType = areaTypes[Math.floor(Math.random() * areaTypes.length)];
+
+    for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+            // Push to the selected area type array
+            selectedType = areaTypes[Math.floor(Math.random() * areaTypes.length)];
+            selectedType.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown: countdown });
+        }
+    }
 }
 
 function removeDuplicatesWithSameCoordinates(arr) {
@@ -633,20 +648,20 @@ if (spawner !== goombas){
         }
     }
 }
-function findClosestItem(snake, ...arrays) {
-    // Helper function to calculate the Euclidean distance between two points
-    function calculateDistancePossess(point1, point2) {
-        return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
-    }
+// Helper function to calculate the Euclidean distance between two points
+function calculateDistance(point1, point2) {
+    return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
+}
 
+// Function to find the closest item to the snake's head
+function findClosestItem(snake, ...arrays) {
     const snakeHead = snake[0];
     let closestItem = null;
     let minDistance = Infinity;
 
-    // Iterate over each array and their items
     arrays.forEach(array => {
         array.forEach(item => {
-            const distance = calculateDistancePossess(snakeHead, item);
+            const distance = calculateDistance(snakeHead, item);
             if (distance < minDistance) {
                 minDistance = distance;
                 closestItem = item;
@@ -654,58 +669,55 @@ function findClosestItem(snake, ...arrays) {
         });
     });
 
-    return closestItem
+    return closestItem;
 }
-        function objectExistsInArrays(object, array) {
-    return array.includes(object);
-}
-function possessionmove(){
-let object = {x:3,y:3}
-if (!choseobject){
-    if (obstacles.length !== 0 ||  dynamicObstacles.length !== 0 || thwomps.length !== 0){
-object = findClosestItem(snake, obstacles, dynamicObstacles, thwomps)
-choseobject = true
-}
-}
-   let exists = objectExistsInArrays(object, obstacles) || 
-               objectExistsInArrays(object, thwomps) || 
-               objectExistsInArrays(object, dynamicObstacles);
 
-    if (choseobject && exists){
-    if (snake[0].x < object.x) {
-if(inverted === false){
-direction = 'right'
-}else{
-direction = 'left'
+// Function to check if an object exists in any of the given arrays
+function objectExistsInArrays(object, ...arrays) {
+    return arrays.some(array => array.includes(object));
 }
-}else if (snake[0].x > object.x) {
-if(inverted === false){
-direction = 'left'
-}else{
-direction = 'right';
-}
+let object = {}
+// Function to handle the snake's movement towards the closest item
+function possessionmove() {
+
+    // If no object is chosen yet, find the closest one
+    if (!choseobject) {
+        if (obstacles.length !== 0 || dynamicObstacles.length !== 0 || thwomps.length !== 0) {
+            object = findClosestItem(snake, obstacles, dynamicObstacles, thwomps);
+            choseobject = true;
+        }
+    }
+
+    // Check if the chosen object still exists in any array
+    let exists = objectExistsInArrays(object, obstacles, dynamicObstacles, thwomps);
+
+    // If an object is chosen and exists, move the snake towards it
+    if (choseobject && exists) {
+        if (snake[0].x < object.x) {
+            direction = inverted ? 'left' : 'right';
+        } else if (snake[0].x > object.x) {
+            direction = inverted ? 'right' : 'left';
         } 
-          if (snake[0].y < object.y) {
-         if(inverted === false){
-direction = 'down'
-}else{
-direction = 'up'
-}        } else if (snake[0].y > object.y) {
-          if(inverted === false){
-direction = 'up'
-}else{
-direction = 'down'
-}
-          }
-}else if ((snake[0].x === object.x && snake[0].y === object.y) || !exists) {
-    choseobject = false;
-    isPossessed = false;
-}
-    if (obstacles.length === 0 ||  dynamicObstacles.length === 0 || thwomps.length === 0){
-choseobject = false
-isPossessed = false
+
+        if (snake[0].y < object.y) {
+            direction = inverted ? 'up' : 'down';
+        } else if (snake[0].y > object.y) {
+            direction = inverted ? 'down' : 'up';
+        }
+    }
+    if (snake[0].x === object.x && snake[0].y === object.y) {
+        // If the snake reaches the object, reset the possession state
+        isPossessed = false;
+        choseobject = false;
+        object = {};
+    }
+
+    // If the object no longer exists, reset the choice state
+    if (!exists) {
+        choseobject = false;
     }
 }
+
         
 function cancelEffects(){
     isConfused = false
@@ -2585,7 +2597,43 @@ function shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, pr
                 } else {
                     drawPolygon(projectile.x, projectile.y, projectile.size, projectile.sides, projectile.color);
                 }
+                
+// Assuming projectile, chaosLord, ice, lava, ectoplasm, earth, electric are defined elsewhere
+const offset = projectile.size /2; // Adjust the offset value as needed
 
+if (projectile.shooter === chaosLord &&
+    !ice.some(iceObject => 
+        iceObject.x >= projectile.x - offset && iceObject.x <= projectile.x + offset &&
+        iceObject.y >= projectile.y - offset && iceObject.y <= projectile.y + offset
+    ) &&
+    !earth.some(earthObject => 
+        earthObject.x >= projectile.x - offset && earthObject.x <= projectile.x + offset &&
+        earthObject.y >= projectile.y - offset && earthObject.y <= projectile.y + offset
+    ) &&
+    !lava.some(lavaObject => 
+        lavaObject.x >= projectile.x - offset && lavaObject.x <= projectile.x + offset &&
+        lavaObject.y >= projectile.y - offset && lavaObject.y <= projectile.y + offset
+    ) &&
+    !ectoplasm.some(ghostObject => 
+        ghostObject.x >= projectile.x - offset && ghostObject.x <= projectile.x + offset &&
+        ghostObject.y >= projectile.y - offset && ghostObject.y <= projectile.y + offset
+    ) &&
+    !electric.some(electricObject => 
+        electricObject.x >= projectile.x - offset && electricObject.x <= projectile.x + offset &&
+        electricObject.y >= projectile.y - offset && electricObject.y <= projectile.y + offset
+    )) {
+
+    addRandomArea(projectile.x / gridSize, projectile.y / gridSize, 2, 3);
+
+    const colors = [electriccolor, ghostcolor, earthcolor, icecolor, lavacolor];
+    if (colors.length > 0) {
+        const randomcolor = colors[Math.floor(Math.random() * colors.length)];
+        projectile.color = randomcolor;
+    } else {
+        console.error('No colors defined!');
+    }
+}
+    
                 if (!projectile.homing){
                 timezone.forEach((mirror) => {
                     if (projectile.x >= mirror.x * gridSize && projectile.x <= (mirror.x + 1) * gridSize &&
@@ -3740,9 +3788,16 @@ isParalyzed = electric.some((electric) => {
     return electric.x === head.x && electric.y === head.y;
 });
 }
-isPossessed = ectoplasm.some((ectoplasm) => {
-    return ectoplasm.x === head.x && ectoplasm.y === head.y;
+// Assume `ectoplasm` is an array of objects with properties `x` and `y`
+// `head` is an object with properties `x` and `y`
+// `isPossessed` is a boolean variable
+
+ectoplasm.forEach((ghost) => {
+    if (ghost.x === head.x && ghost.y === head.y) {
+        isPossessed = true;
+    }
 });
+
 const checkIfInScoreArea = (obstacles, isDynamic) => {
     obstacles.forEach((obstacle, index) => {
         scoreAreaArray.forEach((lava) => {
@@ -4469,6 +4524,7 @@ const randomValue = Math.random()
             lords = [firelord, lightninglord, icelord, earthlord]
             goombas = []
             TaxFormGot = false
+            isPossessed = false
             createParticles('red');
             animateExplosion();
             pauseGame();
@@ -4843,7 +4899,6 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
 
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
-
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 // Horizontal swipe
                 direction = deltaX > 0 ? 'right' : 'left';
@@ -4855,18 +4910,15 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
                     controltype = 'mobile';
                 }
             }
-
             // Perform actions based on direction if needed
             if (!firstControlSchemeSet) {
                 firstControlSchemeSet = true;
             }
         }
-
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchend', handleTouchEnd);
     }
 }
-
         // Start the game loop
         let gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
 
@@ -4875,7 +4927,6 @@ function changeInterval(interval) {
     gameInterval = setInterval(gameLoop, interval);
     currentInterval = interval/100
 }
-
         function getZoomFactor() {
             var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
@@ -4903,13 +4954,10 @@ function resizeCanvasHeight() {
     const canvasHeight = closestNumber(window.innerHeight, gridSize);; // Adjust the canvas height to be a multiple of gridSize
     canvas.height = canvasHeight; // Set the canvas height
 }
-
 // Call the resizeCanvasHeight function initially to set the canvas height
 resizeCanvasHeight();
-
 // Call the resizeCanvasHeight function whenever the window is resized
 window.addEventListener('resize', resizeCanvasHeight);
-
                 function adjustForZoom() {
             // Calculate the zoom factor
             const zoomFactor = window.innerWidth / window.screen.availWidth;
@@ -4924,7 +4972,6 @@ window.addEventListener('resize', getZoomFactor);
         // Call the adjustForZoom function initially and on window resize
         window.addEventListener('resize', adjustForZoom);
         adjustForZoom();
-
     canvas.addEventListener('touchstart', PauseHoldStart) 
 let touchStartTime; // Variable to store the time when touch starts
 canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart event
@@ -4942,11 +4989,8 @@ function checkHold() {
         pauseGame(); // Trigger the action if touch is held for 1.5 seconds
     }
 }
-
-
 // Listen for touchend event to reset the timer if touch is released before 1.5 seconds
 canvas.addEventListener('touchend', PauseHoldEnd);
-
 // Function to handle touchend event
 function PauseHoldEnd() {
     touchStartTime = null; // Reset the touch start time
