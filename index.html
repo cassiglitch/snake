@@ -194,7 +194,42 @@ const fruitString = scorecolorarray.join("");
 let scorecolor = fruitString
 let physicsActive = false;  // Flag to activate physics on collision
 let ghostcolor = '#1F635780'
+        let windactive = false
+       
 
+function windElement(snake, ...arrays) {
+    if (!windactive) return;
+
+    const distanceThreshold = 5;
+
+    function isWithinDistance(coord1, coord2, distance) {
+        return Math.abs(coord1.x - coord2.x) <= distance && Math.abs(coord1.y - coord2.y) <= distance;
+    }
+
+    function moveAway(item, snakeHead) {
+        if (item.x < snakeHead.x) {
+            item.x -= 1;
+        } else if (item.x > snakeHead.x) {
+            item.x += 1;
+        }
+
+        if (item.y < snakeHead.y) {
+            item.y -= 1;
+        } else if (item.y > snakeHead.y) {
+            item.y += 1;
+        }
+    }
+
+    arrays.forEach(array => {
+        array.forEach(item => {
+            snake.forEach(snakePart => {
+                if (isWithinDistance(item, snakePart, distanceThreshold)) {
+                    moveAway(item, snakePart);
+                }
+            });
+        });
+    });
+}
 
 function checkAndToggleGravity() {
     if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused && ghostLord.length === 0) { 
@@ -208,7 +243,7 @@ function checkAndToggleGravity() {
         
 setInterval(checkAndToggleGravity, 30000);
 
-        
+
 function addLavaArea(x, y, size, countdown) {
     let offset = Math.floor(size / 2);
 
@@ -3307,7 +3342,11 @@ function draw() {
     if (GravityApplied && gravitycount > 0) {
         drawInvincibilityAura('magenta');
     }
-
+    
+    if (windactive) {
+        drawInvincibilityAura('lightgrey');
+        setTimeout(() => { windactive = false; }, 5000);
+    }
     if (isFoodOrange) {
         drawInvincibilityAura('green');
         setTimeout(() => { isFoodOrange = false; }, 400);
@@ -3449,6 +3488,8 @@ function drawInvincibilityAura(colorName) {
         'green': 'rgba(0, 255, 0, 0.3)',
         'blue': 'rgba(0, 0, 255, 0.3)',
         'magenta': 'rgba(255, 8, 232, 0.3)',
+        'lightgrey': 'rgba(211, 211, 211, 0.3)',
+        'lava': 'rgba(255, 165, 0, 0.3),'
         // Add more colors as needed
     };
     
@@ -4056,6 +4097,7 @@ cancelEffects()
                     snake2.unshift({ ...snake2[0], color: 'green' });
                 pX = snake[0].x * gridSize + gridSize / 2;
                 pY = snake[0].y * gridSize + gridSize / 2;
+                windactive = true
                 shootWaveOfProjectiles(pX, pY, numberOfProjectiles, waveSpreadAngle, projectileSpeed, pcolourr, obstacles, dynamicObstacles, gridSize, direction, 10, 60, true, 3, false, 20, 1, false,snake)
                 }else if (food.type === 'morph'){
                 cancelEffects()
@@ -4357,6 +4399,7 @@ kamek.push({ x: kamekX2, y: kamekY2 });
             }
         });
     }
+                                
         }
         function calculateObstacleSpawnProbability() {
             // Obstacle spawn probability increases with score
@@ -4676,7 +4719,9 @@ function animateExplosion() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
+            windElement(snake, mirrors, obstacles, dynamicObstacles, thwomps, reflector);
             draw()
+
             physicsActive = false;
                         if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
     applyStatus(5000, 'gravity');
@@ -4795,7 +4840,8 @@ function closestNumber(n, m) {
 function resizeCanvas() {
     const canvasWidth = closestNumber(window.innerWidth, gridSize);
     const canvasHeight = closestNumber(window.innerHeight, gridSize);
-
+    // Remove out-of-bounds elements from mirrors array
+    
     // Set canvas width and height
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
@@ -4831,6 +4877,36 @@ obstacles.forEach((obstacle, obstacleIndex) => {
     }
   });
 });
+    obstacles.forEach((obstacle, obstacleIndex) => {
+        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
+        obstacles.splice(obstacleIndex, 1)
+    }
+    })
+    timezone.forEach((obstacle, obstacleIndex) => {
+        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
+        timezone.splice(obstacleIndex, 1)
+    }
+    })
+    mirrors.forEach((obstacle, obstacleIndex) => {
+        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
+        mirrors.splice(obstacleIndex, 1)
+    }
+    })
+    thwomps.forEach((obstacle, obstacleIndex) => {
+        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
+        thwomps.splice(obstacleIndex, 1)
+    }
+    })
+    dynamicObstacles.forEach((obstacle, obstacleIndex) => {
+        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
+        dynamicObstacles.splice(obstacleIndex, 1)
+    }
+    })
+    reflector.forEach((obstacle, obstacleIndex) => {
+        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
+        reflector.splice(obstacleIndex, 1)
+    }
+    })
 }
 
 
