@@ -4318,10 +4318,10 @@ goombas.forEach((obstacle, index) => {
     const types = ['magnet']; // Possible directions
     const randomIndex = Math.floor(Math.random() * types.length);
     type = types[randomIndex];
-
-
-            // Check for victory
-if (score >= maxscore || chaosdefeated === true) {
+if (chaosdefeated === true && lords.length === 0 && isghostdead === true && iskamekdead === true){
+declareVictory();
+}
+if (score >= maxscore) {
     declareVictory();
 }
 if (score >= maxscore / 2) {
