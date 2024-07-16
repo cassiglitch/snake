@@ -200,7 +200,7 @@ let ghostcolor = '#1F635780'
 function windElement(snake, ...arrays) {
     if (!windactive) return;
 
-    const distanceThreshold = 5;
+    const distanceThreshold = 3
 
     function isWithinDistance(coord1, coord2, distance) {
         return Math.abs(coord1.x - coord2.x) <= distance && Math.abs(coord1.y - coord2.y) <= distance;
@@ -411,11 +411,6 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
-
-
-
-
-
 
     function isNextItemTwoAway() {
         for (let i = 0; i < snake.length - 1; i++) {
@@ -4719,7 +4714,7 @@ function animateExplosion() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
-            windElement(snake, mirrors, obstacles, dynamicObstacles, thwomps, reflector);
+            windElement(snake, mirrors, obstacles, dynamicObstacles, thwomps);
             draw()
 
             physicsActive = false;
