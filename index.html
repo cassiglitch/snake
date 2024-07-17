@@ -195,12 +195,26 @@ let scorecolor = fruitString
 let physicsActive = false;  // Flag to activate physics on collision
 let ghostcolor = '#1F635780'
         let windactive = false
-       
+       let windeffect = [{x:5,y:5}];
+function addWindEffect() {
+  snake.forEach(segment => {
+    for (let dx = -3; dx <= 3; dx++) {
+      for (let dy = -3; dy <= 3; dy++) {
+        // Calculate the position for the wind effect
+        let windPosition = {x: segment.x + dx, y: segment.y + dy};
 
-function windElement(snake, ...arrays) {
+        // Check if this position is already in the windeffect array
+        if (!windeffect.some(pos => pos.x === windPosition.x && pos.y === windPosition.y)) {
+          // If not, add it to the array
+          windeffect.push(windPosition);
+        }
+      }
+    }
+  });
+}function windElement(snake, ...arrays) {
     if (!windactive) return;
 
-    const distanceThreshold = 3
+    const distanceThreshold = 3;
 
     function isWithinDistance(coord1, coord2, distance) {
         return Math.abs(coord1.x - coord2.x) <= distance && Math.abs(coord1.y - coord2.y) <= distance;
@@ -411,6 +425,11 @@ let middleX = getMiddleXCoordinate(scoreDisplay)
         
 scoreArea(middleX,1,4)
 }
+
+
+
+
+
 
     function isNextItemTwoAway() {
         for (let i = 0; i < snake.length - 1; i++) {
@@ -3255,7 +3274,6 @@ if (kamekappears === true && laserTimer < 11.25){
             charging = true;
         
         hascollided = false
-        
         // Update the timestamp of the last laser shot
         lastLaserShot = currentTime;
     }
@@ -3264,28 +3282,51 @@ if (kamekappears === true && laserTimer < 11.25){
 function pauseGame() {
     isPaused = !isPaused; // Toggle the paused state
 }
-
-
-
 function draw() {
-    // Function to clear a specific area
-    function clearArea(x, y, width, height) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
-        ctx.clip();
-        ctx.clearRect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
-        ctx.restore();
-    }
+function clearArea(x, y, width, height) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
+    ctx.clip();
+    ctx.clearRect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
+    ctx.restore();
+}
 
-    // Clear and update the areas that need to be redrawn
-    function clearAndDrawObstacles(obstacles, color) {
-        ctx.fillStyle = color;
-        obstacles.forEach(obstacle => {
-            clearArea(obstacle.x, obstacle.y, 1, 1);
-            ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
-        });
+// Clear and update the areas that need to be redrawn
+function clearAndDrawObstacles(obstacles, color) {
+    ctx.save(); // Save the current context state
+
+    obstacles.forEach(obstacle => {
+        clearArea(obstacle.x, obstacle.y, 1, 1);
+
+        // Extract alpha value from hex color
+        const alpha = getAlphaFromHexColor(color);
+        if (alpha < 1) {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = color.substring(0, 7); // Use only the RGB part
+            ctx.globalAlpha = alpha;
+        } else {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 1;
+        }
+
+        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
+    });
+
+    ctx.restore(); // Restore the context state
+}
+
+// Helper function to extract alpha value from a hex color string
+function getAlphaFromHexColor(color) {
+    if (color.length === 9) { // #RRGGBBAA
+        const alphaHex = color.substring(7, 9);
+        const alphaDecimal = parseInt(alphaHex, 16);
+        return alphaDecimal / 255;
     }
+    return 1; // Default to fully opaque if no alpha channel
+}
+
 
     // Clear the entire background
     ctx.save();
@@ -3323,7 +3364,8 @@ function draw() {
             drawGoomba(goomba.x, goomba.y);
         });
     }
-
+clearAndDrawObstacles(windeffect, '#90EE9080');
+    
     // Draw invincibility auras
     if (isInvincible) {
         drawInvincibilityAura('orange');
@@ -3405,7 +3447,7 @@ function draw() {
     // Draw other obstacles
     clearAndDrawObstacles(obstacles, 'black');
     clearAndDrawObstacles(timezone, 'lightgreen');
-    clearAndDrawObstacles(reflector, '#5B8DFF');
+    clearAndDrawObstacles(reflector, '#5B8DFF')
 
     chaosLord.forEach(firelord => {
         clearArea(firelord.x, firelord.y, 1, 1);
@@ -4714,9 +4756,12 @@ function animateExplosion() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
-            windElement(snake, mirrors, obstacles, dynamicObstacles, thwomps);
+            windElement(snake, mirrors, obstacles, dynamicObstacles, thwomps, reflector);
             draw()
-
+               windeffect = []     
+if (windactive === true){
+addWindEffect()
+}
             physicsActive = false;
                         if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
     applyStatus(5000, 'gravity');
@@ -4788,13 +4833,14 @@ const randomIndex = Math.floor(Math.random() * lords.length);
 if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
         ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
 }
-                    if (isghostdead === true && ghostLord.length === 0){
+                    if (isghostdead === true && ghostLord.length === 0 && lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead === true){
 chaosLord.push({ x: startX/gridSize, y: startY/gridSize });
                     }
-// Handle eating animation
+                    if (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead){
+chaosLord = []
+                    }
             if (isEating) {
                 eatingAnimationFrames--;
-
                 // Apply the wavelike animation
                 for (let i = 1; i < snake.length; i++) {
                     if (i <= eatingAnimationFrames) {
@@ -4904,18 +4950,14 @@ obstacles.forEach((obstacle, obstacleIndex) => {
     })
 }
 
-
 if ((controltype === 'set' || controltype === 'arrow') && controltype !== 'mobile') {
     // Handle arrow key presses
     document.addEventListener('keydown', event => {
         // If a control scheme is already set, return early
         if (firstControlSchemeSet && controltype !== 'arrow') return;
-
-        // Prevent default arrow key behavior (scrolling)
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
             event.preventDefault();
         }
-
         if (!isPaused) {
             switch (event.key) {
                 case 'ArrowUp':
@@ -4946,28 +4988,21 @@ if ((controltype === 'set' || controltype === 'arrow') && controltype !== 'mobil
         }
     });
 }
-
 if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arrow') {
     if (!isPaused) {
         // Handle touch events for mobile controls
         let touchStartX = 0;
         let touchStartY = 0;
-
         function handleTouchStart(event) {
-            // If a control scheme is already set, return early
             if (firstControlSchemeSet && controltype !== 'mobile') return;
-
             touchStartX = event.touches[0].clientX;
             touchStartY = event.touches[0].clientY;
         }
-
         function handleTouchEnd(event) {
             // If a control scheme is already set, return early
             if (firstControlSchemeSet && controltype !== 'mobile') return;
-
             const touchEndX = event.changedTouches[0].clientX;
             const touchEndY = event.changedTouches[0].clientY;
-
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -4981,7 +5016,6 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
                     controltype = 'mobile';
                 }
             }
-            // Perform actions based on direction if needed
             if (!firstControlSchemeSet) {
                 firstControlSchemeSet = true;
             }
@@ -4990,9 +5024,7 @@ if ((controltype === 'set' || controltype === 'mobile') && controltype !== 'arro
         canvas.addEventListener('touchend', handleTouchEnd);
     }
 }
-        // Start the game loop
-        let gameInterval = setInterval(gameLoop, 100); // Adjust the interval as needed
-
+        let gameInterval = setInterval(gameLoop, 100); 
 function changeInterval(interval) {
     clearInterval(gameInterval);
     gameInterval = setInterval(gameLoop, interval);
@@ -5046,13 +5078,11 @@ window.addEventListener('resize', getZoomFactor);
     canvas.addEventListener('touchstart', PauseHoldStart) 
 let touchStartTime; // Variable to store the time when touch starts
 canvas.addEventListener('touchstart', PauseHoldStart); // Listen for touchstart event
-
 // Function to handle touchstart event
 function PauseHoldStart(event) {
     touchStartTime = new Date().getTime(); // Record the time when touch starts
     setTimeout(checkHold, pausetimer); // Check after 1.5 seconds if the touch is still held
 }
-
 // Function to check if touch is still held after 1.5 seconds
 function checkHold() {
     // Check if touch is still active and hasn't moved for 1.5 seconds
