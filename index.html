@@ -4878,6 +4878,7 @@ function closestNumber(n, m) {
 }
 
 function resizeCanvas() {
+    
     const canvasWidth = closestNumber(window.innerWidth, gridSize);
     const canvasHeight = closestNumber(window.innerHeight, gridSize);
     // Remove out-of-bounds elements from mirrors array
@@ -4909,6 +4910,7 @@ function resizeCanvas() {
     food.x += 1;
     food.y += 1;
 }
+    
 obstacles.forEach((obstacle, obstacleIndex) => {
   mirrors.forEach((mirror, mirrorIndex) => {
     if (mirror.x === obstacle.x && mirror.y === obstacle.y) {
@@ -4917,11 +4919,13 @@ obstacles.forEach((obstacle, obstacleIndex) => {
     }
   });
 });
+    
     obstacles.forEach((obstacle, obstacleIndex) => {
         if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
         obstacles.splice(obstacleIndex, 1)
     }
     })
+    
     timezone.forEach((obstacle, obstacleIndex) => {
         if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
         timezone.splice(obstacleIndex, 1)
@@ -4930,11 +4934,6 @@ obstacles.forEach((obstacle, obstacleIndex) => {
     mirrors.forEach((obstacle, obstacleIndex) => {
         if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
         mirrors.splice(obstacleIndex, 1)
-    }
-    })
-    thwomps.forEach((obstacle, obstacleIndex) => {
-        if (obstacle.y > canvasHeight / gridSize || obstacle.x > canvasWidth / gridSize || obstacle.x < 0 || obstacle.y < 0) {
-        thwomps.splice(obstacleIndex, 1)
     }
     })
     dynamicObstacles.forEach((obstacle, obstacleIndex) => {
@@ -5095,6 +5094,7 @@ canvas.addEventListener('touchend', PauseHoldEnd);
 function PauseHoldEnd() {
     touchStartTime = null; // Reset the touch start time
 }
+        
     </script>
 </body>
 </html>
