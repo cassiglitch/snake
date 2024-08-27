@@ -200,10 +200,7 @@ function addWindEffect() {
   snake.forEach(segment => {
     for (let dx = -3; dx <= 3; dx++) {
       for (let dy = -3; dy <= 3; dy++) {
-        // Calculate the position for the wind effect
         let windPosition = {x: segment.x + dx, y: segment.y + dy};
-
-        // Check if this position is already in the windeffect array
         if (!windeffect.some(pos => pos.x === windPosition.x && pos.y === windPosition.y)) {
           // If not, add it to the array
           windeffect.push(windPosition);
@@ -219,7 +216,6 @@ function addWindEffect() {
     function isWithinDistance(coord1, coord2, distance) {
         return Math.abs(coord1.x - coord2.x) <= distance && Math.abs(coord1.y - coord2.y) <= distance;
     }
-
     function moveAway(item, snakeHead) {
         if (item.x < snakeHead.x) {
             item.x -= 1;
@@ -2968,7 +2964,11 @@ function enemyshootmagic() {
         });
     }
 }
-
+function getAverageOrMinInMilliseconds(varone, vartwo) {
+    let average = (varone + vartwo) / 2;
+    let minAverage = average < 5 ? 5 : average;
+    return minAverage * 1000; // Convert to milliseconds
+}
 function shockwaveAnimation(x, y) {
     // Get the canvas element
     // Set up animation parameters
@@ -4749,7 +4749,7 @@ function animateExplosion() {
         requestAnimationFrame(animateExplosion);
     }
 }
-
+let gravitytimer = 0
 
                 function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
@@ -4763,7 +4763,7 @@ addWindEffect()
 }
             physicsActive = false;
                         if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
-    applyStatus(5000, 'gravity');
+    applyStatus(gravitytimer, 'gravity');
 } else {
     GravityApplied = false;
 }
@@ -4886,7 +4886,7 @@ function resizeCanvas() {
     // Set canvas width and height
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
-
+gravitytimer = getAverageOrMinInMilliseconds(canvasHeight/gridSize, canvasWidth/gridSize) 
     // Adjust food position if it's out of bounds
     if (food.x >= canvasWidth / gridSize) {
         food.x = canvasWidth / gridSize - 1;
