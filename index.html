@@ -60,6 +60,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
+        
 let isSlow = false
         let gravitycount = 1
         let snakecutgravity = false
@@ -785,6 +786,12 @@ function checkForEffects(){
     applyStatus(1000, 'well')
     }
 }
+let toggle = false;
+function setToggle() {
+    toggle = true;
+    GravityApplied = true
+}
+setTimeout(setToggle, 5000);
 function applyStatus(cooldown, effect){
     const currentTime = new Date().getTime();
 
@@ -4679,8 +4686,6 @@ function getSnakeHeadX() {
 function getSnakeHeadY() {
     return snake[0].y * gridSize + gridSize / 2;
 }
-
-// Modify the Particle constructor to accept head position parameters
 function Particle(x, y, radius, color, headX, headY) {
     this.x = x + headX; // Calculate the particle's position relative to the snake's head
     this.y = y + headY;
@@ -4740,17 +4745,12 @@ function animateExplosion() {
             particles.splice(index, 1);
         }
     });
-
-    // Simulate holes with the color of the particles
     simulateHoles(particles[0].color); // Pass the color of the first particle
-
-    // Request animation frame
     if (particles.length > 0) {
         requestAnimationFrame(animateExplosion);
     }
 }
 let gravitytimer = 0
-
                 function gameLoop() {
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
@@ -4762,7 +4762,7 @@ if (windactive === true){
 addWindEffect()
 }
             physicsActive = false;
-                        if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0) {
+                        if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && toggle === true) {
     applyStatus(gravitytimer, 'gravity');
 } else {
     GravityApplied = false;
