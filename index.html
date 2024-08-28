@@ -157,7 +157,7 @@ const projectileColor = 'orange'; // Color of the projectiles
 let projectiles = []; // Array to store projectiles
 let enemymovementspeed = 1
     let wellcolor = '#00000080'
-let wells = []
+let wells = [{x:1,y:1}]
 let polygons = []
 let isGravityWellActive = true;
 let effectApplied = 0
@@ -3349,7 +3349,6 @@ function getAlphaFromHexColor(color) {
     clearAndDrawObstacles(ectoplasm, ghostcolor)
     ctx.fillStyle = electriccolor;
     electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-    
     ctx.fillStyle = icecolor;
     ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
     // Draw the earth obstacles
@@ -3487,7 +3486,7 @@ ghostLord.forEach(firelord => {
     if (isGravityWellActive) {
         ctx.fillStyle = scorecolor;
         wellWarning.forEach(obstacle => {
-            clearArea(obstacle.x, obstacle.y, 1, 1);
+            
             ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
         });
     }
@@ -3496,7 +3495,7 @@ ghostLord.forEach(firelord => {
     ctx.fillStyle = wellcolor;
     wells.forEach(well => {
         const pulse = Math.sin(Date.now() / 200) * 5;
-        clearArea(well.x, well.y, 1, 1);
+        
         ctx.fillRect(well.x * gridSize - pulse / 2, well.y * gridSize - pulse / 2, gridSize + pulse, gridSize + pulse);
     });
 
