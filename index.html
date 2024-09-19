@@ -2934,7 +2934,6 @@ function createExplosion(ctx, x, y, color, obstacles, dynamicObstacles, gridSize
         }
     });
 
-
     timezone.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
                     y >= obstacle.y * gridSize && y <= (obstacle.y + 1) * gridSize) {
@@ -4063,7 +4062,9 @@ snake2.unshift({ ...snake2[0], color: 'green' });
     const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
     head.x = randomX;
     head.y = randomY;
-
+    head2.x = head.x
+    head2.y = head.y
+                    
     // Randomize the direction
     const directions = ['up', 'down', 'left', 'right']; // Possible directions
     const randomIndex = Math.floor(Math.random() * directions.length);
