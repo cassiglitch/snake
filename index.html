@@ -4295,6 +4295,7 @@ if (item.length !== 0) {
             cancelEffects()
         }else if (item[0].type === 'welldelete'){
          wells = []   
+        wellWarning = []
         }else if (item[0].type === 'coin'){
 taxrate += 0.01
         }
@@ -4303,7 +4304,6 @@ taxrate += 0.01
         pickUpItem(item)
     }
 }
-
 // Check if there are any enemies matching the criteria and if TaxFormGot is true
 if (esnake.some(esnake => esnake.type === 'IRS') && TaxFormGot === true) {
     // Clear the enemy list
