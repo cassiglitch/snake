@@ -3061,6 +3061,7 @@ let tapEndX = 0;
 let tapEndY = 0;
 
 function handleTapStart(event) {
+    if (isPaused) return; // Disable interaction if paused
     if (event.type === 'touchstart') {
         startX = event.touches[0].clientX;
         startY = event.touches[0].clientY;
@@ -3075,8 +3076,8 @@ controltype = 'arrow'
         }
     }
 }
-
 function handleTapEnd(event) {
+    if (isPaused) return; // Disable interaction if paused
     if (event.type === 'touchend') {
         endX = event.changedTouches[0].clientX;
         endY = event.changedTouches[0].clientY;
@@ -3084,8 +3085,7 @@ function handleTapEnd(event) {
         endX = event.clientX;
         endY = event.clientY;
     }
-
-    // Calculate the distance between start and end points
+  // Calculate the distance between start and end points
     const deltaX = Math.abs(endX - startX);
     const deltaY = Math.abs(endY - startY);
 
