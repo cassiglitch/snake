@@ -2,23 +2,37 @@
 <html>
     <head>
         <title>Snake Game</title>
-        <link rel="stylesheet" type="text/css" href="style.css">
+        <style>
+            .tableC {
+                table-layout: fixed;
+                background-color: white;
+                width: 300px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            td {
+                font-size: 20px;
+            }
+            th {
+                font-size: 25px;
+            }
+        </style>
     </head>
     <body>
         <h1 style="background-color: white; text-align: center;">- Snake Game -</h1>
         <h2>Gamemodes</h2>
-        <table border = 5 class = "tableC">
-            <tr><th>&ensp;&ensp;Difficulties</th></tr>
+        <table border="5" class="tableC">
+            <thead>
+                <tr><th>Difficulties</th></tr>
+            </thead>
             <tbody>
                 <tr>
-                    <td>&ensp;> <a href="game.html">Normal Game</a></td>
+                    <td><a href="game.html">Normal Game</a></td>
                 </tr>
-            </tbody>
-            <tr><th>&ensp;&ensp;Special modes</th></tr>
-            <tbody>
+                <tr><th>Special Modes</th></tr>
                 <tr>
-<a href="Bossrush.html">Boss Rush</a></td>
-        </tr>
+                    <td><a href="bossrush.html">Boss Rush</a></td>
+                </tr>
             </tbody>
         </table>
     </body>
