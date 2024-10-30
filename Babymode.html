@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+/<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -4448,6 +4448,48 @@ kamek.push({ x: kamekX2, y: kamekY2 });
             return Math.min(0.1 + score / 100, 1); // Adjust the maximum spawn probability as needed
         }
 
+function itemSpawn() {
+            // Obstacle spawn probability increases with score
+            return Math.min(0.1 + score / 99, 1); // Adjust the maximum spawn probability as needed
+        }
+
+function spawnItem() {
+            let newItem;
+            do {
+                newItem = {
+                    x: Math.floor(Math.random() * (canvas.height / gridSize)),
+                    y: Math.floor(Math.random() * (canvas.height / gridSize)),
+                    type: generateItem()
+                };
+            } while (snake.some(segment => segment.x === newItem.x && segment.y === newItem.y) ||
+                obstacles.some(obstacle => obstacle.x === newItem.x && obstacle.y === newItem.y) ||
+                dynamicObstacles.some(obstacle => (newItem.x >= obstacle.x && newItem.x < obstacle.x + 1) &&
+                    (newItem.y >= obstacle.y && newItem.y < obstacle.y + 1)));
+
+    item = []
+            item.push(newItem);
+        }
+
+function generateItem() {
+            // Adjust the probability for different types of food as needed
+            const random = Math.random();
+            if (random <= 0.1) {
+const rare = ['antidote']; // Possible directions
+                foodCounts.rare = rare.length
+    const randomIndex2 = Math.floor(Math.random() * rare.length);
+    return rare[randomIndex2];
+            } else if (random <= 0.4) {
+    const Special = ['welldelete', 'coin']; // Possible directions
+                foodCounts.special = Special.length
+    const randomIndex2 = Math.floor(Math.random() * Special.length);
+    return Special[randomIndex2];
+            } else{
+                const common = ['taxform']; // Possible directions
+                foodCounts.common = common.length
+    const randomIndex2 = Math.floor(Math.random() * common.length);
+    return common[randomIndex2];
+            }
+        }
         
         function spawnFood() {
             let newFood;
@@ -4710,14 +4752,13 @@ addWindEffect()
 }
             physicsActive = false;
                         if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && toggle === true) {
-    applyStatus(gravitytimer, 'gravity');
 } else {
     GravityApplied = false;
 }
 if (firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || kamek.length !== 0 || ghostLord.length !== 0 || chaosLord.length !== 0){
 GravityApplied = false;
 }
-            GravityApplied = false;
+            applyGravity()
                     physicsActive = false;
                     if (DoDisplayCheck){
             displaycheck()
