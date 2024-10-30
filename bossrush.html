@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+/<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -98,7 +98,7 @@ let isSlow = false
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = []
+        let kamek = [{x:0, y:0}]
         let DoDisplayCheck = true
         let collisionAnimationFrames = 10;
         let isPaused = false;
@@ -438,20 +438,6 @@ scoreArea(middleX,1,4)
         }
         return true;
     }
-    let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
-    let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
-    isPaused = true
-    reflector = []
-    kamekappears = true
-    let gridOffset = ((2*gridSize) + (gridSize / 2))/2
-            // Call the function with desired parameters
-        createPortalAnimation(kamekX2* gridSize, (kamekY2 * gridSize) + gridOffset, 120, 5000);
-    setTimeout(() => {
-kamek.push({ x: kamekX2, y: kamekY2 });
-    }, 2500);
-    setTimeout(() => {
-        isPaused = false
-    }, 5000);
 
     function shouldStopGravity() {
         const maxY = (canvas.height / gridSize) - 1;
@@ -827,7 +813,7 @@ if(isTaxed === true && effect === 'taxes' && esnake[0].damage === false){
 let tax = score * taxrate;
 score -= tax;
 effectApplied = currentTime
-} 
+}
 if (effect === 'well'){
   wellToggle()
 effectApplied = currentTime
@@ -3812,7 +3798,7 @@ switch (direction) {
         
         track = []
         track = [{x:head.x, y:head.y + 1}]
-        break;\\\\
+        break;
     case 'up':
         head.y = (head.y + 1) % (canvas.height / gridSize);
        head2.y = (head2.y + 1) % (canvas.height / gridSize);
@@ -4428,9 +4414,23 @@ if (score >= maxscore / 2) {
             }
     }
 
+if (reflector.length === 12 && kamek.length === 0 && kamekappears === false && firelord.length ===0) {
+    let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
+    let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
+    isPaused = true
+    reflector = []
+    kamekappears = true
+    let gridOffset = ((2*gridSize) + (gridSize / 2))/2
+            // Call the function with desired parameters
+        createPortalAnimation(kamekX2* gridSize, (kamekY2 * gridSize) + gridOffset, 120, 5000);
+    setTimeout(() => {
+kamek.push({ x: kamekX2, y: kamekY2 });
+    }, 2500);
+    setTimeout(() => {
+        isPaused = false
+    }, 5000);
+}
 
-
-          
             
             if (laser.isShooting) {
         obstacles.forEach((obstacle, index) => {
@@ -4646,7 +4646,7 @@ const randomValue = Math.random()
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
-            kamek = [{x;startX/gridSize, y:startY/gridSize}]
+            kamek = [{x:0, y:0}]
             kamekappears = false
             firstControlSchemeSet = false;
             cangetvenom = true
