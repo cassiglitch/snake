@@ -102,6 +102,7 @@ let isSlow = false
         let DoDisplayCheck = true
         let collisionAnimationFrames = 10;
         let isPaused = false;
+        let didwin = false
         let charging = false;
         let freeze = false;
         let freezetimer = 5;
@@ -4605,9 +4606,6 @@ const randomValue = Math.random()
         }
             }
             inverted = false
-            turrets = []
-            lords = [firelord, lightninglord, icelord, earthlord]
-            goombas = []
             TaxFormGot = false
             isPossessed = false
             createParticles('red');
@@ -4626,28 +4624,33 @@ const randomValue = Math.random()
             esnake = []        
             timezone = []
             isEating = false;
-            projectiles = []
+            projectiles = [] 
+            reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 11, y: 12 },  { x: 13, y: 14 },  { x: 15, y: 16 },  { x: 17, y: 18 },  { x: 19, y: 20 },  { x: 21, y: 22 },{ x: 23, y: 24 }]
+   if (didwin === false){
+            lords = [firelord, lightninglord, icelord, earthlord]
+            goombas = []
             lava = []
             lavacoords = []
             firelord = []
-            reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 11, y: 12 },  { x: 13, y: 14 },  { x: 15, y: 16 },  { x: 17, y: 18 },  { x: 19, y: 20 },  { x: 21, y: 22 },{ x: 23, y: 24 }]
             ice = []
             electric = []
+            turrets = []
             earth = []
             ghostLord = []
             chaosdefeated = false
-            ectoplasm = []
+            ectoplasm = [] 
+            kamek = []
             chaosLord = []
-            wellWarning = []
             isghostdead = false
             lightninglord = []
             icelord = []
             earthlord = []
+   }
+            wellWarning = []
             isInvincible = false;
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
-            kamek = []
             kamekappears = false
             firstControlSchemeSet = false;
             cangetvenom = true
@@ -4657,6 +4660,7 @@ const randomValue = Math.random()
             venomreset()
             spawnFood();
             changeInterval(100)
+            didwin = false
         }
 
  
@@ -4668,6 +4672,7 @@ const randomValue = Math.random()
             createParticles('gold');
             animateExplosion();
             pauseGame()
+            didwin = true
             restartGame();
         }
         
