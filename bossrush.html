@@ -4819,22 +4819,21 @@ changeInterval(150)
 }else if (currentInterval === 1.5 && isSlow === false && isEarthed === false){
 changeInterval(100)
 }
-if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+if (lords.length === 2 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && phases === 'elementlords'){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
         selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
         
     lords.splice(randomIndex, 1);
 }
-if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+if (lords.length === 1 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && phases === 'elementlords'){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord2 = lords[randomIndex];
         selectedLord2.push({ x: startX/gridSize, y: startY/gridSize });
         
     lords.splice(randomIndex, 1);
 }
-if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
-    lords = [firelord, lightninglord, icelord, earthlord]
+if (lords.length === 3 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && phases === 'elementlords'){
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord3 = lords[randomIndex];
         selectedLord3.push({ x: startX/gridSize, y: startY/gridSize });
@@ -4842,6 +4841,7 @@ const randomIndex = Math.floor(Math.random() * lords.length);
     lords.splice(randomIndex, 1);
 }   
             if (iskamekdead === true && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && phases !== 'elementlords' && lords.length === 4){
+                lords = [firelord, lightninglord, icelord, earthlord]
                 phases = 'elementlords'
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
