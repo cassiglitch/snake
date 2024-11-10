@@ -60,7 +60,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
-        
+        let phases = 'kamek'
 let isSlow = false
         let gravitycount = 1
         let snakecutgravity = false
@@ -4626,8 +4626,16 @@ const randomValue = Math.random()
             timezone = []
             isEating = false;
             projectiles = [] 
+            if (phases = 'elementlords'){
             lords = [firelord, lightninglord, icelord, earthlord]
-            reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 11, y: 12 },  { x: 13, y: 14 },  { x: 15, y: 16 },  { x: 17, y: 18 },  { x: 19, y: 20 },  { x: 21, y: 22 },{ x: 23, y: 24 }]
+           const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+        selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
+            }
+    lords.splice(randomIndex, 1);
+            if (phases === 'kamek'){
+                reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 11, y: 12 },  { x: 13, y: 14 },  { x: 15, y: 16 },  { x: 17, y: 18 },  { x: 19, y: 20 },  { x: 21, y: 22 },{ x: 23, y: 24 }]
+            }
    if (didwin === false){
             lords = [firelord, lightninglord, icelord, earthlord]
             goombas = []
@@ -4831,6 +4839,7 @@ const randomIndex = Math.floor(Math.random() * lords.length);
     lords.splice(randomIndex, 1);
 }   
             if (iskamekdead === true && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+                phases = 'elementlords'
 const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
         selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
