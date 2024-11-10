@@ -4626,6 +4626,9 @@ const randomValue = Math.random()
             timezone = []
             isEating = false;
             projectiles = [] 
+            if (phases === 'ghost'){
+ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
+            }
             if (phases === 'elementlords'){
                 iskamekdead === true
             lords = [firelord, lightninglord, icelord, earthlord]
@@ -4850,6 +4853,7 @@ const randomIndex = Math.floor(Math.random() * lords.length);
     lords.splice(randomIndex, 1);
 }
 if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+    phases = 'ghost'
         ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
 }
                     if (isghostdead === true && ghostLord.length === 0 && lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead === true){
