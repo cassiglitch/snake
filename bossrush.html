@@ -4640,7 +4640,20 @@ ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
             }
             }
             if (phases === 'kamek'){
-                reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 11, y: 12 },  { x: 13, y: 14 },  { x: 15, y: 16 },  { x: 17, y: 18 },  { x: 19, y: 20 },  { x: 21, y: 22 },{ x: 23, y: 24 }]
+                let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
+    let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
+    isPaused = true
+    reflector = []
+    kamekappears = true
+    let gridOffset = ((2*gridSize) + (gridSize / 2))/2
+            // Call the function with desired parameters
+        createPortalAnimation(kamekX2* gridSize, (kamekY2 * gridSize) + gridOffset, 120, 5000);
+    setTimeout(() => {
+kamek.push({ x: kamekX2, y: kamekY2 });
+    }, 2500);
+    setTimeout(() => {
+        isPaused = false
+    }, 5000);
             }
    if (didwin === false){
             lords = [firelord, lightninglord, icelord, earthlord]
