@@ -4856,6 +4856,10 @@ if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightnin
     phases = 'ghost'
         ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
 }
+                    if (isghostdead === true && ghostLord.length === 0&& phases === 'ghost'){
+phases = 'chaos'
+chaosLord.push({ x: startX/gridSize, y: startY/gridSize });
+                    }
                     if (isghostdead === true && ghostLord.length === 0 && lords.length === 0 && firelord.length ===0&& icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead === true && phases === 'ghost'){
                         phases = 'chaos'
 chaosLord.push({ x: startX/gridSize, y: startY/gridSize });
