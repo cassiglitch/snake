@@ -4852,11 +4852,11 @@ const randomIndex = Math.floor(Math.random() * lords.length);
         
     lords.splice(randomIndex, 1);
 }
-if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && isghostdead === false){
+if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && isghostdead === false && phases === 'elementlords'){
     phases = 'ghost'
         ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
 }
-                    if (isghostdead === true && ghostLord.length === 0 && lords.length === 0 && firelord.length ===0&& icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead === true){
+                    if (isghostdead === true && ghostLord.length === 0 && lords.length === 0 && firelord.length ===0&& icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead === true && phases === 'ghost'){
                         phases = 'chaos'
 chaosLord.push({ x: startX/gridSize, y: startY/gridSize });
                     }
