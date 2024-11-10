@@ -67,8 +67,7 @@ let isSlow = false
         let lavacoords = []
         let goombadirection = 'left'
         let goombaoffset = 1.00
-        let reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 2, y: 1},  { x: 3, y: 9 },  { x: 5, y: 1 },  { x: 2, y: 1 },  { x: 5, y: 1 },  { x: 1, y: 1 },{ x: 1, y: 1 }]
-        let isFast = false
+        let reflector = []        let isFast = false
         let timezone = []
         let mirrors = []
         let gotextralife = false;
@@ -144,7 +143,7 @@ let isSlow = false
 let thwomps = []
 let pX = 0;
 let wellStrength = 4
-let firelord = []
+let firelord = [{x:4,y:4}]
      let lightninglord = []
         let icelord = []
         let earthlord = []
@@ -4625,6 +4624,7 @@ const randomValue = Math.random()
             timezone = []
             isEating = false;
             projectiles = [] 
+            lords = [firelord, lightninglord, icelord, earthlord]
             reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 11, y: 12 },  { x: 13, y: 14 },  { x: 15, y: 16 },  { x: 17, y: 18 },  { x: 19, y: 20 },  { x: 21, y: 22 },{ x: 23, y: 24 }]
    if (didwin === false){
             lords = [firelord, lightninglord, icelord, earthlord]
