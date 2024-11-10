@@ -4852,7 +4852,7 @@ const randomIndex = Math.floor(Math.random() * lords.length);
         
     lords.splice(randomIndex, 1);
 }
-if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0){
+if (lords.length === 0 && firelord.length ===0&& icelord.length ===0 && lightninglord.length === 0 && earthlord.length === 0 && isghostdead === false){
     phases = 'ghost'
         ghostLord.push({ x: startX/gridSize, y: startY/gridSize });
 }
