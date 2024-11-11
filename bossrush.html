@@ -4874,7 +4874,9 @@ if (isghostdead && ghostLord.length === 0 && lords.length === 0 && firelord.leng
     phases = 'chaos';
     chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
 }
-
+if (phases === 'chaos'){
+chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
+}
 // Clear chaosLord if any lord or phase state is not ready for chaos phase
 if (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead) {
     chaosLord = [];
