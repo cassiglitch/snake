@@ -4836,7 +4836,7 @@ changeInterval(150)
 changeInterval(100)
 }
 // Function to add a random lord to the grid
-phases()
+phasesControl()
 
             if (isEating) {
                 eatingAnimationFrames--;
@@ -4852,7 +4852,7 @@ phases()
                 }
             }
         }
-function phases(){
+function phasesControl(){
 function addRandomLord(lords) {
     const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
