@@ -4836,6 +4836,23 @@ changeInterval(150)
 changeInterval(100)
 }
 // Function to add a random lord to the grid
+phases()
+
+            if (isEating) {
+                eatingAnimationFrames--;
+                // Apply the wavelike animation
+                for (let i = 1; i < snake.length; i++) {
+                    if (i <= eatingAnimationFrames) {
+                        snake[i].color = 'green';
+                    }
+                }
+
+                if (eatingAnimationFrames === 0) {
+                    isEating = false;
+                }
+            }
+        }
+function phases(){
 function addRandomLord(lords) {
     const randomIndex = Math.floor(Math.random() * lords.length);
     let selectedLord = lords[randomIndex];
@@ -4881,22 +4898,7 @@ chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
 if (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead) {
     chaosLord = [];
 }
-
-            if (isEating) {
-                eatingAnimationFrames--;
-                // Apply the wavelike animation
-                for (let i = 1; i < snake.length; i++) {
-                    if (i <= eatingAnimationFrames) {
-                        snake[i].color = 'green';
-                    }
-                }
-
-                if (eatingAnimationFrames === 0) {
-                    isEating = false;
-                }
-            }
-        }
-
+}
 function closestNumber(n, m) {
     // Find the quotient
     let q = Math.floor(n / m);
