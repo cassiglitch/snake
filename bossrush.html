@@ -4881,13 +4881,13 @@ function phasesControl() {
     }
 
     // Transition to chaos phase if ghost is dead and ghostLord is empty
-    if (isghostdead && ghostLord.length === 0 && phases === 'ghost') {
+    if (isghostdead && ghostLord.length === 0 && phases === 'chaos') {
         phases = 'chaos';
         chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
     }
 
     // Clear chaosLord if any condition does not match the chaos phase
-    if (phases === 'chaos' && (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead)) {
+    if (phases !== 'chaos' && (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead)) {
         chaosLord = [];
     }
 }
