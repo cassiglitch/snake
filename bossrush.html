@@ -4852,46 +4852,57 @@ phasesControl()
                 }
             }
         }
-function phasesControl() {
-    function addRandomLord(lords) {
+phasesControl(){
+   function addRandomLord(lords) {
         if (lords.length > 0) {
             const randomIndex = Math.floor(Math.random() * lords.length);
             const selectedLord = lords[randomIndex];
             selectedLord.push({ x: startX / gridSize, y: startY / gridSize });
-            lords.splice(randomIndex, 1);
+            lords.splice(randomIndex, 1)
         }
-    }
+   }
+// Handle the elementlords phase
 
-    // Initialize the lords array if necessary
-    if (iskamekdead && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && phases !== 'elementlords' && lords.length === 4) {
-        lords = [firelord, lightninglord, icelord, earthlord];
-        phases = 'elementlords';
+// Handle the elementlords phase
+if (firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && phases === 'elementlords') {
+    if (lords.length > 0 && lords.length <= 3) {
         addRandomLord(lords);
-    }
-
-    // Handle the elementlords phase if all lords are empty
-    if (phases === 'elementlords' && lords.length > 0 && lords.length <= 3) {
-        addRandomLord(lords);
-    }
-
-    // Transition to ghost phase if no lords are left
-    if (lords.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isghostdead && phases === 'elementlords') {
-        phases = 'ghost';
-        ghostLord.push({ x: startX / gridSize, y: startY / gridSize });
-    }
-
-    // Transition to chaos phase if ghost is dead and ghostLord is empty
-    if (isghostdead && ghostLord.length === 0 && phases === 'chaos') {
-        phases = 'chaos';
-        chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
-    }
-
-    // Clear chaosLord if any condition does not match the chaos phase
-    if (phases !== 'chaos' && (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead)) {
-        chaosLord = [];
     }
 }
 
+// Start the elementlords phase if Kamek is dead and all lords are initialized
+if (iskamekdead && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && phases !== 'elementlords' && lords.length === 4) {
+    lords = [firelord, lightninglord, icelord, earthlord];
+    phases = 'elementlords';
+    addRandomLord(lords);
+}
+
+
+// Transition to ghost phase if no lords are left
+if (lords.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isghostdead && phases === 'elementlords') {
+    phases = 'ghost';
+    ghostLord.push({ x: startX / gridSize, y: startY / gridSize });
+}
+
+// Transition to chaos phase if ghost is dead and ghostLord is empty
+if (isghostdead && ghostLord.length === 0 && phases === 'ghost') {
+    phases = 'chaos';
+    chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
+}
+
+// Redundant check for chaos phase initiation
+if (isghostdead && ghostLord.length === 0 && lords.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead && phases === 'ghost') {
+    phases = 'chaos';
+    chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
+}
+if (phases === 'chaos'){
+chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
+}
+// Clear chaosLord if any lord or phase state is not ready for chaos phase
+if (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead) {
+    chaosLord = [];
+}
+}
 setInterval(phasesControl, 1);
 
 function closestNumber(n, m) {
