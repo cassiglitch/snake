@@ -1721,108 +1721,84 @@ function drawKamek(x, y){
 
     return boundingBox;
 }
-       
-let chaosAngle = 0;
-let movingchaosMagic = 0;
-let chaosMagic = 0;
-let chaosLordInMotion = false;
-let chaosLordBoundingBox = drawChaosLord(5, 5);
-let canTeleport = false;
-  function manageChaosLord() {
-    if (chaosLord.length !== 0) {
-        
-        const functions = [
-    lightningArea,
-    ghostArea,
-    earthArea,
-    iceArea,
-    addLavaArea
-];
+let chaosLordBoundingBox = drawChaosLord(5, 5); // Initial position of chaosLord
+let chaosMagic = "launch"; // Start with 'launch' magic type
+let magicCooldown = 0; // Track cooldown for switching magic
 
-// Choose a random function
-const randomFunction = functions[Math.floor(Math.random() * functions.length)];
+function manageChaosLord() {
+    // Ensure chaosLord is defined and valid
+    if (!Array.isArray(chaosLord) || chaosLord.length === 0) return;
 
-randomFunction(chaosLord[0].x, chaosLord[0].y, 2, 1.8);
-        if (chaosLord[0].health === undefined) {
-            chaosLord[0].health = 100;
-        }
-
-        if (chaosLordInMotion === false) {
-            const targetX = snake[0].x * gridSize;
-            const targetY = snake[0].y * gridSize;
-            chaosAngle = Math.atan2(targetY - chaosLord[0].y * gridSize, targetX - chaosLord[0].x * gridSize);
-        }
-
-        let velocityX = Math.cos(chaosAngle);
-        let velocityY = Math.sin(chaosAngle);
-
-        if (chaosLord.length > 1) {
-            chaosLord.length = 1;
-        }
-
-
-        if (chaosLordInMotion === false) {
-            const magicOptions = ['launch', 'bolt', 'port' ,'obstacle']
-            const randomIndex = Math.floor(Math.random() * magicOptions.length);
-            chaosMagic = magicOptions[randomIndex];
-        }
-        if (chaosLordInMotion === true) {
-            const magicOptions = ['launch', 'bolt', 'port', 'bolt', 'port','obstacle']
-            const randomIndex = Math.floor(Math.random() * magicOptions.length);
-            movingchaosMagic = magicOptions[randomIndex];
-        }
-
-        if ((chaosMagic === 'launch') || movingchaosMagic === 'launch' && chaosLordInMotion ) {
-            if (movingchaosMagic === 'launch' && chaosLordInMotion){
-                targetX = snake[0].x * gridSize;
-             targetY = snake[0].y * gridSize;
-            chaosAngle = Math.atan2(targetY - chaosLord[0].y * gridSize, targetX - chaosLord[0].x * gridSize);
-            }
-
-                
-            chaosLord[0].x += velocityX;
-            chaosLord[0].y += velocityY;
-            chaosLordInMotion = true;
-            chaosLordBoundingBox = drawChaosLord(chaosLord[0].x, chaosLord[0].y);
-
-            if (chaosLordBoundingBox.xMin < 0 || chaosLordBoundingBox.yMin < 0 ||
-                chaosLordBoundingBox.xMax > canvas.width || chaosLordBoundingBox.yMax > canvas.height) {
-                chaosLordInMotion = false;
-            }
-        } else if ((chaosMagic === 'bolt' && !chaosLordInMotion ) || movingchaosMagic === 'bolt' && chaosLordInMotion ) {
-            canTeleport = true
-            shootWaveOfProjectiles(chaosLord[0].x * gridSize, chaosLord[0].y * gridSize, 1, 1, 0.5, 'blue', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, chaosLord);
-        } else if ((chaosMagic === 'port' && !chaosLordInMotion  && canTeleport === true) || movingchaosMagic === 'port' && chaosLordInMotion  && canTeleport === true) {
-            const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
-            const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
-            chaosLord[0].x = randomX;
-            chaosLord[0].y = randomY;
-        } else if ((chaosMagic === 'obstacle' && !chaosLordInMotion) || movingchaosMagic === 'obstacle' && chaosLordInMotion) {
-          
-// Assume obstacles and mirrors are defined arrays
-
-
-// Calculate random coordinates within the grid
-let x = Math.floor(Math.random() * (canvas.width / gridSize));
-let y = Math.floor(Math.random() * (canvas.height / gridSize));
-
-    
-        
-const functions2 = [
-    lightningArea,
-    ghostArea,
-    earthArea,
-    iceArea,
-    addLavaArea
-];
-
-// Choose a random function
-const randomArea = functions2[Math.floor(Math.random() * functions2.length)];
-
-randomArea(x/gridSize,y/gridSize, 2, 3);
-            }
-        }
+    // Initialize chaosLord health if undefined
+    chaosLord[0].health = chaosLord[0].health || 100;
+    chaosLord.length = 1;  // Restrict chaosLord to one instance
+const areaFunctions = [lightningArea, ghostArea, earthArea, iceArea, addLavaArea];
+        const randomAreaFunction = areaFunctions[Math.floor(Math.random() * areaFunctions.length)];
+        randomAreaFunction(chaosLord[0].x, chaosLord[0].y, 2, 1.8); // Spread area around new position 
+    // Handle cooldown for switching magic type (prevents constant switching)
+    if (magicCooldown > 0) {
+        magicCooldown--;
+    } else {
+        // Randomly choose the magic type after a cooldown period
+        chaosMagic = Math.random() < 0.5 ? "launch" : "bolt";
+        magicCooldown = 60; // Set cooldown to 60 frames (1 second if 60 FPS)
     }
+
+    // --- LAUNCH (Teleport) Logic ---
+    if (chaosMagic === "launch") {
+        // Detect snake movement direction
+        const snakeHead = snake[0];
+        const snakeNextPosition = snake[1]; // Assuming `snake[1]` is the next segment
+
+        const directionX = snakeHead.x - snakeNextPosition.x;
+        const directionY = snakeHead.y - snakeNextPosition.y;
+
+        // Set lead distance ahead of the snake in grid units
+        const leadDistance = 5; // Adjust this value as needed
+
+        // Calculate target teleport position based on direction and lead distance
+        const targetX = snakeHead.x + directionX * leadDistance;
+        const targetY = snakeHead.y + directionY * leadDistance;
+
+        // Teleport chaosLord to the calculated position
+        chaosLord[0].x = targetX;
+        chaosLord[0].y = targetY;
+
+        // Apply area effect after teleporting
+        const areaFunctions = [lightningArea, ghostArea, earthArea, iceArea, addLavaArea];
+        const randomAreaFunction = areaFunctions[Math.floor(Math.random() * areaFunctions.length)];
+        randomAreaFunction(chaosLord[0].x, chaosLord[0].y, 2, 1.8); // Spread area around new position
+
+        // Update bounding box position for chaosLord
+        chaosLordBoundingBox = drawChaosLord(chaosLord[0].x, chaosLord[0].y);
+
+        // Check for canvas boundaries and adjust if necessary
+        const outOfBounds =
+            chaosLordBoundingBox.xMin < 0 ||
+            chaosLordBoundingBox.yMin < 0 ||
+            chaosLordBoundingBox.xMax > canvas.width ||
+            chaosLordBoundingBox.yMax > canvas.height;
+
+        if (outOfBounds) {
+            // Reposition within bounds if out of canvas
+            chaosLord[0].x = Math.max(0, Math.min(targetX, canvas.width / gridSize));
+            chaosLord[0].y = Math.max(0, Math.min(targetY, canvas.height / gridSize));
+        }
+
+    } else if (chaosMagic === "bolt") {
+        // --- BOLT Logic ---
+
+        // Shoot a wave of projectiles at the current position of chaosLord
+        shootWaveOfProjectiles(
+            chaosLord[0].x * gridSize, chaosLord[0].y * gridSize,
+            1, 1, 0.5, 'blue',
+            obstacles, dynamicObstacles, gridSize,
+            'down', 20, 70, true, 3, false, 20, 1, true, chaosLord
+        );
+    }
+}
+
+
        
     function drawEarthLord(x, y) {
     // Scale the coordinates by gridSize
@@ -4835,9 +4811,12 @@ changeInterval(150)
 }else if (currentInterval === 1.5 && isSlow === false && isEarthed === false){
 changeInterval(100)
 }
+if (canEnterChaosPhase && phases === 'chaos'){
+initializeChaosPhase()
+}
 // Function to add a random lord to the grid
-phasesControl()
-
+managePhaseTransitions()
+                    
             if (isEating) {
                 eatingAnimationFrames--;
                 // Apply the wavelike animation
@@ -4852,59 +4831,86 @@ phasesControl()
                 }
             }
         }
-function phasesControl(){
-   function addRandomLord(lords) {
-        if (lords.length > 0) {
-            const randomIndex = Math.floor(Math.random() * lords.length);
-            const selectedLord = lords[randomIndex];
-            selectedLord.push({ x: startX / gridSize, y: startY / gridSize });
-            lords.splice(randomIndex, 1)
+        function ChaosLordSpawn(){
+        if (canEnterChaosPhase && phases === 'chaos'){
+initializeChaosPhase()
+}
         }
-   }
-// Handle the elementlords phase
-
-// Handle the elementlords phase
-if (firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && phases === 'elementlords') {
-    if (lords.length > 0 && lords.length <= 3) {
-        addRandomLord(lords);
-    }
+setInterval(ChaosLordSpawn, 1)        
+function allLordsDefeated() {
+    return kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0;
+}
+function ifLordExists(){
+return firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0; 
 }
 
-// Start the elementlords phase if Kamek is dead and all lords are initialized
-if (iskamekdead && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && phases !== 'elementlords' && lords.length === 4) {
+function managePhaseTransitions() {
+    switch (phases) {
+        case 'kamek':
+            if (iskamekdead) {
+                initializeElementlordsPhase();
+                phases = 'elementlords';
+            }
+            break;
+
+        case 'elementlords':
+            if (allElementlordsDefeated() && lords.length === 0) {
+                initializeGhostPhase();
+                phases = 'ghost';
+            } else if (lords.length > 0 && !ifLordExists()) {
+                addRandomLord(lords);
+            }
+            break;
+
+        case 'ghost':
+            if (isghostdead && lords.length === 0) {
+                initializeChaosPhase();
+                phases = 'chaos';
+            }
+            break;
+
+        case 'chaos':
+if (canEnterChaosPhase && phases === 'chaos'){
+initializeChaosPhase()
+}
+            break;
+    }
+
+    // Clear chaosLord if conditions for chaos phase are not fully met
+    if (!canEnterChaosPhase()) chaosLord = [];
+}
+
+function initializeElementlordsPhase() {
     lords = [firelord, lightninglord, icelord, earthlord];
-    phases = 'elementlords';
     addRandomLord(lords);
 }
 
-
-// Transition to ghost phase if no lords are left
-if (lords.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isghostdead && phases === 'elementlords') {
-    phases = 'ghost';
+function initializeGhostPhase() {
     ghostLord.push({ x: startX / gridSize, y: startY / gridSize });
 }
 
-// Transition to chaos phase if ghost is dead and ghostLord is empty
-if (isghostdead && ghostLord.length === 0 && phases === 'ghost') {
-    phases = 'chaos';
+function initializeChaosPhase() {
     chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
 }
 
-// Redundant check for chaos phase initiation
-if (isghostdead && ghostLord.length === 0 && lords.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && iskamekdead && phases === 'ghost') {
-    phases = 'chaos';
+function maintainChaosPhase() {
     chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
 }
-if (phases === 'chaos'){
-chaosLord.push({ x: startX / gridSize, y: startY / gridSize });
-}
-// Clear chaosLord if any lord or phase state is not ready for chaos phase
-if (!isghostdead || ghostLord.length !== 0 || lords.length !== 0 || firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || !iskamekdead) {
-    chaosLord = [];
-}
-}
-setInterval(phasesControl, 1);
 
+function canEnterChaosPhase() {
+    return isghostdead && ghostLord.length === 0 && allLordsDefeated() && iskamekdead;
+}
+
+function allElementlordsDefeated() {
+    return firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && lords.length === 0;
+}
+
+function addRandomLord(lords) {
+    const randomIndex = Math.floor(Math.random() * lords.length);
+    let selectedLord = lords[randomIndex];
+    selectedLord.push({ x: startX / gridSize, y: startY / gridSize });
+    lords.splice(randomIndex, 1); // Remove the selected lord from the array
+}
 function closestNumber(n, m) {
     // Find the quotient
     let q = Math.floor(n / m);
