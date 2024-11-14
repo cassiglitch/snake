@@ -82,6 +82,10 @@ let isSlow = false
         let startingGridSize = 20;
         let gridSize = 20;
         let flaming = false
+        let firegone = false
+        let lightninggone = false
+        let earthgone = false
+        let icegone = false
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let snake2 = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
@@ -122,13 +126,13 @@ let isSlow = false
         let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
-        let LaserCooldownReset = 0
+        let LaserCooldownReset = 35
         let esnake = [];
         let turrets = []
         let symbiote = [];
         let controlsinverted = false
         let hasBeenTaxed = false
-        let laserTimer = 5
+        let laserTimer = 35
         let controltype = 'set'
         let goombas = []
         let chaosdefeated = false
@@ -2538,6 +2542,7 @@ firelord.forEach((firelord,findex) => {
 let firelordhit = isCollidingWithFireLord(fireLordBoundingBox, projectile.x, projectile.y)
 if (firelordhit === true){
     firelord.splice(findex,1)
+    firegone = true
 createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
 }
@@ -2547,6 +2552,7 @@ earthlord.forEach((firelord,findex) => {
 let earthlordhit = isCollidingWithFireLord(earthLordBoundingBox, projectile.x, projectile.y)
 if (earthlordhit === true){
     earthlord.splice(findex,1)
+    earthgone = true
 createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
 }
@@ -2568,6 +2574,7 @@ lightninglord.forEach((firelord,findex) => {
 let lightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, projectile.x, projectile.y)
 if (lightninglordhit === true){
     lightninglord.splice(findex,1)
+    lightninggone = true
 createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
 }
@@ -2577,6 +2584,7 @@ icelord.forEach((icelord,findex) => {
 let icrlordhit = isCollidingWithFireLord(iceLordBoundingBox, projectile.x, projectile.y)
 if (icrlordhit === true){
     icelord.splice(findex,1)
+    icegone = true
 createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
 }
@@ -3004,6 +3012,7 @@ if (kamekappears === false) {
 let isfirelordhit = isCollidingWithFireLord(fireLordBoundingBox, x, y)
 if (isfirelordhit === true) {
 firelord = []
+firegone = true
 }
 
 
@@ -3018,15 +3027,18 @@ ghostLord = []
 let islightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, x, y)
 if (islightninglordhit === true) {
 lightninglord = []
+lightninggone = true
 }
 
   let isicelordhit = isCollidingWithFireLord(iceLordBoundingBox, x, y)
 if (isicelordhit === true) {
 icelord = []
+icegone = true
 }          
 let isearthlordhit = isCollidingWithFireLord(earthLordBoundingBox, x, y)
 if (isearthlordhit === true) {
 earthlord = []
+earthgone = true
 }
     
             timezone.forEach((obstacle, index) => {
@@ -4444,6 +4456,14 @@ ghostLord.push({ x: 2, y: 2 });
             }
             if (phases === 'elementlords'){
                 iskamekdead === true
+                earthgone = false
+                lightninggone = false
+                firegone = false
+                icegone = false
+                    lightninglord = []
+            icelord = []
+            earthlord = []
+            firelord = []
             lords = [firelord, lightninglord, icelord, earthlord]
                 if (lords.length === 4){
            const randomIndex = Math.floor(Math.random() * lords.length);
@@ -4468,7 +4488,7 @@ kamek.push({ x: kamekX2, y: kamekY2 });
         isPaused = false
     }, 5000);
             }
-   if (didwin === false){
+   if (didwin === true){
             lords = [firelord, lightninglord, icelord, earthlord]
             goombas = []
             lava = []
@@ -4667,7 +4687,7 @@ managePhaseTransitions()
         }
 
 function allLordsDefeated() {
-    return kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0;
+    return kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && icegone === true && firegone === true && lightninggone === true && earthgone === true && lords.length === 0;
 }
 function ifLordExists(){
 return firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0; 
