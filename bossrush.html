@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -126,13 +125,13 @@ let isSlow = false
         let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
-        let LaserCooldownReset = 35
+        let LaserCooldownReset = 5
         let esnake = [];
         let turrets = []
         let symbiote = [];
         let controlsinverted = false
         let hasBeenTaxed = false
-        let laserTimer = 35
+        let laserTimer = 5
         let controltype = 'set'
         let goombas = []
         let chaosdefeated = false
@@ -1688,7 +1687,7 @@ function drawKamek(x, y){
     ctx.arc(x + gridSize * 0.2, y - gridSize, pupilRadius, 0, Math.PI * 2);
     ctx.fill();
 
-let mouthWidth = gridSize * 0.8;
+let mouthWidth = gridSize * 0.8; 
     let mouthHeight = gridSize * 0.15;
     ctx.fillStyle = 'black';
     ctx.fillRect(x, y, mouthWidth, mouthHeight);
@@ -2259,19 +2258,20 @@ function isCollidingWithGhostLord(ghostLordBoundingBox, pointX, pointY) {
     return pointX >= ghostLordBoundingBox.xMin && pointX <= ghostLordBoundingBox.xMax &&
            pointY >= ghostLordBoundingBox.yMin && pointY <= ghostLordBoundingBox.yMax;
 }
+// Assuming ctx is defined as the 2D drawing context of the canvas
 let ghostAngle = 0;
 let ghostMagic = 0;
 let ghostLordInMotion = false;
 let ghostLordBoundingBox = drawGhostLord(5, 5);
 let ghostcanteleport = true;
 let magicCooldown = 0; // Track cooldown for switching magic
+let hauntingChains = []; // Store chains for "Haunting Chains" magic
+let shadowSummons = []; // Store summoned shadows for "Shadow Summon" magic
 
 function manageGhostLord() {
     if (ghostLord.length !== 0) {
-        // Trigger a ghost area effect around the ghost lord's position
         ghostArea(ghostLord[0].x, ghostLord[0].y, 2, 1);
 
-        // Angle calculation for following behavior
         if (!ghostLordInMotion) {
             const targetX = snake[0].x * gridSize;
             const targetY = snake[0].y * gridSize;
@@ -2281,41 +2281,47 @@ function manageGhostLord() {
         let velocityX = Math.cos(ghostAngle);
         let velocityY = Math.sin(ghostAngle);
 
-        // Limit ghostLord to one instance
         if (ghostLord.length > 1) {
             ghostLord.length = 1;
         }
 
-        // Randomly assign magic abilities with a cooldown
         if (magicCooldown > 0) {
             magicCooldown--;
         } else {
-            const magic = ['launch', 'bolt', 'follow'];
+            const magic = ['launch', 'bolt', 'follow', 'port', 'hauntingChains', 'shadowSummon'];
             const randomIndex = Math.floor(Math.random() * magic.length);
             ghostMagic = magic[randomIndex];
-            magicCooldown = 60; // Set cooldown to 60 frames
+            magicCooldown = 60;
         }
 
-        // Handle magic actions based on the selected magic type
         if (ghostMagic === 'launch') {
-            // Ghost Lord's launch behavior
             ghostLord[0].x += velocityX;
             ghostLord[0].y += velocityY;
             ghostLordInMotion = true;
             ghostLordBoundingBox = drawGhostLord(ghostLord[0].x, ghostLord[0].y);
 
-            // Boundary check for canvas limits
             if (ghostLordBoundingBox.xMin < 0 || ghostLordBoundingBox.yMin < 0 ||
                 ghostLordBoundingBox.xMax > canvas.width || ghostLordBoundingBox.yMax > canvas.height) {
                 ghostLordInMotion = false;
             }
-        } else if (ghostMagic === 'bolt') {
+        } else if (ghostMagic === 'hauntingChains') {
+         hauntingChains = []    
+            launchHauntingChain(ghostLord[0].x, ghostLord[0].y);
+        } else if (ghostMagic === 'shadowSummon') {
+            shadowSummons.push({
+                x: Math.random() * (canvas.width / gridSize),
+                y: Math.random() * (canvas.height / gridSize),
+                lifetime: 180
+            });
+        }else if (ghostMagic === 'bolt') {
             // Ghost Lord's bolt action
             shootWaveOfProjectiles(ghostLord[0].x * gridSize, ghostLord[0].y * gridSize, 1, 1, 0.5, 'blue', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, ghostLord);
+            ghostMagic = 0
         } else if (ghostMagic === 'port' && ghostcanteleport) {
             // Ghost Lord's teleport ability
             ghostLord[0].x = Math.floor(Math.random() * (canvas.width / gridSize));
             ghostLord[0].y = Math.floor(Math.random() * (canvas.height / gridSize));
+            ghostcanteleport = false
         } else if (ghostMagic === 'follow') {
             // Adapted follow action (originally chaosLord's launch behavior)
             const snakeHead = snake[0];
@@ -2346,29 +2352,104 @@ function manageGhostLord() {
             }
         }
     }
+    
+
+    // Render and update chains and shadows each frame
+    moveAndRenderChains();
+    moveAndRenderShadows();
 }
 
-
-        
-function getDirectionToSnakeHead(x, y, snake) {
-    // Get the head of the snake
-    const head = snake[0];
-  
-    // Calculate the differences in x and y coordinates
-    const dx = head.x - x;
-    const dy = head.y - y;
-
-    // Calculate the magnitude of the vector
-    const magnitude = Math.sqrt(dx * dx + dy * dy);
-
-    // Normalize the direction vector (convert to unit vector)
-    const direction = {
-        x: dx / magnitude,
-        y: dy / magnitude
+function launchHauntingChain(startX, startY) {
+    const chain = {
+        x: startX,
+        y: startY,
+        directionX: Math.cos(ghostAngle),
+        directionY: Math.sin(ghostAngle),
+        active: true,
+        segments: [],
+        paralysisTimer: 0
     };
-
-    return direction;
+    hauntingChains.push(chain);
 }
+
+function moveAndRenderChains() {
+    hauntingChains.forEach((chain, index) => {
+        if (chain.active) {
+            const nextX = chain.x + chain.directionX;
+            const nextY = chain.y - chain.directionY;
+
+            if (checkCollisionWithWall(nextX, nextY) || checkCollisionWithSnake(nextX, nextY)) {
+                chain.active = false;
+                if (checkCollisionWithSnake(nextX, nextY)){
+                    isParalyzed = true;
+                    chain.paralysisTimer = 300; // 5 seconds at 60 FPS
+                }
+            } else {
+                chain.x = nextX;
+                chain.y = nextY;
+                chain.segments.push({ x: nextX, y: nextY });
+            }
+        } else if (chain.paralysisTimer > 0) {
+            chain.paralysisTimer--;
+            if (chain.paralysisTimer === 0) {
+                isParalyzed = false;
+                hauntingChains.splice(index, 1);
+            }
+        }
+
+        drawChainSegments();
+    });
+}
+function drawChainSegments() {
+    hauntingChains.forEach(chain => {
+    ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'; // Ghostly purple color
+            ctx.fillRect(chain.x * gridSize, chain.y * gridSize, gridSize, gridSize)
+        chain.segments.forEach(segment => {
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+        });
+    });
+}
+
+
+function checkCollisionWithWall(x, y) {
+    return x < 0 || y < 0 || x >= canvas.width / gridSize || y >= canvas.height / gridSize;
+}
+
+function checkCollisionWithSnake(x, y) {
+    return snake.some(segment => segment.x === Math.floor(x) && segment.y === Math.floor(y));
+}
+
+function moveAndRenderShadows() {
+    shadowSummons.forEach((shadow, index) => {
+        const snakeHead = snake[0];
+        const angleToSnake = Math.atan2(snakeHead.y - shadow.y, snakeHead.x - shadow.x);
+
+        shadow.x += Math.cos(angleToSnake) * 0.3;
+        shadow.y += Math.sin(angleToSnake) * 0.3;
+
+        drawShadow(shadow.x, shadow.y);
+
+        if (Math.abs(shadow.x - snakeHead.x) < 1 && Math.abs(shadow.y - snakeHead.y) < 1) {
+            if (snake.length > 1) {
+snake.pop()
+                HaHaNoCollision(10)
+            }
+            shadowSummons.splice(index, 1);
+        }
+
+        shadow.lifetime--;
+        if (shadow.lifetime <= 0) {
+            shadowSummons.splice(index, 1);
+        }
+    });
+}
+
+function drawShadow(x, y) {
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
+}
+
+
 let iskamekdead = false;
 let onlyoneportal = false
 function kamekDeath() {
@@ -3178,6 +3259,18 @@ function getAlphaFromHexColor(color) {
     ctx.fillStyle = earthcolor;
     earth.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
 
+    ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'; // Ghostly purple color for the chains
+    hauntingChains.forEach(chain => {
+        chain.segments.forEach(segment => {
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+        });
+    });
+
+    shadowSummons.forEach((shadow, index) => {
+ctx.fillStyle = 'rgba(0, 0, 255, 0.7)'; // Shadow color (ghostly blue)
+    ctx.fillRect(shadow.x * gridSize, shadow.y * gridSize, gridSize, gridSize);
+    })
+
     clearAndDrawObstacles(ectoplasm, ghostcolor)
     ctx.fillStyle = electriccolor;
     electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
@@ -3346,7 +3439,7 @@ ghostLord.forEach(firelord => {
 
     // Draw score
     const scoreDisplay = document.getElementById('scoreDisplay');
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount} <br> Current Phase: ${phases}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
     drawLaser();
 }
 
@@ -4225,6 +4318,31 @@ goombas.forEach((obstacle, index) => {
         );
 }}
 
+    shadowSummons.forEach((shadow, index) => {
+        const snakeHead = snake[0];
+        const angleToSnake = Math.atan2(snakeHead.y - shadow.y, snakeHead.x - shadow.x);
+if (!isPaused){
+        shadow.x += Math.cos(angleToSnake) * 0.3;
+        shadow.y += Math.sin(angleToSnake) * 0.3;
+}
+        drawShadow(shadow.x, shadow.y);
+
+        if (Math.abs(shadow.x - snakeHead.x) < 1 && Math.abs(shadow.y - snakeHead.y) < 1 && !isInvincible) {
+            if (snake.length > 1) {
+snake.length = snake.length - 2
+snake2.length = snake2.length - 2
+HaHaNoCollision(10)
+            }
+            shadowSummons.splice(index, 1);
+        }
+
+        shadow.lifetime--;
+        if (shadow.lifetime <= 0) {
+            shadowSummons.splice(index, 1);
+        }
+    });
+
+
     // Randomize the direction
     const types = ['magnet']; // Possible directions
     const randomIndex = Math.floor(Math.random() * types.length);
@@ -4452,6 +4570,8 @@ const randomValue = Math.random()
             isEating = false;
             projectiles = [] 
             if (phases === 'ghost'){
+shadowSummons = []
+hauntingChains = []
 ghostLord.push({ x: 2, y: 2 });
             }
             if (phases === 'elementlords'){
