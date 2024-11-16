@@ -2259,15 +2259,19 @@ function isCollidingWithGhostLord(ghostLordBoundingBox, pointX, pointY) {
            pointY >= ghostLordBoundingBox.yMin && pointY <= ghostLordBoundingBox.yMax;
 }
 // Assuming ctx is defined as the 2D drawing context of the canvas
+let spectralSwipes = []; // Tracks active swipes
+    let possessionProjections = []; // Tracks active projections
 let ghostAngle = 0;
 let ghostMagic = 0;
+let haslaunchedchain = false
 let ghostLordInMotion = false;
 let ghostLordBoundingBox = drawGhostLord(5, 5);
 let ghostcanteleport = true;
 let magicCooldown = 0; // Track cooldown for switching magic
 let hauntingChains = []; // Store chains for "Haunting Chains" magic
 let shadowSummons = []; // Store summoned shadows for "Shadow Summon" magic
-
+let shadownumber = 5
+let swipenumber = 2
 function manageGhostLord() {
     if (ghostLord.length !== 0) {
         ghostArea(ghostLord[0].x, ghostLord[0].y, 2, 1);
@@ -2288,7 +2292,7 @@ function manageGhostLord() {
         if (magicCooldown > 0) {
             magicCooldown--;
         } else {
-            const magic = ['launch', 'bolt', 'follow', 'port', 'hauntingChains', 'shadowSummon'];
+            const magic = ['launch','shadowSummon','follow','bolt','port','hauntingChains','spectralSwipe'];
             const randomIndex = Math.floor(Math.random() * magic.length);
             ghostMagic = magic[randomIndex];
             magicCooldown = 60;
@@ -2304,15 +2308,18 @@ function manageGhostLord() {
                 ghostLordBoundingBox.xMax > canvas.width || ghostLordBoundingBox.yMax > canvas.height) {
                 ghostLordInMotion = false;
             }
-        } else if (ghostMagic === 'hauntingChains') {
+            } else if (ghostMagic === 'hauntingChains' && haslaunchedchain === false) {
          hauntingChains = []    
             launchHauntingChain(ghostLord[0].x, ghostLord[0].y);
+            haslaunchedchain = true
         } else if (ghostMagic === 'shadowSummon') {
+        if (shadowSummons.length < shadownumber){
             shadowSummons.push({
                 x: Math.random() * (canvas.width / gridSize),
                 y: Math.random() * (canvas.height / gridSize),
                 lifetime: 180
             });
+            }
         }else if (ghostMagic === 'bolt') {
             // Ghost Lord's bolt action
             shootWaveOfProjectiles(ghostLord[0].x * gridSize, ghostLord[0].y * gridSize, 1, 1, 0.5, 'blue', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true, ghostLord);
@@ -2322,6 +2329,7 @@ function manageGhostLord() {
             ghostLord[0].x = Math.floor(Math.random() * (canvas.width / gridSize));
             ghostLord[0].y = Math.floor(Math.random() * (canvas.height / gridSize));
             ghostcanteleport = false
+            magicCooldown = 0
         } else if (ghostMagic === 'follow') {
             // Adapted follow action (originally chaosLord's launch behavior)
             const snakeHead = snake[0];
@@ -2350,14 +2358,60 @@ function manageGhostLord() {
                 ghostLord[0].x = Math.max(0, Math.min(targetX, canvas.width / gridSize));
                 ghostLord[0].y = Math.max(0, Math.min(targetY, canvas.height / gridSize));
             }
-        }
+        } else if (ghostMagic === 'spectralSwipe') {
+        if (spectralSwipes.length < swipenumber){
+            triggerSpectralSwipe();
+        } 
     }
-    
-
-    // Render and update chains and shadows each frame
+    }
     moveAndRenderChains();
     moveAndRenderShadows();
+    moveAndRenderSwipes();
 }
+function triggerSpectralSwipe() {
+    const swipe = {
+        x: 0,
+        y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize, // Random vertical position
+        width: gridSize * 2,
+        height: gridSize,
+        speed: 5,
+        active: true
+    };
+    spectralSwipes.push(swipe);
+}
+
+function moveAndRenderSwipes() {
+    spectralSwipes.forEach((swipe, index) => {
+        swipe.x += swipe.speed;
+
+        // Check collision with snake
+        snake.forEach(segment => {
+            if (
+                segment.x * gridSize < swipe.x + swipe.width &&
+                segment.x * gridSize + gridSize > swipe.x &&
+                segment.y * gridSize < swipe.y + swipe.height &&
+                segment.y * gridSize + gridSize > swipe.y
+            ) {
+                // Collision detected: Remove a segment from the snake
+                if (snake.length > 2){
+                snake.splice(snake.length - 1, 1);
+                snake2.splice(snake2.length - 1, 1);
+}else {
+restartGame()
+}
+            }
+        });
+
+        // Render the swipe
+
+        // Remove swipe if it moves off-screen
+        if (swipe.x > canvas.width) {
+            spectralSwipes.splice(index, 1);
+        }
+    });
+
+}
+
 
 function launchHauntingChain(startX, startY) {
     const chain = {
@@ -2376,13 +2430,18 @@ function moveAndRenderChains() {
     hauntingChains.forEach((chain, index) => {
         if (chain.active) {
             const nextX = chain.x + chain.directionX;
-            const nextY = chain.y - chain.directionY;
+            const nextY = chain.y + chain.directionY;
 
             if (checkCollisionWithWall(nextX, nextY) || checkCollisionWithSnake(nextX, nextY)) {
                 chain.active = false;
+                setTimeout(() => {
+    hauntingChains.splice(index, 1);
+    haslaunchedchain = false;
+}, 2000); 
                 if (checkCollisionWithSnake(nextX, nextY)){
                     isParalyzed = true;
-                    chain.paralysisTimer = 300; // 5 seconds at 60 FPS
+                    chain.paralysisTimer = 20; // 5 seconds at 60 FPS
+                chain.active = false
                 }
             } else {
                 chain.x = nextX;
@@ -2393,22 +2452,14 @@ function moveAndRenderChains() {
             chain.paralysisTimer--;
             if (chain.paralysisTimer === 0) {
                 isParalyzed = false;
-                hauntingChains.splice(index, 1);
+                hauntingChains.splice(index, 1)
+            haslaunchedchain = false
             }
         }
 
-        drawChainSegments();
     });
 }
-function drawChainSegments() {
-    hauntingChains.forEach(chain => {
-    ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'; // Ghostly purple color
-            ctx.fillRect(chain.x * gridSize, chain.y * gridSize, gridSize, gridSize)
-        chain.segments.forEach(segment => {
-            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-        });
-    });
-}
+
 
 
 function checkCollisionWithWall(x, y) {
@@ -2427,13 +2478,16 @@ function moveAndRenderShadows() {
         shadow.x += Math.cos(angleToSnake) * 0.3;
         shadow.y += Math.sin(angleToSnake) * 0.3;
 
-        drawShadow(shadow.x, shadow.y);
 
         if (Math.abs(shadow.x - snakeHead.x) < 1 && Math.abs(shadow.y - snakeHead.y) < 1) {
             if (snake.length > 1) {
-snake.pop()
-                HaHaNoCollision(10)
+snake.length = snake.length - 2
+snake2.length = snake2.length - 2
+HaHaNoCollision(10)
+            }else{
+            restartGame()
             }
+            
             shadowSummons.splice(index, 1);
         }
 
@@ -2442,11 +2496,6 @@ snake.pop()
             shadowSummons.splice(index, 1);
         }
     });
-}
-
-function drawShadow(x, y) {
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(x * gridSize, y * gridSize, gridSize, gridSize);
 }
 
 
@@ -3348,6 +3397,25 @@ clearAndDrawObstacles(windeffect, '#90EE9080');
             ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize);
         });
     }
+    spectralSwipes.forEach((swipe, index) => {
+        // Render the swipe
+        ctx.fillStyle = 'rgba(48, 25, 52, 0.7)';
+        ctx.fillRect(swipe.x, swipe.y, swipe.width, swipe.height);
+    });
+
+
+    hauntingChains.forEach(chain => {
+        chain.segments.forEach(segment => {
+    ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'; // Ghostly purple color for 
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+        });
+    });
+
+    shadowSummons.forEach((shadow, index) => {
+ctx.fillStyle = 'rgba(196, 88, 153, 0.7)'; // Shadow color (ghostly blue)
+    ctx.fillRect(shadow.x * gridSize, shadow.y * gridSize, gridSize, gridSize);
+    })
+
 
     // Draw the snake's head
     const head = snake[0];
@@ -3784,11 +3852,19 @@ checkCollisions(wells, false);
 checkCollisions(dynamicObstacles, true);
 checkCollisions(thwomps, true);
 
-if(kamek.length === 0 && !physicsActive){
-isParalyzed = electric.some((electric) => {
-    return electric.x === head.x && electric.y === head.y;
-});
+if (kamek.length === 0 && !physicsActive && ghostLord.length === 0 && hauntingChains.length === 0) {
+    isParalyzed = electric.some((electric) => electric.x === head.x && electric.y === head.y);
 }
+hauntingChains.forEach((chain, index) => {
+    if (chain.active) {
+        const nextX = chain.x + chain.directionX;
+        const nextY = chain.y + chain.directionY;
+if(checkCollisionWithSnake(nextX, nextY)){
+isParalyzed = checkCollisionWithSnake(nextX, nextY)
+}
+}
+})
+
 // Assume `ectoplasm` is an array of objects with properties `x` and `y`
 // `head` is an object with properties `x` and `y`
 // `isPossessed` is a boolean variable
