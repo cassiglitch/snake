@@ -2271,7 +2271,7 @@ let magicCooldown = 0; // Track cooldown for switching magic
 let hauntingChains = []; // Store chains for "Haunting Chains" magic
 let shadowSummons = []; // Store summoned shadows for "Shadow Summon" magic
 let shadownumber = 5
-let swipenumber = 2
+let swipenumber = 10
 function manageGhostLord() {
     if (ghostLord.length !== 0) {
         ghostArea(ghostLord[0].x, ghostLord[0].y, 2, 1);
@@ -3507,10 +3507,9 @@ ghostLord.forEach(firelord => {
 
     // Draw score
     const scoreDisplay = document.getElementById('scoreDisplay');
-    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
+    scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}<br> Current Magic: ${ghostMagic}`;
     drawLaser();
 }
-
 
 function drawInvincibilityAura(colorName) {
     // Mapping of color names to RGBA values
