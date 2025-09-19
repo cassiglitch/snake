@@ -2693,7 +2693,7 @@
         
         ghostLord.forEach((firelord,findex) => {
         let ghostlordhit = isCollidingWithFireLord(ghostLordBoundingBox, projectile.x, projectile.y)
-        if (ghostlordhit === true){
+        if (ghostlordhit === true && ghostMagic != 'port'){
             ghostLord.splice(findex,1)
         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
@@ -3510,7 +3510,7 @@
         
             // Draw score
             const scoreDisplay = document.getElementById('scoreDisplay');
-            scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}<br> Current Magic: ${ghostMagic}`;
+            scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
             drawLaser();
         }
         
