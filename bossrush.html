@@ -1,5 +1,17 @@
 <html lang="en">
-<head>
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <style>
+   body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden; /* No more scrolling for you! */
+            background-color: #f0f0f0;
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
@@ -47,26 +59,33 @@
             -moz-user-select: none; /* For Firefox */
              -ms-user-select: none; /* For Internet Explorer/Edge */
         }
-    </style>
-    <title>Snake Game</title>
-</head>
-<body>
-    <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.4.2/dist/tinycolor-min.js"></script>
-    <div id="scoreDisplay">Score: 0</div>
-    <canvas id="snakeCanvas"></canvas>
-        <div id="victoryMessage"></div>
-    <script>
-        const canvas = document.getElementById('snakeCanvas');
+  </style>
+  <title>
+   Snake Game
+  </title>
+ </head>
+ <body>
+  <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.4.2/dist/tinycolor-min.js">
+  </script>
+  <div id="scoreDisplay">
+   Score: 0
+  </div>
+  <canvas id="snakeCanvas">
+  </canvas>
+  <div id="victoryMessage">
+  </div>
+  <script>
+   const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
         
-        let phases = 'kamek'
+        let phases = 'wizard'
         let isSlow = false
         let gravitycount = 1
         let snakecutgravity = false
         let lavacoords = []
-        let goombadirection = 'left'
-        let goombaoffset = 1.00
-        let reflector = [{ x: 1, y: 2 }, { x: 3, y: 4 },  { x: 5, y: 6 },  { x: 7, y: 8 },  { x: 9, y: 10 },  { x: 2, y: 1},  { x: 3, y: 9 },  { x: 5, y: 1 },  { x: 2, y: 1 },  { x: 5, y: 1 },  { x: 1, y: 1 },{ x: 1, y: 1 }]
+        let miniondirection = 'left'
+        let minionoffset = 1.00
+        let reflector = []
         
             let isFast = false
         let timezone = []
@@ -90,7 +109,7 @@
         let snake2 = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0};
         let obstacles = []
-        let kamekappears = false
+        let wizardappears = false
         let firstControlSchemeSet = false;
         let dynamicObstacles = [];
         let direction = 'right';
@@ -102,7 +121,7 @@
         let isInvincible = false;
         let invincibilityDuration = 0;
         let isColliding = false;
-        let kamek = []
+        let wizard = []
         let DoDisplayCheck = true
         let collisionAnimationFrames = 10;
         let isPaused = false;
@@ -125,15 +144,15 @@
         let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
-        let LaserCooldownReset = 5
+        let LaserCooldownReset = 35
         let esnake = [];
         let turrets = []
         let symbiote = [];
         let controlsinverted = false
         let hasBeenTaxed = false
-        let laserTimer = 5
+        let laserTimer = 35
         let controltype = 'set'
-        let goombas = []
+        let minions = []
         let chaosdefeated = false
         let magic = []
         let isIced= false
@@ -145,7 +164,7 @@
             var antiZoomFactor = 1 / zoomFactor;
                let currentInterval = 1;
         let track = []
-        let thwomps = []
+        let thunkers = []
         let pX = 0;
         let wellStrength = 4
         let firelord = []
@@ -172,7 +191,7 @@
         let GravityApplied = true
         let magicstatus = 0
         let lightbrown = '#C4A484'
-        let kamekcanteleport = true
+        let wizardcanteleport = true
         let sideshield = 6
         let shield = false
         let magictype = 'bolt'
@@ -246,7 +265,7 @@
         }
         
         function checkAndToggleGravity() {
-            if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused && ghostLord.length === 0) { 
+            if (wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused && ghostLord.length === 0) { 
         GravityApplied = !GravityApplied;
         gravitycount += 1
             } else {
@@ -592,40 +611,40 @@
             }
         
             
-        function kamekUpdate(){
-            if (kamek.length > 1) {
-            kamek.length = 1;
+        function wizardUpdate(){
+            if (wizard.length > 1) {
+            wizard.length = 1;
         }
-            if (kamek.length !== 0){
+            if (wizard.length !== 0){
         applyStatus(1000, 'magic')
-        if (kamek[0].health === undefined){
-            kamek[0].health = 100;
+        if (wizard[0].health === undefined){
+            wizard[0].health = 100;
         }
             }
-        if (kamek.length !== 0){
-            const distance = Math.abs(snake[0].x - kamek[0].x) + Math.abs(snake[0].y - kamek[0].y);
+        if (wizard.length !== 0){
+            const distance = Math.abs(snake[0].x - wizard[0].x) + Math.abs(snake[0].y - wizard[0].y);
               if (distance <= 5) {
             const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
             const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
-            kamek[0].x = randomX;
-            kamek[0].y = randomY;
+            wizard[0].x = randomX;
+            wizard[0].y = randomY;
         timezone = []
-            kamekcanteleport = true
+            wizardcanteleport = true
               if (shield === true){
                timezone = []
-               generatePolygonCoordinates(kamek[0].x, kamek[0].y, 5, sideshield, timezone)
+               generatePolygonCoordinates(wizard[0].x, wizard[0].y, 5, sideshield, timezone)
               }
               }
         }
-        if (kamek.length === 0){
+        if (wizard.length === 0){
             timezone = []
         }
         }
         
-        function kamekMagic() {
+        function wizardMagic() {
             if (!isPaused) {
         // Determine the type of magic
-        if ((Math.random() <= 0.2 && kamekcanteleport === false) && isParalyzed === false) {
+        if ((Math.random() <= 0.2 && wizardcanteleport === false) && isParalyzed === false) {
             const magic = ['bolt', 'status', 'obstacle'];
             const randomIndex = Math.floor(Math.random() * magic.length);
             magictype = magic[randomIndex];
@@ -644,16 +663,16 @@
         // Perform the action based on the type of magic
         if (magictype === 'bolt') {
             enemyshootmagic();
-        } else if (magictype === 'port' && kamekcanteleport === true) {
+        } else if (magictype === 'port' && wizardcanteleport === true) {
             const randomX = Math.floor(Math.random() * (canvas.width / gridSize));
             const randomY = Math.floor(Math.random() * (canvas.height / gridSize));
-            kamek[0].x = randomX;
-            kamek[0].y = randomY;
+            wizard[0].x = randomX;
+            wizard[0].y = randomY;
             timezone = [];
         } else if (magictype === 'wall') {
-            generatePolygonCoordinates(kamek[0].x, kamek[0].y, 5, sideshield, timezone);
+            generatePolygonCoordinates(wizard[0].x, wizard[0].y, 5, sideshield, timezone);
             shield = true
-            kamekcanteleport = false;
+            wizardcanteleport = false;
         } else if (magictype === 'status') {
             const status = ['paralyzed'];
             const randomIndex = Math.floor(Math.random() * status.length);
@@ -665,7 +684,7 @@
             }
         }else if (magictype === 'obstacle'){
         // Assume obstacles and mirrors are defined arrays
-        const obstacles2 = [turrets, goombas];
+        const obstacles2 = [turrets, minions];
         
         // Generate a random index to select either the obstacles or mirrors array
         const randomIndex = Math.floor(Math.random() * obstacles2.length);
@@ -678,7 +697,7 @@
         let y = Math.floor(Math.random() * (canvas.height / gridSize));
         
         // Add the new obstacle or mirror at the random coordinates
-        if (spawner !== goombas){
+        if (spawner !== minions){
             if (spawner === turrets){
         if (turrets.length < 5){
         spawnTurrets(x,y)
@@ -686,12 +705,12 @@
             }else{
         spawner.push({x:x,y:y})
         }
-        }else if(spawner === goombas){
+        }else if(spawner === minions){
             y -= 6
             if(y < 0){
         y = 6
             }
-            spawnGoombas(x, y)
+            spawnminions(x, y)
         }
         }
             }
@@ -730,14 +749,14 @@
         
             // If no object is chosen yet, find the closest one
             if (!choseobject) {
-        if (obstacles.length !== 0 || dynamicObstacles.length !== 0 || thwomps.length !== 0) {
-            object = findClosestItem(snake, obstacles, dynamicObstacles, thwomps);
+        if (obstacles.length !== 0 || dynamicObstacles.length !== 0 || thunkers.length !== 0) {
+            object = findClosestItem(snake, obstacles, dynamicObstacles, thunkers);
             choseobject = true;
         }
             }
         
             // Check if the chosen object still exists in any array
-            let exists = objectExistsInArrays(object, obstacles, dynamicObstacles, thwomps);
+            let exists = objectExistsInArrays(object, obstacles, dynamicObstacles, thunkers);
         
             // If an object is chosen and exists, move the snake towards it
             if (choseobject && exists) {
@@ -822,11 +841,11 @@
           wellToggle()
         effectApplied = currentTime
         }
-        if (effect === 'magic' && kamek.length !== 0){
-            kamekMagic()
+        if (effect === 'magic' && wizard.length !== 0){
+            wizardMagic()
             effectApplied = currentTime
         }
-        if (effect === 'gravity' && kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && ghostLord.length === 0) {
+        if (effect === 'gravity' && wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && ghostLord.length === 0) {
             GravityApplied = !GravityApplied;
             effectApplied = currentTime
         }
@@ -948,10 +967,10 @@
         }, 250);
         
             }
-        function spawnGoombas(x,y){
+        function spawnminions(x,y){
             createPortalAnimation(x* gridSize, y * gridSize, 60, 1000);
             setTimeout(() => {
-            goombas.push({ x: x, y: y });
+            minions.push({ x: x, y: y });
         }, 500);
         
             }
@@ -1062,7 +1081,7 @@
         
               // Check if the turret is within range and if it can fire
               if (distance <= 5 && (now - well.lastFired >= 1000)) {
-        shootWaveOfProjectiles(well.x * gridSize, well.y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true,kamek);
+        shootWaveOfProjectiles(well.x * gridSize, well.y * gridSize, 1, 1, 0.5,'purple', obstacles, dynamicObstacles, gridSize,'down', 20, 70, true, 3,false, 20,1, true,wizard);
         
         // Update the last fired timestamp
         well.lastFired = now;
@@ -1474,7 +1493,7 @@
             ctx.fill();
         }
         
-        function drawGoomba(gx, gy) {
+        function drawminion(gx, gy) {
             // Scale size
             let x = gx * gridSize;
             let y = gy * gridSize;
@@ -1550,7 +1569,7 @@
         }
         
         // Function to check if a point collides with the bounding box
-        function isPointInGoombaBoundingBox(px, py, gx, gy) {
+        function isPointInminionBoundingBox(px, py, gx, gy) {
             let x = gx * gridSize;
             let y = gy * gridSize;
             let size = gridSize;
@@ -1570,7 +1589,7 @@
         py <= boundingBoxY + boundingBoxHeight
             );
         }
-        let GoombaCollision
+        let minionCollision
         
         
         function getBoundingBox(polygon) {
@@ -1594,9 +1613,9 @@
             return pointX >= box.minX && pointX <= box.maxX && pointY >= box.minY && pointY <= box.maxY;
         }
         
-        // Function to get Kamek's bounding box
-        function getKamekBoundingBox(x, y, gridSize) {
-            // Calculate vertices of Kamek's polygons
+        // Function to get wizard's bounding box
+        function getwizardBoundingBox(x, y, gridSize) {
+            // Calculate vertices of wizard's polygons
             let robePolygon = [
         [x, y + gridSize + gridSize],
         [x + gridSize + (gridSize / 2), y + gridSize + gridSize],
@@ -1618,15 +1637,15 @@
             return getBoundingBox(allVertices);
         }
         
-        // Function to check if a point is colliding with Kamek
-        function isCollidingWithKamek(kamekX, kamekY, gridSize, pointX, pointY) {
-            // Get Kamek's bounding box
-            let kamekBoundingBox = getKamekBoundingBox(kamekX, kamekY, gridSize);
+        // Function to check if a point is colliding with wizard
+        function isCollidingWithwizard(wizardX, wizardY, gridSize, pointX, pointY) {
+            // Get wizard's bounding box
+            let wizardBoundingBox = getwizardBoundingBox(wizardX, wizardY, gridSize);
             
-            // Check if the point is within Kamek's bounding box
-            return isPointInBox(pointX, pointY, kamekBoundingBox);
+            // Check if the point is within wizard's bounding box
+            return isPointInBox(pointX, pointY, wizardBoundingBox);
         }
-        function drawKamek(x, y){
+        function drawwizard(x, y){
             // Scale the coordinates by gridSize
             x = x * gridSize;
             y = y * gridSize;
@@ -2502,9 +2521,9 @@
         }
         
         
-        let iskamekdead = false;
+        let iswizarddead = false;
         let onlyoneportal = false
-        function kamekDeath() {
+        function wizardDeath() {
             isPaused = true;
         
             if (!onlyoneportal) {
@@ -2520,29 +2539,29 @@
             createPortalAnimation(turret.x * gridSize, turret.y * gridSize, 30, 2000);
         });
         
-        goombas.forEach((goomba) => {
-            createPortalAnimation(goomba.x * gridSize, (goomba.y * gridSize) + (gridSize / 2), 75, 2000);
+        minions.forEach((minion) => {
+            createPortalAnimation(minion.x * gridSize, (minion.y * gridSize) + (gridSize / 2), 75, 2000);
         });
         
-        createExplosion(ctx, kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90);
-        createPortalAnimation(kamek[0].x * gridSize, (kamek[0].y * gridSize) + gridOffset, 100, 2000);
+        createExplosion(ctx, wizard[0].x * gridSize, (wizard[0].y * gridSize) + gridOffset, 'green', obstacles, dynamicObstacles, gridSize, 90);
+        createPortalAnimation(wizard[0].x * gridSize, (wizard[0].y * gridSize) + gridOffset, 100, 2000);
         onlyoneportal = true
             
         
         setTimeout(() => {
-            kamek = [];
+            wizard = [];
             turrets = [];
-            goombas = [];
+            minions = [];
             timezone = []
-            iskamekdead = true;
+            iswizarddead = true;
             startX = randomX * gridSize
             startY = randomY * gridSize
         }, 1100);
         
         setTimeout(() => {
             isPaused = false;
-            kamekappears = false;
-            iskamekdead = false;
+            wizardappears = false;
+            iswizarddead = false;
         }, 2000);
             }
         }
@@ -2608,7 +2627,7 @@
                 ctx.clearRect(projectile.x - 6, projectile.y - 6, 12, 12);
         
                 if (increase === false || projectile.count <= 5) {
-                    if (projectile.homing && flaming === false && projectile.shooter === kamek) {
+                    if (projectile.homing && flaming === false && projectile.shooter === wizard) {
                         // Adjust velocity to home in on the target
                         const targetX = snake[0].x * gridSize;
                         const targetY = snake[0].y * gridSize;
@@ -2769,10 +2788,10 @@
                     }
                 });
         
-                thwomps.forEach((thwomp, thwompindex) => {
-                    if (projectile.x >= thwomp.x * gridSize && projectile.x <= (thwomp.x + 2) * gridSize &&
-                        projectile.y >= thwomp.y * gridSize && projectile.y <= (thwomp.y + 2) * gridSize) {
-                        thwomps.splice(thwompindex, 1);
+                thunkers.forEach((thunkers, thunkersindex) => {
+                    if (projectile.x >= thunkers.x * gridSize && projectile.x <= (thunkers.x + 2) * gridSize &&
+                        projectile.y >= thunkers.y * gridSize && projectile.y <= (thunkers.y + 2) * gridSize) {
+                        thunkers.splice(thunkersindex, 1);
                         if (projectile.shooter === earthlord){
                     earthArea(projectile.x,projectile.y, 3,3)
                         }
@@ -2793,7 +2812,7 @@
                     }
                 });
         
-        kamek.forEach((esnake) => {
+        wizard.forEach((esnake) => {
                     if (projectile.x >= esnake.x * gridSize && projectile.x <= (esnake.x + 1) * gridSize &&
                         projectile.y >= esnake.y * gridSize && projectile.y <= (esnake.y + 1) * gridSize) {
                         if (projectile.shooter === earthlord){
@@ -2801,8 +2820,8 @@
                         }
                         createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                         projectiles.splice(index, 1);
-                        kamekDeath()
-              const distance = Math.abs(kamke[0].x - projectile.x) + Math.abs(kamek[0].y - projectile.y);
+                        wizardDeath()
+              const distance = Math.abs(kamke[0].x - projectile.x) + Math.abs(wizard[0].y - projectile.y);
               if (distance <= wellStrength) {
           projectile.homing = true
               }
@@ -2918,21 +2937,21 @@
         }
             });
         
-            thwomps.forEach((thwomp, dynamicObstacleIndex) => {
-        const thwompx = (thwomp.x + 1) * gridSize;
-        const thwompy = (thwomp.y + 1) * gridSize;
-        const distance = Math.sqrt((thwompx - x) ** 2 + (thwompy - y) ** 2);
+            thunkers.forEach((thunkers, dynamicObstacleIndex) => {
+        const thunkersx = (thunkers.x + 1) * gridSize;
+        const thunkersy = (thunkers.y + 1) * gridSize;
+        const distance = Math.sqrt((thunkersx - x) ** 2 + (thunkersy - y) ** 2);
         
         if (distance <= explode) {
-            thwomps.splice(dynamicObstacleIndex, 1);
+            thunkers.splice(dynamicObstacleIndex, 1);
         }
             });
         }
         
         function enemyshootmagic() {
-            if (kamek.length !== 0) {
-        kamek.forEach((kamek, index) => {
-            shootWaveOfProjectiles(kamek.x * gridSize, kamek.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,kamek);
+            if (wizard.length !== 0) {
+        wizard.forEach((wizard, index) => {
+            shootWaveOfProjectiles(wizard.x * gridSize, wizard.y * gridSize, 1, 1, 0.5, 'purple', obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 3, false, 20, 1, true,wizard);
         });
             }
         }
@@ -3132,7 +3151,7 @@
         
             // Add the pixel coordinates to the laserPixels array
             laserPixels.push({ x: x, y: y });
-        if (kamekappears === false) {
+        if (wizardappears === false) {
             // Check for collision with obstacles for the laser pixel
             obstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 1) * gridSize &&
@@ -3183,7 +3202,7 @@
                 }
             });
         
-            if (kamekappears === false){
+            if (wizardappears === false){
             // Check for collision with dynamic obstacles for the laser pixel
             dynamicObstacles.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 2) * gridSize &&
@@ -3193,27 +3212,27 @@
                 }
             });
         
-        thwomps.forEach((obstacle, index) => {
+        thunkers.forEach((obstacle, index) => {
                 if (x >= obstacle.x * gridSize && x <= (obstacle.x + 2) * gridSize &&
                     y >= obstacle.y * gridSize && y <= (obstacle.y + 2) * gridSize) {
                     // Remove the dynamic obstacle from the array
-                    thwomps.splice(index, 1);
+                    thunkers.splice(index, 1);
                 }
             });
             }
-         if(kamek.length > 0){
-            for (let i = kamek.length - 1; i >= 0; i--) {
-            let kamekElement = kamek[i];
-            let collisionResult = isCollidingWithKamek(
-        kamekElement.x * gridSize,
-        kamekElement.y * gridSize,
+         if(wizard.length > 0){
+            for (let i = wizard.length - 1; i >= 0; i--) {
+            let wizardElement = wizard[i];
+            let collisionResult = isCollidingWithwizard(
+        wizardElement.x * gridSize,
+        wizardElement.y * gridSize,
         gridSize,
         x,
         y
             );
         
             if (collisionResult === true && sideshield <= 2) {
-        kamekDeath()
+        wizardDeath()
         }
             }}
         }
@@ -3230,10 +3249,10 @@
         });
         ctx.stroke();
         
-        if (kamekappears === true && laserTimer < 11.25){
+        if (wizardappears === true && laserTimer < 11.25){
         laserTimer = laserTimer/2
            laserCooldown = laserTimer * 1000 
-        }else if (kamekappears === false){
+        }else if (wizardappears === false){
             laserTimer = LaserCooldownReset
            laserCooldown = laserTimer * 1000 
         
@@ -3331,19 +3350,19 @@
             // Draw the earth obstacles
             ctx.fillStyle = lavacolor;
             lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-            // Draw Kamek
-            if (kamek.length !== 0) {
-        kamek.forEach(kamek => {
-            clearArea(kamek.x, kamek.y, 1, 1);
-            drawKamek(kamek.x, kamek.y);
+            // Draw wizard
+            if (wizard.length !== 0) {
+        wizard.forEach(wizard => {
+            clearArea(wizard.x, wizard.y, 1, 1);
+            drawwizard(wizard.x, wizard.y);
         });
             }
         
-            // Draw Goombas
-            if (goombas.length !== 0) {
-        goombas.forEach(goomba => {
-            clearArea(goomba.x, goomba.y, 1, 1);
-            drawGoomba(goomba.x, goomba.y);
+            // Draw minions
+            if (minions.length !== 0) {
+        minions.forEach(minion => {
+            clearArea(minion.x, minion.y, 1, 1);
+            drawminion(minion.x, minion.y);
         });
             }
         clearAndDrawObstacles(windeffect, '#90EE9080');
@@ -3495,8 +3514,8 @@
             clearAndDrawObstacles(mirrors, 'darkgrey');
             clearAndDrawObstacles(turrets, '#6ec485');
         
-            // Draw thwomps and dynamic obstacles
-            thwomps.forEach(obstacle => {
+            // Draw thunkers and dynamic obstacles
+            thunkers.forEach(obstacle => {
         clearArea(obstacle.x, obstacle.y, 2, 2);
         ctx.fillStyle = 'black';
         ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
@@ -3660,8 +3679,8 @@
             snakecutgravity = false
             }
             ManageTurrets()
-            if (kamek.length !== 0){
-                kamekUpdate()
+            if (wizard.length !== 0){
+                wizardUpdate()
             }
         if (!isPaused && earthlord.length !== 0){
           manageEarthLord()  
@@ -3827,9 +3846,9 @@
         });
             });
         };
-        goombas.forEach((goomba,index) => {
-        GoombaCollision = isPointInGoombaBoundingBox(snake[0].x* gridSize, snake[0].y * gridSize,goomba.x, goomba.y)
-            if (!isInvincible && (GoombaCollision === true && direction !== 'down')){
+        minions.forEach((minion,index) => {
+        minionCollision = isPointInminionBoundingBox(snake[0].x* gridSize, snake[0].y * gridSize,minion.x, minion.y)
+            if (!isInvincible && (minionCollision === true && direction !== 'down')){
         const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
             snake.splice(0, numSegmentsToRemove);
@@ -3852,9 +3871,9 @@
         
         // Dynamic obstacles
         checkCollisions(dynamicObstacles, true);
-        checkCollisions(thwomps, true);
+        checkCollisions(thunkers, true);
         
-        if (kamek.length === 0 && !physicsActive && ghostLord.length === 0 && hauntingChains.length === 0) {
+        if (wizard.length === 0 && !physicsActive && ghostLord.length === 0 && hauntingChains.length === 0) {
             isParalyzed = electric.some((electric) => electric.x === head.x && electric.y === head.y);
         }
         hauntingChains.forEach((chain, index) => {
@@ -3902,7 +3921,7 @@
             // Check if Snake hits obstacles
             if (!isInvincible && (obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) ||
                 !isInvincible && dynamicObstacles.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
-                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || !isInvincible && thwomps.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
+                    (head.y >= obstacle.y && head.y < obstacle.y + 2)) || !isInvincible && thunkers.some(obstacle => (head.x >= obstacle.x && head.x < obstacle.x + 2) &&
                     (head.y >= obstacle.y && head.y < obstacle.y + 2)) ||!isInvincible && lava.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {          
         const numSegmentsToRemove = Math.ceil(snake.length * lives);
         if (snake.length > numSegmentsToRemove) {
@@ -4360,12 +4379,12 @@
             }
         });
         
-        goombas.forEach(obstacle => {
+        minions.forEach(obstacle => {
             if (obstacle.direction === undefined){
              obstacle.direction = 'left'   
             }
         })
-        goombas.forEach(obstacle => {
+        minions.forEach(obstacle => {
           // Simplify the condition for moving up and down
           if (obstacle.y + 3 + 0.60 <= canvas.height / gridSize) {
             obstacle.y += 1;
@@ -4389,15 +4408,15 @@
           }
         });
         
-        // Check for collisions with the player's head and remove the Goomba
-        goombas.forEach((obstacle, index) => {
+        // Check for collisions with the player's head and remove the minion
+        minions.forEach((obstacle, index) => {
           if (obstacle.y === head.y && Math.abs(obstacle.x - head.x) <= 0.5 && direction === 'down') {
-            goombas.splice(index, 1);
+            minions.splice(index, 1);
             score += 1;
           }
         });
         
-        thwomps.forEach(obstacle => {
+        thunkers.forEach(obstacle => {
             if (obstacle.state === 2) {
                 // Left to right movement
                 obstacle.y -= 0.25;
@@ -4445,7 +4464,7 @@
             const types = ['magnet']; // Possible directions
             const randomIndex = Math.floor(Math.random() * types.length);
             type = types[randomIndex];
-        if (chaosdefeated === true && lords.length === 0 && isghostdead === true && iskamekdead === true){
+        if (chaosdefeated === true && lords.length === 0 && isghostdead === true && iswizarddead === true){
         declareVictory();
         }
         if (score >= maxscore) {
@@ -4457,17 +4476,17 @@
             }
             }
         
-        if (reflector.length === 12 && kamek.length === 0 && kamekappears === false && firelord.length ===0) {
-            let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
-            let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
+        if (reflector.length === 12 && wizard.length === 0 && wizardappears === false && firelord.length ===0) {
+            let wizardX2 = Math.floor(Math.random() * (canvas.width / gridSize));
+            let wizardY2 = Math.floor(Math.random() * (canvas.height / gridSize));
             isPaused = true
             reflector = []
-            kamekappears = true
+            wizardappears = true
             let gridOffset = ((2*gridSize) + (gridSize / 2))/2
             // Call the function with desired parameters
-        createPortalAnimation(kamekX2* gridSize, (kamekY2 * gridSize) + gridOffset, 120, 5000);
+        createPortalAnimation(wizardX2* gridSize, (wizardY2 * gridSize) + gridOffset, 120, 5000);
             setTimeout(() => {
-        kamek.push({ x: kamekX2, y: kamekY2 });
+        wizard.push({ x: wizardX2, y: wizardY2 });
             }, 2500);
             setTimeout(() => {
         isPaused = false
@@ -4586,7 +4605,7 @@
         return; // Exit the function if the position is already occupied
             }
         const randomValue = Math.random()
-            const specialTypes = ['snake', 'polygon', 'dynamic', 'square', 'square','thwomp'];
+            const specialTypes = ['snake', 'polygon', 'dynamic', 'square', 'square','thunkers'];
             const randomIndex2 = Math.floor(Math.random() * specialTypes.length);
             const special2 = specialTypes[randomIndex2];
         
@@ -4606,8 +4625,8 @@
             if (special2 === 'polygon') {
         formrandomshape(2);
             } 
-            if (special2 === 'thwomp') {
-        thwomps.push({ x: x, y: 0, state: 1 });
+            if (special2 === 'thunkers') {
+        thunkers.push({ x: x, y: 0, state: 1 });
             } 
             if (special2 === 'dynamic') {
         const id = Math.random() < 0.5 ? 1 : 2;
@@ -4656,7 +4675,7 @@
             gotextralife = false;
             taxrate = 0.20
             symbiotes = []
-            thwomps = []
+            thunkers = []
             snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             snake2 = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
             obstacles = [];
@@ -4673,7 +4692,7 @@
         ghostLord.push({ x: 2, y: 2 });
             }
             if (phases === 'elementlords'){
-                iskamekdead === true
+                iswizarddead === true
                 earthgone = false
                 lightninggone = false
                 firegone = false
@@ -4690,17 +4709,17 @@
                 lords.splice(randomIndex, 1);
             }
             }
-            if (phases === 'kamek'){
-                let kamekX2 = Math.floor(Math.random() * (canvas.width / gridSize));
-            let kamekY2 = Math.floor(Math.random() * (canvas.height / gridSize));
+            if (phases === 'wizard'){
+                let wizardX2 = Math.floor(Math.random() * (canvas.width / gridSize));
+            let wizardY2 = Math.floor(Math.random() * (canvas.height / gridSize));
             isPaused = true
             reflector = []
-            kamekappears = true
+            wizardappears = true
             let gridOffset = ((2*gridSize) + (gridSize / 2))/2
             // Call the function with desired parameters
-        createPortalAnimation(kamekX2* gridSize, (kamekY2 * gridSize) + gridOffset, 120, 5000);
+        createPortalAnimation(wizardX2* gridSize, (wizardY2 * gridSize) + gridOffset, 120, 5000);
             setTimeout(() => {
-        kamek.push({ x: kamekX2, y: kamekY2 });
+        wizard.push({ x: wizardX2, y: wizardY2 });
             }, 2500);
             setTimeout(() => {
         isPaused = false
@@ -4708,7 +4727,7 @@
             }
            if (didwin === true){
             lords = [firelord, lightninglord, icelord, earthlord]
-            goombas = []
+            minions = []
             lava = []
             lavacoords = []
             firelord = []
@@ -4719,7 +4738,7 @@
             ghostLord = []
             chaosdefeated = false
             ectoplasm = [] 
-            kamek = []
+            wizard = []
             isghostdead = false
             lightninglord = []
             icelord = []
@@ -4741,7 +4760,7 @@
             eatingAnimationFrames = 0;
             lives = 0.5;
             livecount = 2;
-            kamekappears = false
+            wizardappears = false
             firstControlSchemeSet = false;
             cangetvenom = true
             wells = []
@@ -4851,19 +4870,19 @@
             resizeCanvas(); // Resize the canvas on every game loop iteration
             resizeCanvasHeight();
             update();
-            windElement(snake, mirrors, obstacles, dynamicObstacles, thwomps, reflector);
+            windElement(snake, mirrors, obstacles, dynamicObstacles, thunkers, reflector);
             draw()
                windeffect = []     
         if (windactive === true){
         addWindEffect()
         }
             physicsActive = false;
-                        if (kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && toggle === true) {
+                        if (wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && toggle === true) {
             applyStatus(gravitytimer, 'gravity');
         } else {
             GravityApplied = false;
         }
-        if (firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || kamek.length !== 0 || ghostLord.length !== 0){
+        if (firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0 || wizard.length !== 0 || ghostLord.length !== 0){
         GravityApplied = false;
         }
             applyGravity()
@@ -4916,7 +4935,7 @@
         }
         
         function allLordsDefeated() {
-            return kamek.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && icegone === true && firegone === true && lightninggone === true && earthgone === true && lords.length === 0;
+            return wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && icegone === true && firegone === true && lightninggone === true && earthgone === true && lords.length === 0;
         }
         function ifLordExists(){
         return firelord.length !== 0 || icelord.length !== 0 || lightninglord.length !== 0 || earthlord.length !== 0; 
@@ -4924,8 +4943,8 @@
         
         function managePhaseTransitions() {
             switch (phases) {
-        case 'kamek':
-            if (iskamekdead) {
+        case 'wizard':
+            if (iswizarddead) {
                 initializeElementlordsPhase();
                 phases = 'elementlords';
             }
@@ -4944,7 +4963,7 @@
             if (isghostdead && lords.length === 0 && ghostLord.length === 0) {
                 didwin = true
                 declareVictory()
-                phases = 'kamek'
+                phases = 'wizard'
             }
             break;
         
@@ -5020,7 +5039,7 @@
             mirrors.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
         || timezone.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
         ||reflector.some(obstacle => obstacle.x === food.x && obstacle.y === food.y)
-        ||thwomps.some(obstacle => 
+        ||thunkers.some(obstacle => 
         (food.x >= obstacle.x && food.x < obstacle.x + 2) &&
         (food.y >= obstacle.y && food.y < obstacle.y + 2)
             )) {
@@ -5211,7 +5230,6 @@
         function PauseHoldEnd() {
             touchStartTime = null; // Reset the touch start time
         }
-        
-    </script>
-</body>
+  </script>
+ </body>
 </html>
