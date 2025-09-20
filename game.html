@@ -4686,46 +4686,6 @@
             timezone = []
             isEating = false;
             projectiles = [] 
-            if (phases === 'ghost'){
-        shadowSummons = []
-        hauntingChains = []
-        ghostLord.push({ x: 2, y: 2 });
-            }
-            if (phases === 'elementlords'){
-                iswizarddead === true
-                earthgone = false
-                lightninggone = false
-                firegone = false
-                icegone = false
-                    lightninglord = []
-            icelord = []
-            earthlord = []
-            firelord = []
-            lords = [firelord, lightninglord, icelord, earthlord]
-                if (lords.length === 4){
-           const randomIndex = Math.floor(Math.random() * lords.length);
-            let selectedLord = lords[randomIndex];
-        selectedLord.push({ x: startX/gridSize, y: startY/gridSize });
-                lords.splice(randomIndex, 1);
-            }
-            }
-            if (phases === 'wizard'){
-                let wizardX2 = Math.floor(Math.random() * (canvas.width / gridSize));
-            let wizardY2 = Math.floor(Math.random() * (canvas.height / gridSize));
-            isPaused = true
-            reflector = []
-            wizardappears = true
-            let gridOffset = ((2*gridSize) + (gridSize / 2))/2
-            // Call the function with desired parameters
-        createPortalAnimation(wizardX2* gridSize, (wizardY2 * gridSize) + gridOffset, 120, 5000);
-            setTimeout(() => {
-        wizard.push({ x: wizardX2, y: wizardY2 });
-            }, 2500);
-            setTimeout(() => {
-        isPaused = false
-            }, 5000);
-            }
-           if (didwin === true){
             lords = [firelord, lightninglord, icelord, earthlord]
             minions = []
             lava = []
@@ -4754,7 +4714,6 @@
         magicCooldown = 0; // Track cooldown for switching magic
         hauntingChains = []; // Store chains for "Haunting Chains" magic
         shadowSummons = []
-           }
             wellWarning = []
             isInvincible = false;
             eatingAnimationFrames = 0;
