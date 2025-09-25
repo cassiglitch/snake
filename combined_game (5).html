@@ -289,7 +289,7 @@ function spawnGhostLordWithAnimation(x, y) {
     function animate() {
         const elapsed = Date.now() - startTime;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+draw()
         corners.forEach((c, i) => {
             const radius = 5;
             const theta = angle + (i * Math.PI / 2);
@@ -3282,9 +3282,6 @@ damageBoss("icelord", 10)
   damageBoss("firelord", 10)
         }
         
-        
-        
-            
         let isghostlordhit = isCollidingWithFireLord(ghostLordBoundingBox, x, y)
         if (isghostlordhit === true & ghostMagic != 'port') {
         damageBoss("ghostLord", 10)
@@ -3301,7 +3298,7 @@ damageBoss("icelord", 10)
         }          
         let isearthlordhit = isCollidingWithFireLord(earthLordBoundingBox, x, y)
         if (isearthlordhit === true) {
-        damageBoss(“earthlord", 10)
+        damageBoss("earthlord", 10)
         }
             
             timezone.forEach((obstacle, index) => {
