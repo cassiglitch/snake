@@ -11,10 +11,10 @@
             margin: 0;
             overflow: hidden; /* No more scrolling for you! */
             background-color: #f0f0f0;
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
+      
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
         body {
             display: flex;
             flex-direction: column;
@@ -77,7 +77,7 @@
   <script>
    const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
-        
+         let gravtime = 0
         let phases = 'wizard'
         let isSlow = false
         let gravitycount = 1
@@ -86,7 +86,8 @@
         let miniondirection = 'left'
         let minionoffset = 1.00
         let reflector = []
-        
+        let gravtimerreset = -300
+    let gravtimeuponreset = gravtimerreset
             let isFast = false
         let timezone = []
         let mirrors = []
@@ -141,16 +142,17 @@
         let neoncolor = '#39ff14';
         let sunset = '#00FFFF'
         let welldeleter = '#00FFFF80'
+        let paralysisTimer = 0;
         let taxrate = 0.20
         let timeslow = '#00ff8c'
         let timespeed = '#ff0073'
-        let LaserCooldownReset = 35
+        let LaserCooldownReset = 12.5
         let esnake = [];
         let turrets = []
         let symbiote = [];
         let controlsinverted = false
         let hasBeenTaxed = false
-        let laserTimer = 35
+        let laserTimer = LaserCooldownReset
         let controltype = 'set'
         let minions = []
         let chaosdefeated = false
@@ -220,6 +222,674 @@
         let ghostcolor = '#1F635780'
         let windactive = false
                let windeffect = [];
+               
+               let isghostspwaning = false
+    let chaoslord = []; // keep as array like other lords for consistency
+let chaosInMotion = false;
+let chaosAngle = 0;
+let chaosVelocityX = 0;
+let chaosVelocityY = 0;
+let chaosMagic = null;
+let chaosMagicCooldown = 0;   // ticks until next magic choice
+let chaosTeleportAvailable = true;
+let chaosArea = []
+let chaosBoundingBox = drawChaosLord(5, 5); // init drawing to compute bounding box if drawChaosLord declared below
+let chaosCanSpawnTurrets = true;
+let chaosCooldownTimers = {
+  teleport: 0,
+  boltCombo: 0,
+  spawn: 0
+};
+let chaosHealthDefault = 500; // tweak as needed
+
+
+function initChaosLord(x, y) {
+  chaoslord.length = 0;
+  chaoslord.push({
+    x: (x !== undefined) ? x : Math.floor(Math.random() * (canvas.width / gridSize)),
+    y: (y !== undefined) ? y : Math.floor(Math.random() * (canvas.height / gridSize)),
+    health: chaosHealthDefault,
+    lastActionTick: 0
+  });
+  chaosInMotion = false;
+  chaosMagic = null;
+  chaosMagicCooldown = 0;
+  chaosTeleportAvailable = true;
+  chaosCooldownTimers = { teleport: 0, boltCombo: 0, spawn: 0 };
+  chaosBoundingBox = drawChaosLord(chaoslord[0].x, chaoslord[0].y);
+}
+
+// Utility to return bounding box similar to other draw functions
+function getChaosLordBoundingBox(cx, cy) {
+  // cx,cy are in grid coords; mirror calculation used in other drawX functions
+  const x = cx * gridSize;
+  const y = cy * gridSize;
+  return {
+    xMin: x - gridSize * 1.1,
+    yMin: y - gridSize * 1.6,
+    xMax: x + gridSize * 1.1,
+    yMax: y + gridSize * 1.2
+  };
+}
+
+function isCollidingWithChaosLord(chaosBoundingBox, pointX, pointY) {
+  return pointX >= chaosBoundingBox.xMin && pointX <= chaosBoundingBox.xMax &&
+         pointY >= chaosBoundingBox.yMin && pointY <= chaosBoundingBox.yMax;
+}
+
+// Draw routine that synthesizes visual elements from wizard, fire, earth, ice, lightning, ghost
+function drawChaosLord(cx, cy) {
+  // cx, cy are in grid coordinates
+  const x = cx * gridSize;
+  const y = cy * gridSize;
+
+  // Body base -- large pentagonal torso like other lords
+  drawFlatPolygon(x, y, gridSize * 1.05, 5, 'rgba(80,80,80,0.95)'); // base stone/demonic core
+
+  // Core shimmer: a radial-ish overlay hinting at elemental fusion
+  ctx.save();
+  const grad = ctx.createRadialGradient(x, y - gridSize * 0.4, 2, x, y - gridSize * 0.4, gridSize * 1.6);
+  // combine colors from different lords, but subtle
+  grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+  grad.addColorStop(0.25, 'rgba(255,120,20,0.25)'); // fire
+  grad.addColorStop(0.45, 'rgba(0,160,255,0.22)'); // ice/lightning
+  grad.addColorStop(0.6, 'rgba(40,200,40,0.18)'); // earth/greenish
+  grad.addColorStop(0.85, 'rgba(120,0,140,0.12)'); // ghost/purple
+  grad.addColorStop(1, 'rgba(0,0,0,0.0)');
+  ctx.beginPath();
+  ctx.arc(x, y - gridSize * 0.4, gridSize * 1.3, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.restore();
+
+  // Head element: wizard hat + crown hybrid
+  drawFlatPolygon(x, y - gridSize * 0.8, gridSize * 0.98, 3, 'rgba(50,40,120,0.9)'); // hat/triangle
+  drawFlatPolygon(x, y - gridSize * 1.6, gridSize * 0.45, 5, 'rgba(220,200,80,0.95)'); // crown-like accent
+
+  // Eyes: multiple layered orbs (white + colored pupils)
+  let eyeRadius = gridSize * 0.22;
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.arc(x - gridSize * 0.22, y - gridSize, eyeRadius, 0, Math.PI * 2);
+  ctx.arc(x + gridSize * 0.22, y - gridSize, eyeRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // pupils: multi-colored to show fused elements
+  ctx.fillStyle = electriccolor || 'yellow';
+  ctx.beginPath();
+  ctx.arc(x - gridSize * 0.22, y - gridSize, eyeRadius * 0.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = icecolor || 'lightblue';
+  ctx.beginPath();
+  ctx.arc(x + gridSize * 0.22, y - gridSize, eyeRadius * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Robe/arm accents: use black base with stroke highlights from different lords
+  ctx.fillStyle = 'black';
+  ctx.fillRect(x - gridSize * 0.72, y, gridSize * 1.44, gridSize);
+  // streaks/stitches of elemental colors
+  ctx.strokeStyle = 'rgba(255,100,30,0.9)'; ctx.lineWidth = gridSize * 0.06; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + gridSize); ctx.stroke(); // fire
+  ctx.strokeStyle = electriccolor || 'rgba(255,230,0,0.9)'; ctx.beginPath(); ctx.moveTo(x - gridSize*0.25, y); ctx.lineTo(x - gridSize*0.25, y + gridSize*0.6); ctx.stroke(); // lightning streak
+  ctx.strokeStyle = icecolor || 'rgba(220,240,255,0.9)'; ctx.beginPath(); ctx.moveTo(x + gridSize*0.25, y); ctx.lineTo(x + gridSize*0.25, y + gridSize*0.6); ctx.stroke(); // ice streak
+
+  // Arms and feet like other lords
+  let armWidth = gridSize * 0.22;
+  let armHeight = gridSize * 0.6;
+  ctx.fillStyle = 'black';
+  ctx.fillRect(x - gridSize * 0.92, y - gridSize * 0.18, armWidth, armHeight);
+  ctx.fillRect(x + gridSize * 0.68, y - gridSize * 0.18, armWidth, armHeight);
+  let footWidth = gridSize * 0.42;
+  let footHeight = gridSize * 0.42;
+  ctx.fillRect( x - gridSize * 0.5, y + gridSize * 0.8, footWidth, footHeight );
+  ctx.fillRect( x + gridSize * 0.1, y + gridSize * 0.8, footWidth, footHeight );
+
+  // ghosty trailing aura (like ghost lord)
+  ctx.save();
+  ctx.globalAlpha = 0.15;
+  drawFlatPolygon(x, y + gridSize * 0.9, gridSize * 1.1, 5, ghostcolor || 'rgba(180,180,250,0.5)');
+  ctx.restore();
+
+  // Return bounding box so other code can check collisions
+  const boundingBox = {
+    xMin: x - gridSize * 1.1,
+    yMin: y - gridSize * 1.6,
+    xMax: x + gridSize * 1.1,
+    yMax: y + gridSize * 1.2
+  };
+  return boundingBox;
+}
+
+// Manage Chaos Lord behavior (call each frame/update tick)
+function manageChaosLord() {
+  if (chaoslord.length === 0) return;
+  const c = chaoslord[0];
+
+  // health fallback
+  if (c.health === undefined) c.health = chaosHealthDefault;
+
+  // always apply a 'magic' status indicator so other systems treat it like wizard
+  applyStatus && applyStatus(1000, 'chaos');
+
+  // basic area effects around chaos (mix of all area types - small radius)
+  addLavaArea && addLavaArea(c.x, c.y, 2, 1.2);
+  lightningArea && lightningArea(c.x, c.y, 2, 0.8);
+  iceArea && iceArea(c.x, c.y, 2, 0.8);
+  earthArea && earthArea(c.x, c.y, 2, 1.0);
+  ghostArea && ghostArea(c.x, c.y, 2, 0.9);
+  addChaosArea(c.x, c.y, 2, 1.3)
+
+  // compute angle towards snake
+  const targetX = snake[0].x * gridSize;
+  const targetY = snake[0].y * gridSize;
+  if (!chaosInMotion) {
+    chaosAngle = Math.atan2(targetY - c.y * gridSize, targetX - c.x * gridSize);
+  }
+
+  // motion velocity (blend of existing speeds)
+  if (!chaosInMotion) {
+    const stepSize = 0.45; // slightly faster than single-element lords
+    chaosVelocityX = Math.cos(chaosAngle) * stepSize;
+    chaosVelocityY = Math.sin(chaosAngle) * stepSize;
+  }
+
+  // make sure only single Chaos Lord exists
+  if (chaoslord.length > 1) chaoslord.length = 1;
+
+  // cooldown/timer decrement
+  if (chaosMagicCooldown > 0) chaosMagicCooldown--;
+  if (chaosCooldownTimers.teleport > 0) chaosCooldownTimers.teleport--;
+  if (chaosCooldownTimers.boltCombo > 0) chaosCooldownTimers.boltCombo--;
+  if (chaosCooldownTimers.spawn > 0) chaosCooldownTimers.spawn--;
+
+  // Choose magic when ready
+  if (chaosMagicCooldown <= 0) {
+    const allMagic = [
+      'launch', 'multiBolt', 'port', 'obstacle', 'follow', 'spawnTurret'
+    ];
+    chaosMagic = allMagic[Math.floor(Math.random() * allMagic.length)];
+    // set cooldown until next selection
+    chaosMagicCooldown = 40 + Math.floor(Math.random() * 60); // vary frequency
+  }
+
+  // Execute selected magic
+  switch (chaosMagic) {
+    case 'launch':
+      // move towards player like elemental lords
+      c.x += chaosVelocityX;
+      c.y += chaosVelocityY;
+      chaosInMotion = true;
+      chaosBoundingBox = drawChaosLord(c.x, c.y);
+      // if out of bounds, stop
+      if (chaosBoundingBox.xMin < 0 || chaosBoundingBox.yMin < 0 ||
+          chaosBoundingBox.xMax > canvas.width || chaosBoundingBox.yMax > canvas.height) {
+        chaosInMotion = false;
+      }
+      break;
+
+    case 'multiBolt':
+      // shoot several bolts in quick succession (like combined bolts)
+      if (chaosCooldownTimers.boltCombo <= 0) {
+        for (let i=0;i<3;i++){
+          setTimeout(() => {
+            const col = (i%2===0) ? 'orange' : (i===1 ? 'blue' : electriccolor || 'yellow');
+            shootWaveOfProjectiles && shootWaveOfProjectiles(c.x * gridSize, c.y * gridSize, 1, 1, 0.6, col, obstacles, dynamicObstacles, gridSize, 'down', 20, 70, true, 4, false, 20, 1, true, chaoslord);
+          }, i*120);
+        }
+        chaosCooldownTimers.boltCombo = 160;
+      }
+      break;
+
+    case 'port':
+      if (chaosTeleportAvailable && chaosCooldownTimers.teleport <= 0) {
+        c.x = Math.floor(Math.random() * (canvas.width / gridSize));
+        c.y = Math.floor(Math.random() * (canvas.height / gridSize));
+        chaosTeleportAvailable = false;
+        chaosCooldownTimers.teleport = 160; // ticks before next teleport
+        // small portal animation
+        createPortalAnimation && createPortalAnimation(c.x * gridSize + gridSize/2, c.y * gridSize + gridSize/2, 40, 450);
+      }
+      break;
+
+    case 'obstacle':
+      // spawn either turrets or minions (like wizard)
+      if (chaosCooldownTimers.spawn <= 0) {
+        const spawnerChoices = [turrets];
+        const spawner = spawnerChoices[Math.floor(Math.random() * spawnerChoices.length)];
+        const sx = Math.floor(Math.random() * (canvas.width / gridSize));
+        let sy = Math.floor(Math.random() * (canvas.height / gridSize));
+        if (spawner === turrets) {
+          if (turrets.length < 6) spawnTurrets(sx, sy);
+        }
+        chaosCooldownTimers.spawn = 120;
+      }
+      break;
+
+    case 'follow':
+      // position ahead of snake head (like ghost follow)
+      const snakeHead = snake[0];
+      const snakeNext = snake[1] || {x: snakeHead.x, y: snakeHead.y};
+      const dirX = snakeHead.x - snakeNext.x;
+      const dirY = snakeHead.y - snakeNext.y;
+      const lead = 5;
+      c.x = snakeHead.x + dirX * lead;
+      c.y = snakeHead.y + dirY * lead;
+      // also trigger a random area function at that spot
+      const areaFns = [lightningArea, ghostArea, earthArea, iceArea, addLavaArea];
+      const fn = areaFns[Math.floor(Math.random() * areaFns.length)];
+      fn && fn(c.x, c.y, 2, 1.5);
+      chaosBoundingBox = drawChaosLord(c.x, c.y);
+      break;
+
+    case 'spawnTurret':
+      if (chaosCanSpawnTurrets) {
+        const tx = Math.floor(Math.random() * (canvas.width / gridSize));
+        const ty = Math.floor(Math.random() * (canvas.height / gridSize));
+        spawnTurrets(tx, ty);
+        chaosCanSpawnTurrets = false;
+        setTimeout(() => { chaosCanSpawnTurrets = true; }, 1800);
+      }
+      break;
+
+
+    default:
+      // nothing special; possibly continue in motion until out of bounds
+      if (chaosInMotion) {
+        c.x += chaosVelocityX;
+        c.y += chaosVelocityY;
+        chaosBoundingBox = drawChaosLord(c.x, c.y);
+        if (chaosBoundingBox.xMin < 0 || chaosBoundingBox.yMin < 0 ||
+            chaosBoundingBox.xMax > canvas.width || chaosBoundingBox.yMax > canvas.height) {
+          chaosInMotion = false;
+        }
+      }
+      break;
+  }
+
+  // Draw bound box so other systems can reuse it if needed
+  chaosBoundingBox = drawChaosLord(c.x, c.y);
+}
+
+
+// Example spawn call (call from game init or boss spawn logic):
+initChaosLord(5,5);
+chaoslord = []
+                      // === Modular Health Bar System ===
+let bossStats = {
+    ghostLord: { current: 30, max: 30 },
+    firelord: { current: 20, max: 20 },
+    icelord: { current: 20, max: 20 },
+    lightninglord: { current: 20, max: 20 },
+    earthlord: { current: 20, max: 20 },
+    chaoslord: { current:30, max: 30 }
+};
+
+function drawHealthBar(bossName, gx, gy, width = 100, height = 8) {
+    const boss = bossStats[bossName];
+    if (!boss) return;
+
+    const x = gx * gridSize - width / 2;
+    const y = gy * gridSize - gridSize - 10; // slightly above the boss
+
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(x, y, width, height);
+
+    const percent = Math.max(boss.current / boss.max, 0);
+    ctx.fillStyle = 'red';
+    ctx.fillRect(x, y, width * percent, height);
+
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, width, height);
+}
+
+// === Damage Handlers ===
+function damageBoss(bossName, amount) {
+    const boss = bossStats[bossName];
+    if (!boss) return;
+    boss.current = Math.max(boss.current - amount, 0);
+    if (boss.current === 0) {
+        killBoss(bossName);
+    }
+}
+
+function killBoss(bossName) {
+    if (bossName === "ghostLord") {
+        ghostLord.length = 0;
+        isghostdead = true;
+    } else if (bossName === "firelord") firelord.length = 0;
+    else if (bossName === "icelord") icelord.length = 0;
+    else if (bossName === "lightninglord") lightninglord.length = 0;
+    else if (bossName === "earthlord") earthlord.length = 0;
+    else if (bossName === "chaoslord") {
+    chaoslord.length = 0;
+    declareVictory
+}
+}
+
+function spawnGhostLordWithAnimation() {
+    // Pause the game
+    isPaused = true;
+         const canvasWidth = closestNumber(window.innerWidth, gridSize);; // Adjust the canvas
+         const canvasHeight = closestNumber(window.innerHeight, gridSize);; // Adjust the canvas
+    // Center of animation in grid coordinates
+    let x = ((canvasWidth / 2)/ gridSize);
+    let y = ((canvasHeight / 2)/ gridSize);
+    phases = y
+    // Ensure draw functions receive pixel coordinates
+    const corners = [
+        { dx: -5, dy: -5, drawFunc: drawEarthLord, angleOffset: 0 },
+        { dx: 5, dy: -5, drawFunc: drawFireLord, angleOffset: Math.PI / 2 },
+        { dx: 5, dy: 5, drawFunc: drawLightningLord, angleOffset: Math.PI },
+        { dx: -5, dy: 5, drawFunc: drawIceLord, angleOffset: (3 * Math.PI) / 2 }
+    ];
+
+    let angle = 0;
+    let spinSpeed = 0.05;
+    const maxSpinSpeed = 0.5;
+
+    const portalCenter = { x: x * gridSize, y: y * gridSize };
+    const maxPortalRadius = 60;
+    let portalRadius = 0;
+
+    let phase = "spinning"; // spinning -> converging -> beams -> slam -> greenTransition -> closing
+    let convergenceProgress = 0; // 0 to 1
+    let greenProgress = 0; // 0 to 1
+    let greenHoldTime = 0;
+
+    function drawCorners() {
+        corners.forEach((c) => {
+            // Apply rotation and convergence
+            const lx = x + (c.dx * Math.cos(angle) - c.dy * Math.sin(angle)) * (1 - convergenceProgress);
+            const ly = y + (c.dx * Math.sin(angle) + c.dy * Math.cos(angle)) * (1 - convergenceProgress);
+
+            // Convert to pixels for drawFunc
+            c.drawFunc(lx, ly);
+
+            // Store for crack drawing
+            c.currentX = lx * gridSize
+            c.currentY = ly * gridSize
+        });
+    }
+
+    function drawPurpleCracks() {
+        ctx.strokeStyle = "purple";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        // Cracks between corners
+        for (let i = 0; i < corners.length; i++) {
+            const c1 = corners[i];
+            const c2 = corners[(i + 1) % corners.length];
+            ctx.moveTo(c1.currentX, c1.currentY);
+            ctx.lineTo(c2.currentX, c2.currentY);
+        }
+
+        // Beams to center
+        corners.forEach(c => {
+            ctx.moveTo(c.currentX, c.currentY);
+            ctx.lineTo(portalCenter.x, portalCenter.y);
+        });
+
+        ctx.stroke();
+    }
+
+    function drawPortal() {
+        const gradient = ctx.createRadialGradient(
+            portalCenter.x, portalCenter.y, 0,
+            portalCenter.x, portalCenter.y, maxPortalRadius
+        );
+        gradient.addColorStop(0, `rgba(100,255,100,${greenProgress})`);
+        gradient.addColorStop(greenProgress * 0.5, `rgba(0,255,0,${greenProgress})`);
+        gradient.addColorStop(1, `rgba(0,0,0,0.5)`);
+
+        ctx.beginPath();
+        ctx.arc(portalCenter.x, portalCenter.y, portalRadius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+    }
+
+    function animate() {
+        // Localized clearing using clipping
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(portalCenter.x, portalCenter.y, maxPortalRadius + gridSize * 10, 0, 2 * Math.PI);
+        ctx.clip();
+        ctx.restore();
+
+        // Draw corners if not in greenHold frame
+        if (!(phase === "greenTransition" && greenHoldTime >= 700)) {
+            drawCorners();
+        }
+
+        // Draw cracks once corners start converging
+        if (phase !== "spinning") {
+            drawPurpleCracks();
+        }
+
+        // Phase updates
+        switch (phase) {
+            case "spinning":
+                angle += spinSpeed;
+                spinSpeed = Math.min(spinSpeed + 0.005, maxSpinSpeed);
+                portalRadius = Math.min(portalRadius + 1.5, maxPortalRadius / 2); // pre-open
+                if (spinSpeed >= maxSpinSpeed) phase = "converging";
+                break;
+
+            case "converging":
+                convergenceProgress += 0.02;
+                convergenceProgress = Math.min(convergenceProgress, 1);
+                if (convergenceProgress >= 1) phase = "beams";
+                break;
+
+            case "beams":
+                portalRadius += 2; // slowly grow portal
+                if (portalRadius >= maxPortalRadius) phase = "slam";
+                break;
+
+            case "slam":
+                convergenceProgress += 0.02; // finalize convergence
+                convergenceProgress = Math.min(convergenceProgress, 1);
+                portalRadius = maxPortalRadius;
+                if (convergenceProgress >= 1) phase = "greenTransition";
+                break;
+
+            case "greenTransition":
+                greenProgress += 0.01;
+                drawPortal();
+                if (greenProgress >= 1) {
+                    greenHoldTime += 16; // approx 60fps
+                    if (greenHoldTime >= 1000) phase = "closing";
+                }
+                break;
+
+            case "closing":
+                drawPortal();
+                portalRadius -= 0.5;
+                if (portalRadius <= 0) {
+                    // Spawn ghost lord
+                    ghostLord = [{ x: x, y: y }];
+                    bossStats.ghostLord.current = bossStats.ghostLord.max;
+                    isPaused = false;
+                   isghostspwaning = true
+                    return; // stop animation
+                }
+                break;
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+}
+
+
+function spawnChaosLordWithAnimation() {
+    // Pause the game
+    isPaused = true;
+    const canvasWidth = closestNumber(window.innerWidth, gridSize); 
+    const canvasHeight = closestNumber(window.innerHeight, gridSize); 
+
+    // Center of animation in grid coordinates
+    let x = (canvasWidth / 2) / gridSize;
+    let y = (canvasHeight / 2) / gridSize;
+
+    // Adjusted corners for spinning formation
+    const corners2 = [
+    { dx: 8 * Math.cos(0),            dy: 8 * Math.sin(0),             drawFunc: drawEarthLord,     angleOffset: 0 },
+    { dx: 8 * Math.cos(2 * Math.PI / 5),  dy: 8 * Math.sin(2 * Math.PI / 5),  drawFunc: drawFireLord,      angleOffset: 2 * Math.PI / 5 },
+    { dx: 8 * Math.cos(4 * Math.PI / 5),  dy: 8 * Math.sin(4 * Math.PI / 5),  drawFunc: drawLightningLord, angleOffset: 4 * Math.PI / 5 },
+    { dx: 8 * Math.cos(6 * Math.PI / 5),  dy: 8 * Math.sin(6 * Math.PI / 5),  drawFunc: drawIceLord,       angleOffset: 6 * Math.PI / 5 },
+    { dx: 8 * Math.cos(8 * Math.PI / 5),  dy: 8 * Math.sin(8 * Math.PI / 5),  drawFunc: drawGhostLord,     angleOffset: 8 * Math.PI / 5 },
+
+    ];
+
+    let angle = 0;
+    let spinSpeed = 0.05;
+    const maxSpinSpeed = 0.5;
+
+    const portalCenter = { x: x * gridSize, y: y * gridSize };
+    const maxPortalRadius = 60;
+    let portalRadius = 0;
+
+    let phase = "spinning"; // spinning -> converging -> beams -> slam -> greenTransition -> closing
+    let convergenceProgress = 0; 
+    let greenProgress = 0; 
+    let greenHoldTime = 0;
+
+    function drawCorners2() {
+        corners2.forEach((c) => {
+            const lx = x + (c.dx * Math.cos(angle) - c.dy * Math.sin(angle)) * (1 - convergenceProgress);
+            const ly = y + (c.dx * Math.sin(angle) + c.dy * Math.cos(angle)) * (1 - convergenceProgress);
+
+            c.drawFunc(lx, ly);
+
+            c.currentX = lx * gridSize;
+            c.currentY = ly * gridSize;
+        });
+
+        // Wizard slightly above the center
+        drawwizard(x, y - 1); // adjust the "-1" to move higher/lower
+    }
+
+    function drawPurpleCracks2() {
+        ctx.strokeStyle = "purple";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        // Cracks between corners
+        for (let i = 0; i < corners2.length; i++) {
+            const c1 = corners2[i];
+            const c2 = corners2[(i + 1) % corners2.length];
+            ctx.moveTo(c1.currentX, c1.currentY);
+            ctx.lineTo(c2.currentX, c2.currentY);
+        }
+
+        // Beams to center
+        corners2.forEach(c => {
+            ctx.moveTo(c.currentX, c.currentY);
+            ctx.lineTo(portalCenter.x, portalCenter.y);
+        });
+
+        ctx.stroke();
+    }
+
+    function drawPortal2() {
+        const gradient = ctx.createRadialGradient(
+            portalCenter.x, portalCenter.y, 0,
+            portalCenter.x, portalCenter.y, maxPortalRadius
+        );
+        gradient.addColorStop(0, `rgba(255,104,103,${greenProgress})`);
+        gradient.addColorStop(greenProgress * 0.5, `rgba(255,0,0,${greenProgress})`);
+        gradient.addColorStop(1, `rgba(0,0,0,0.5)`);
+
+        ctx.beginPath();
+        ctx.arc(portalCenter.x, portalCenter.y, portalRadius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+    }
+
+    function animate() {
+        // Localized clearing
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(portalCenter.x, portalCenter.y, maxPortalRadius + gridSize * 10, 0, 2 * Math.PI);
+        ctx.clip();
+        ctx.restore();
+
+        if (!(phase === "greenTransition" && greenHoldTime >= 700)) {
+            drawCorners2();
+        }
+
+        if (phase !== "spinning") {
+            drawPurpleCracks2();
+        }
+
+        switch (phase) {
+            case "spinning":
+                angle += spinSpeed;
+                spinSpeed = Math.min(spinSpeed + 0.005, maxSpinSpeed);
+                portalRadius = Math.min(portalRadius + 1.5, maxPortalRadius / 2);
+                if (spinSpeed >= maxSpinSpeed) phase = "converging";
+                break;
+
+            case "converging":
+                convergenceProgress += 0.02;
+                convergenceProgress = Math.min(convergenceProgress, 1);
+                if (convergenceProgress >= 1) phase = "beams";
+                break;
+
+            case "beams":
+                portalRadius += 2;
+                if (portalRadius >= maxPortalRadius) phase = "slam";
+                break;
+
+            case "slam":
+                convergenceProgress += 0.02;
+                convergenceProgress = Math.min(convergenceProgress, 1);
+                portalRadius = maxPortalRadius;
+                if (convergenceProgress >= 1) phase = "greenTransition";
+                break;
+
+            case "greenTransition":
+                greenProgress += 0.01;
+                drawPortal2();
+                if (greenProgress >= 1) {
+                    greenHoldTime += 16;
+                    if (greenHoldTime >= 1000) phase = "closing";
+                }
+                break;
+
+            case "closing":
+                drawPortal2();
+                portalRadius -= 0.5;
+                if (portalRadius <= 0) {
+                    chaoslord = [{ x: x, y: y }];
+                    bossStats.chaoslord.current = bossStats.chaoslord.max;
+                    isPaused = false;
+setTimeout(function() {
+    phases = 'chaos'
+}, 900);
+                    return; 
+                }
+                break;
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+}
+
+
+
+// === Hook into main draw loop ===
+function drawBossHealthBars() {
+    if (ghostLord.length > 0) drawHealthBar("ghostLord", ghostLord[0].x, ghostLord[0].y);
+    if (firelord.length > 0) drawHealthBar("firelord", firelord[0].x, firelord[0].y);
+    if (icelord.length > 0) drawHealthBar("icelord", icelord[0].x, icelord[0].y);
+    if (lightninglord.length > 0) drawHealthBar("lightninglord", lightninglord[0].x, lightninglord[0].y);
+    if (earthlord.length > 0) drawHealthBar("earthlord", earthlord[0].x, earthlord[0].y);
+}
         function addWindEffect() {
           snake.forEach(segment => {
             for (let dx = -3; dx <= 3; dx++) {
@@ -263,9 +933,9 @@
         });
             });
         }
-        
+
         function checkAndToggleGravity() {
-            if (wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused && ghostLord.length === 0) { 
+            if (wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && !isPaused && ghostLord.length === 0 && chaoslord.length === 0) { 
         GravityApplied = !GravityApplied;
         gravitycount += 1
             } else {
@@ -273,8 +943,25 @@
         }
             }
         
-        setInterval(checkAndToggleGravity, 30000);
+
+        function addChaosArea(x, y, size, countdown) {
+            let offset = Math.floor(size / 2);
         
+            // Assuming canvasWidth and canvasHeight are the dimensions of your canvas
+            let canvasWidth = Math.floor(canvas.width / gridSize); // Example canvas width
+            let canvasHeight = Math.floor(canvas.height / gridSize); // Example canvas height
+            
+            for (let i = -offset; i <= offset; i++) {
+        for (let j = -offset; j <= offset; j++) {
+         const colors = [
+      ghostcolor, earthcolor, electriccolor, icecolor, lavacolor
+    ];
+        let color = colors[Math.floor(Math.random() * colors.length)];
+            chaosArea.push({ x: Math.floor(x + i), y: Math.floor(y + j), countdown:countdown, color:color});
+        }
+            }
+            
+        }
         
         function addLavaArea(x, y, size, countdown) {
             let offset = Math.floor(size / 2);
@@ -493,6 +1180,7 @@
             }
         
             function applyGravity() {
+            if (gravtimeuponreset === 0){
         const maxY = (canvas.height / gridSize) - 1;
         let disconnected = isNextItemTwoAway();
         let stopGravity = snake.some(segment => segment.y === maxY) || shouldStopGravity();
@@ -544,8 +1232,14 @@
         if (physicsActive){
             applyRopePhysics()
         }
+        if (gravtime > gravtimerreset && !isPaused){
+        gravtime = (gravtime - 1)
+        }else if (gravtime <= gravtimerreset){
+        gravtimeuponreset = gravtimerreset
+        gravtime = 0
         }
-            
+        }
+         }   
         
             function applyRopePhysics() {
         for (let i = 0; i < snake.length - 1; i++) {
@@ -845,7 +1539,7 @@
             wizardMagic()
             effectApplied = currentTime
         }
-        if (effect === 'gravity' && wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && ghostLord.length === 0) {
+        if (effect === 'gravity' && wizard.length === 0 && firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && ghostLord.length === 0 && chaoslord.length === 0) {
             GravityApplied = !GravityApplied;
             effectApplied = currentTime
         }
@@ -2311,9 +3005,20 @@
         if (magicCooldown > 0) {
             magicCooldown--;
         } else {
-            const magic = ['launch','shadowSummon','follow','bolt','port','hauntingChains','spectralSwipe'];
-            const randomIndex = Math.floor(Math.random() * magic.length);
-            ghostMagic = magic[randomIndex];
+                   const random = Math.random();
+            if (random <= 0.01) {
+        const rare = ['shadowSummon']; // Possible directions
+            const randomIndex2 = Math.floor(Math.random() * rare.length);
+ghostMagic = rare[randomIndex2]
+            } else if (random <= 0.4) {
+            const Special = ['spectralSwipe', 'hauntingChains']; // Possible directions
+            const randomIndex2 = Math.floor(Math.random() * Special.length);
+            ghostMagic = Special[randomIndex2];
+            } else{
+                const common = ['launch','bolt','port']; // Possible directions
+            const randomIndex2 = Math.floor(Math.random() * common.length);
+            ghostMagic = common[randomIndex2];
+            }
             magicCooldown = 60;
         }
         
@@ -2329,6 +3034,9 @@
             }
             } else if (ghostMagic === 'hauntingChains' && haslaunchedchain === false) {
          hauntingChains = []    
+                     const targetX = snake[0].x * gridSize;
+            const targetY = snake[0].y * gridSize;
+            ghostAngle = Math.atan2(targetY - ghostLord[0].y * gridSize, targetX - ghostLord[0].x * gridSize);
             launchHauntingChain(ghostLord[0].x, ghostLord[0].y);
             haslaunchedchain = true
         } else if (ghostMagic === 'shadowSummon') {
@@ -2352,34 +3060,6 @@
             setTimeout(() => {
   ghostcanteleport = true
 }, 2000); //
-        } else if (ghostMagic === 'follow') {
-            // Adapted follow action (originally chaosLord's launch behavior)
-            const snakeHead = snake[0];
-            const snakeNextPosition = snake[1];
-        
-            const directionX = snakeHead.x - snakeNextPosition.x;
-            const directionY = snakeHead.y - snakeNextPosition.y;
-        
-            const leadDistance = 5;
-            const targetX = snakeHead.x + directionX * leadDistance;
-            const targetY = snakeHead.y + directionY * leadDistance;
-        
-            ghostLord[0].x = targetX;
-            ghostLord[0].y = targetY;
-        
-            const areaFunctions = [lightningArea, ghostArea, earthArea, iceArea, addLavaArea];
-            const randomAreaFunction = areaFunctions[Math.floor(Math.random() * areaFunctions.length)];
-            randomAreaFunction(ghostLord[0].x, ghostLord[0].y, 2, 1.8);
-        
-            ghostLordBoundingBox = drawGhostLord(ghostLord[0].x, ghostLord[0].y);
-        
-            const outOfBounds = ghostLordBoundingBox.xMin < 0 || ghostLordBoundingBox.yMin < 0 ||
-                                ghostLordBoundingBox.xMax > canvas.width || ghostLordBoundingBox.yMax > canvas.height;
-        
-            if (outOfBounds) {
-                ghostLord[0].x = Math.max(0, Math.min(targetX, canvas.width / gridSize));
-                ghostLord[0].y = Math.max(0, Math.min(targetY, canvas.height / gridSize));
-            }
         } else if (ghostMagic === 'spectralSwipe') {
         if (spectralSwipes.length < swipenumber){
             triggerSpectralSwipe();
@@ -2387,7 +3067,7 @@
             }
             }
             moveAndRenderChains();
-            moveAndRenderShadows();
+updateAndRenderShadows()
             moveAndRenderSwipes();
         }
         function triggerSpectralSwipe() {
@@ -2492,33 +3172,25 @@
             return snake.some(segment => segment.x === Math.floor(x) && segment.y === Math.floor(y));
         }
         
-        function moveAndRenderShadows() {
-            shadowSummons.forEach((shadow, index) => {
-        const snakeHead = snake[0];
-        const angleToSnake = Math.atan2(snakeHead.y - shadow.y, snakeHead.x - shadow.x);
-        
-        shadow.x += Math.cos(angleToSnake) * 0.3;
-        shadow.y += Math.sin(angleToSnake) * 0.3;
-        
-        
-        if (Math.abs(shadow.x - snakeHead.x) < 1 && Math.abs(shadow.y - snakeHead.y) < 1) {
-            if (snake.length > 1) {
-        snake.length = snake.length - 2
-        snake2.length = snake2.length - 2
-        HaHaNoCollision(10)
-            }else{
-            restartGame()
-            }
-            
-            shadowSummons.splice(index, 1);
-        }
-        
+function updateAndRenderShadows() {
+    for (let i = shadowSummons.length - 1; i >= 0; i--) {
+        let shadow = shadowSummons[i];
+
+        // Tick down lifetime
         shadow.lifetime--;
+
+        // Remove expired summons
         if (shadow.lifetime <= 0) {
-            shadowSummons.splice(index, 1);
+            shadowSummons.splice(i, 1);
+            continue;
         }
-            });
-        }
+
+        // Draw shadow summon
+        ctx.fillStyle = "rgba(50, 50, 50, 0.65)";
+        ctx.fillRect(shadow.x * gridSize, shadow.y * gridSize, gridSize, gridSize);
+    }
+}
+
         
         
         let iswizarddead = false;
@@ -2860,6 +3532,9 @@
             if (projectile.shooter === lightninglord){
                     lightningArea(projectile.x/gridSize,projectile.y/gridSize, 3,1)
                         }
+                                    if (projectile.shooter === chaoslord){
+                    chaosArea(projectile.x/gridSize,projectile.y/gridSize, 3,1)
+                        }
                             createExplosion(ctx, projectile.x, projectile.y, projectile.color, obstacles, dynamicObstacles, gridSize, explode);
                             projectiles.splice(index, 1);
                             const numSegmentsToRemove = Math.ceil(snake.length * 0.01);
@@ -3031,14 +3706,15 @@
         }
         
         
-        const laser = {
-            isShooting: false,
-            x1: 0,
-            y1: 0,
-            x2: 0,
-            y2: 0,
-            width: gridSize// Width of the laser (in pixels)
-        };
+let laser = {
+    isShooting: false,
+    x1: 0,
+    y1: 0,
+    x2: 0,
+    y2: 0,
+    width: gridSize,
+};
+
         
         // Handle tap events for shooting the laser
         let tapStartX = 0;
@@ -3112,8 +3788,7 @@
         
         let lastLaserShot = 0; // Timestamp of the last laser shot
         let laserCooldown = laserTimer * 1000; // Cooldown period in milliseconds (30 seconds)
-        
-        
+        let laserhits = new Set()
         // Function to handle shooting the laser
         function shootLaser(targetX, targetY) {
             const currentTime = new Date().getTime();
@@ -3122,6 +3797,7 @@
             if (currentTime - lastLaserShot < laserCooldown) {
         return; // Laser is still on cooldown
             } else {
+        laserhits = new Set()
         isShooting = true;
         charging = false;
         // Calculate the angle and distance to the canvas edge
@@ -3161,36 +3837,30 @@
                 }
             });
         }
-        let isfirelordhit = isCollidingWithFireLord(fireLordBoundingBox, x, y)
-        if (isfirelordhit === true) {
-        firelord = []
-        firegone = true
+    if (!laserhits.has("firelord") && isCollidingWithFireLord(fireLordBoundingBox, x, y)) {
+            damageBoss("firelord", 10);
+            laserhits.add("firelord");
         }
-        
-        
-        
-            
-        let isghostlordhit = isCollidingWithFireLord(ghostLordBoundingBox, x, y)
-        if (isghostlordhit === true & ghostMagic != 'port') {
-        ghostLord = []
-            isghostdead = true
+         
+            if (!laserhits.has("chaoslord") && isCollidingWithChaosLord(chaosBoundingBox, x,y)) {
+            damageBoss("chaoslord", 10);
+            laserhits.add("chaoslord");
         }
-            
-        let islightninglordhit = isCollidingWithFireLord(lightningLordBoundingBox, x, y)
-        if (islightninglordhit === true) {
-        lightninglord = []
-        lightninggone = true
+        if (!laserhits.has("ghostLord") && isCollidingWithFireLord(ghostLordBoundingBox, x, y) && ghostMagic !== 'port') {
+            damageBoss("ghostLord", 10);
+            laserhits.add("ghostLord");
         }
-        
-          let isicelordhit = isCollidingWithFireLord(iceLordBoundingBox, x, y)
-        if (isicelordhit === true) {
-        icelord = []
-        icegone = true
-        }          
-        let isearthlordhit = isCollidingWithFireLord(earthLordBoundingBox, x, y)
-        if (isearthlordhit === true) {
-        earthlord = []
-        earthgone = true
+        if (!laserhits.has("lightninglord") && isCollidingWithFireLord(lightningLordBoundingBox, x, y)) {
+            damageBoss("lightninglord", 10);
+            laserhits.add("lightninglord");
+        }
+        if (!laserhits.has("icelord") && isCollidingWithFireLord(iceLordBoundingBox, x, y)) {
+            damageBoss("icelord", 10);
+            laserhits.add("icelord");
+        }
+        if (!laserhits.has("earthlord") && isCollidingWithFireLord(earthLordBoundingBox, x, y)) {
+            damageBoss("earthlord", 10);
+            laserhits.add("earthlord");
         }
             
             timezone.forEach((obstacle, index) => {
@@ -3272,266 +3942,269 @@
         function pauseGame() {
             isPaused = !isPaused; // Toggle the paused state
         }
-        function draw() {
-        function clearArea(x, y, width, height) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
-            ctx.clip();
-            ctx.clearRect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
-            ctx.restore();
+function draw() {
+    // Clear the entire canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // --- Helper functions ---
+
+    // Clears a rectangle area (no save/restore or clip)
+    function clearArea(x, y, width, height) {
+        ctx.clearRect(x * gridSize, y * gridSize, width * gridSize, height * gridSize);
+    }
+
+    // Draw obstacles with optional alpha
+function clearAndDrawBlackObstacles(obstacles, color) {
+    const baseAlpha = getAlphaFromHexColor(color); // starting alpha
+    const rgbPart = color.substring(0, 7);
+
+    // Loop backwards so we can splice safely
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        const obstacle = obstacles[i];
+
+        let obstacleAlpha = baseAlpha;
+
+        if (typeof obstacle.foodseaten === "number") {
+            // Smooth gradient: foodseaten 1 → 3 maps to alpha 0.75 → 0.25
+            const clamped = Math.max(1, Math.min(3, obstacle.foodseaten));
+            obstacleAlpha = baseAlpha * (0.75 - ((clamped - 1) / 2) * 0.5);
         }
-        
-        // Clear and update the areas that need to be redrawn
-        function clearAndDrawObstacles(obstacles, color) {
-            ctx.save(); // Save the current context state
-        
-            obstacles.forEach(obstacle => {
+
+        // If fully transparent (foodseaten >= 4), remove and trigger shockwave
+        if (obstacleAlpha <= 0) {
+            obstacles.splice(i, 1);
+            continue; // skip drawing
+        }
+
+        ctx.fillStyle = rgbPart;
+        ctx.globalAlpha = obstacleAlpha;
+
         clearArea(obstacle.x, obstacle.y, 1, 1);
-        
-        // Extract alpha value from hex color
-        const alpha = getAlphaFromHexColor(color);
-        if (alpha < 1) {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = color.substring(0, 7); // Use only the RGB part
-            ctx.globalAlpha = alpha;
-        } else {
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = color;
-            ctx.globalAlpha = 1;
-        }
-        
         ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
-            });
-        
-            ctx.restore(); // Restore the context state
+    }
+
+    ctx.globalAlpha = 1; // reset alpha
+}
+function clearAndDrawObstacles(blocks, color) {
+    let alpha = 1;
+    let fill = color;
+
+    // handle #RRGGBBAA
+    if (color.startsWith('#') && color.length === 9) {
+        alpha = parseInt(color.substring(7, 9), 16) / 255;
+        fill = color.substring(0, 7); // #RRGGBB
+    }
+
+    ctx.fillStyle = fill;
+    ctx.globalAlpha = alpha;
+
+    blocks.forEach(obstacle => {
+        clearArea(obstacle.x, obstacle.y, 1, 1);
+        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
+    });
+
+    ctx.globalAlpha = 1;
+}
+
+
+
+
+
+    // Extract alpha from hex color string (#RRGGBBAA)
+    function getAlphaFromHexColor(color) {
+        if (color.length === 9) {
+            const alphaHex = color.substring(7, 9);
+            return parseInt(alphaHex, 16) / 255;
         }
-        
-        // Helper function to extract alpha value from a hex color string
-        function getAlphaFromHexColor(color) {
-            if (color.length === 9) { // #RRGGBBAA
-        const alphaHex = color.substring(7, 9);
-        const alphaDecimal = parseInt(alphaHex, 16);
-        return alphaDecimal / 255;
-            }
-            return 1; // Default to fully opaque if no alpha channel
-        }
-        
-        
-            // Clear the entire background
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(0, 0, canvas.width, canvas.height);
-            ctx.clip();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.restore();
-        
-            // Draw the earth obstacles
-            ctx.fillStyle = earthcolor;
-            earth.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-        
-            ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'; // Ghostly purple color for the chains
-            hauntingChains.forEach(chain => {
-        chain.segments.forEach(segment => {
-            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-        });
-            });
-        
-            shadowSummons.forEach((shadow, index) => {
-        ctx.fillStyle = 'rgba(0, 0, 255, 0.7)'; // Shadow color (ghostly blue)
-            ctx.fillRect(shadow.x * gridSize, shadow.y * gridSize, gridSize, gridSize);
-            })
-        
-            clearAndDrawObstacles(ectoplasm, ghostcolor)
-            ctx.fillStyle = electriccolor;
-            electric.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-            ctx.fillStyle = icecolor;
-            ice.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-            // Draw the earth obstacles
-            ctx.fillStyle = lavacolor;
-            lava.forEach(obstacle => ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize));
-            // Draw wizard
-            if (wizard.length !== 0) {
-        wizard.forEach(wizard => {
-            clearArea(wizard.x, wizard.y, 1, 1);
-            drawwizard(wizard.x, wizard.y);
-        });
-            }
-        
-            // Draw minions
-            if (minions.length !== 0) {
-        minions.forEach(minion => {
-            clearArea(minion.x, minion.y, 1, 1);
-            drawminion(minion.x, minion.y);
-        });
-            }
-        clearAndDrawObstacles(windeffect, '#90EE9080');
-            
-            // Draw invincibility auras
-            if (isInvincible) {
-        drawInvincibilityAura('orange');
-            }
-            const currentTime = new Date().getTime();
-            if (charging && !(currentTime - lastLaserShot < laserCooldown)) {
+        return 1;
+    }
+
+    // --- Draw everything ---
+
+    // Earth obstacles
+    ctx.fillStyle = earthcolor;
+    earth.forEach(o => ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize, gridSize));
+
+    // Chains
+    ctx.fillStyle = 'rgba(255, 0, 255, 0.7)';
+    hauntingChains.forEach(chain => chain.segments.forEach(seg => {
+        ctx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize, gridSize);
+    }));
+
+    // Shadow summons
+    ctx.fillStyle = 'rgba(0, 0, 255, 0.7)';
+    shadowSummons.forEach(sh => {
+        ctx.fillRect(sh.x * gridSize, sh.y * gridSize, gridSize, gridSize);
+    });
+
+    // Other obstacles with alpha
+    clearAndDrawObstacles(ectoplasm, ghostcolor);
+    ctx.fillStyle = electriccolor;
+    electric.forEach(o => ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize, gridSize));
+    ctx.fillStyle = icecolor;
+    ice.forEach(o => ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize, gridSize));
+    ctx.fillStyle = lavacolor;
+    lava.forEach(o => ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize, gridSize));
+
+chaosArea.forEach(o => {
+  ctx.fillStyle = o.color;  // set fill color from the object
+  ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize, gridSize);
+});
+
+    // Wizard
+    wizard.forEach(w => {
+        clearArea(w.x, w.y, 1, 1);
+        drawwizard(w.x, w.y);
+    });
+
+    // Minions
+    minions.forEach(m => {
+        clearArea(m.x, m.y, 1, 1);
+        drawminion(m.x, m.y);
+    });
+
+    clearAndDrawObstacles(windeffect, '#90EE9080');
+
+    // Invincibility and other auras
+    if (isInvincible) drawInvincibilityAura('orange');
+    const now = Date.now();
+    if (charging && !(now - lastLaserShot < laserCooldown)) {
         drawInvincibilityAura('red');
-        setTimeout(() => { charging = false; }, 1000);
-            }
-        
-            if (GravityApplied && gravitycount > 0) {
-        drawInvincibilityAura('magenta');
-            }
-            
-            if (windactive) {
+        setTimeout(() => { charging = false; }, 4000);
+    }
+    if (GravityApplied) drawInvincibilityAura('magenta');
+    if (windactive) {
         drawInvincibilityAura('lightgrey');
         setTimeout(() => { windactive = false; }, 5000);
-            }
-            if (isFoodOrange) {
+    }
+    if (isFoodOrange) {
         drawInvincibilityAura('green');
         setTimeout(() => { isFoodOrange = false; }, 400);
-            }
-        
-            if (freeze) {
+    }
+    if (freeze) {
         drawInvincibilityAura('blue');
         setTimeout(() => { freeze = false; }, freezetimer * 1000);
-            }
-        
-            // Draw the snake
-            snake.forEach(segment => {
-        clearArea(segment.x, segment.y, 1, 1);
-        ctx.fillStyle = segment.color;
-        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-            });
-        
-            // Draw enemy snake
-            if (esnake.length !== 0) {
-        ctx.fillStyle = getenemycolor(esnake[0].type);
-        esnake.forEach(esnake => {
-            clearArea(esnake.x, esnake.y, 1, 1);
-            ctx.fillRect(esnake.x * gridSize, esnake.y * gridSize, gridSize, gridSize);
-        });
-            }
-        
-            // Draw symbiote
-            if (symbiote.length !== 0) {
-        symbiote.forEach(symbiote => {
-            clearArea(symbiote.x, symbiote.y, 1, 1);
-            ctx.fillStyle = getVenomColor(symbiote.type);
-            ctx.fillRect(symbiote.x * gridSize, symbiote.y * gridSize, gridSize, gridSize);
-        });
-            }
-            spectralSwipes.forEach((swipe, index) => {
-        // Render the swipe
+    }
+
+    // Snake
+    snake.forEach(seg => {
+        clearArea(seg.x, seg.y, 1, 1);
+        ctx.fillStyle = seg.color;
+        ctx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize, gridSize);
+    });
+
+    // Enemy snake
+    ctx.fillStyle = getenemycolor(esnake[0]?.type || '');
+    esnake.forEach(e => {
+        clearArea(e.x, e.y, 1, 1);
+        ctx.fillRect(e.x * gridSize, e.y * gridSize, gridSize, gridSize);
+    });
+
+    // Symbiotes
+    symbiote.forEach(s => {
+        clearArea(s.x, s.y, 1, 1);
+        ctx.fillStyle = getVenomColor(s.type);
+        ctx.fillRect(s.x * gridSize, s.y * gridSize, gridSize, gridSize);
+    });
+
+    // Spectral swipes
+    spectralSwipes.forEach(swipe => {
         ctx.fillStyle = 'rgba(48, 25, 52, 0.7)';
         ctx.fillRect(swipe.x, swipe.y, swipe.width, swipe.height);
-            });
-        
-        
-            hauntingChains.forEach(chain => {
-        chain.segments.forEach(segment => {
-            ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'; // Ghostly purple color for 
-            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+    });
+
+    // Draw head on top
+    const head = snake[0];
+    clearArea(head.x, head.y, 1, 1);
+    ctx.fillStyle = 'lightgreen';
+    ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+
+    // Items
+    item.forEach(it => {
+        clearArea(it.x, it.y, 1, 1);
+        ctx.fillStyle = getitem(it.type);
+        ctx.fillRect(it.x * gridSize, it.y * gridSize, gridSize, gridSize);
+    });
+
+    // Food
+    clearArea(food.x, food.y, 1, 1);
+    ctx.fillStyle = getFoodColor(food.type);
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+    // Eating animation
+    if (isEating) drawEatingAnimation();
+
+    // Other obstacles
+    clearAndDrawBlackObstacles(obstacles, 'black');
+    clearAndDrawObstacles(timezone, 'lightgreen');
+    clearAndDrawObstacles(reflector, '#5B8DFF');
+
+    // Special entities
+    const specialLords = [
+        { array: firelord, drawFunc: drawFireLord, name: "firelord" },
+        { array: icelord, drawFunc: drawIceLord, name: "icelord" },
+        { array: lightninglord, drawFunc: drawLightningLord, name: "lightninglord" },
+        { array: earthlord, drawFunc: drawEarthLord, name: "earthlord" },
+        { array: ghostLord, drawFunc: drawGhostLord, name: "ghostLord" },
+        { array: chaoslord, drawFunc: drawChaosLord, name: "chaoslord" }
+    ];
+    specialLords.forEach(lord => {
+        lord.array.forEach(f => {
+            clearArea(f.x, f.y, 1, 1);
+            lord.drawFunc(f.x, f.y);
+            drawHealthBar(lord.name, f.x, f.y);
         });
-            });
-        
-            shadowSummons.forEach((shadow, index) => {
-        ctx.fillStyle = 'rgba(196, 88, 153, 0.7)'; // Shadow color (ghostly blue)
-            ctx.fillRect(shadow.x * gridSize, shadow.y * gridSize, gridSize, gridSize);
-            })
-        
-        
-            // Draw the snake's head
-            const head = snake[0];
-            clearArea(head.x, head.y, 1, 1);
-            ctx.fillStyle = 'lightgreen';
-            ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
-        
-            // Draw item
-            if (item.length !== 0) {
-        item.forEach(it => {
-            clearArea(it.x, it.y, 1, 1);
-            ctx.fillStyle = getitem(it.type);
-            ctx.fillRect(it.x * gridSize, it.y * gridSize, gridSize, gridSize);
-        });
-            }
-        
-            // Draw food
-            clearArea(food.x, food.y, 1, 1);
-            ctx.fillStyle = getFoodColor(food.type);
-            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
-        
-            // Draw eating animation
-            if (isEating) {
-        drawEatingAnimation();
-            }
-        
-            // Draw other obstacles
-            clearAndDrawObstacles(obstacles, 'black');
-            clearAndDrawObstacles(timezone, 'lightgreen');
-            clearAndDrawObstacles(reflector, '#5B8DFF')
-        
-             
-            // Draw special entities
-            firelord.forEach(firelord => {
-        clearArea(firelord.x, firelord.y, 1, 1);
-        drawFireLord(firelord.x, firelord.y);
-            });
-            lightninglord.forEach(firelord => {
-        clearArea(firelord.x, firelord.y, 1, 1);
-        drawLightningLord(firelord.x, firelord.y);
-            });
-            earthlord.forEach(firelord => {
-        clearArea(firelord.x, firelord.y, 1, 1);
-        drawEarthLord(firelord.x, firelord.y);
-            });
-            icelord.forEach(firelord => {
-        clearArea(firelord.x, firelord.y, 1, 1);
-        drawIceLord(firelord.x, firelord.y);
-            });
-        
-        ghostLord.forEach(firelord => {
-        clearArea(firelord.x, firelord.y, 1, 1);
-        drawGhostLord(firelord.x, firelord.y);
-            });
-            
-            // Draw gravity well warning
-            if (isGravityWellActive) {
+    });
+
+    // Gravity wells and warnings
+    if (isGravityWellActive) {
         ctx.fillStyle = scorecolor;
-        wellWarning.forEach(obstacle => {
-            
-            ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize, gridSize);
-        });
-            }
-        
-            // Draw wells with pulsating effect
-            ctx.fillStyle = wellcolor;
-            wells.forEach(well => {
+        wellWarning.forEach(o => ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize, gridSize));
+    }
+    ctx.fillStyle = wellcolor;
+    wells.forEach(w => {
         const pulse = Math.sin(Date.now() / 200) * 5;
-        
-        ctx.fillRect(well.x * gridSize - pulse / 2, well.y * gridSize - pulse / 2, gridSize + pulse, gridSize + pulse);
-            });
-        
-            // Draw mirrors
-            clearAndDrawObstacles(mirrors, 'darkgrey');
-            clearAndDrawObstacles(turrets, '#6ec485');
-        
-            // Draw thunkers and dynamic obstacles
-            thunkers.forEach(obstacle => {
-        clearArea(obstacle.x, obstacle.y, 2, 2);
+        ctx.fillRect(w.x * gridSize - pulse / 2, w.y * gridSize - pulse / 2, gridSize + pulse, gridSize + pulse);
+    });
+
+    // Mirrors and turrets
+    clearAndDrawObstacles(mirrors, 'darkgrey');
+    clearAndDrawObstacles(turrets, '#6ec485');
+
+    // Thunkers & dynamic obstacles
+    thunkers.forEach(o => {
+        clearArea(o.x, o.y, 2, 2);
         ctx.fillStyle = 'black';
-        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
-            });
-        
-            dynamicObstacles.forEach(obstacle => {
-        clearArea(obstacle.x, obstacle.y, 2, 2);
+        ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize * 2, gridSize * 2);
+    });
+    dynamicObstacles.forEach(o => {
+        clearArea(o.x, o.y, 2, 2);
         ctx.fillStyle = 'grey';
-        ctx.fillRect(obstacle.x * gridSize, obstacle.y * gridSize, gridSize * 2, gridSize * 2);
-            });
-        
-            // Draw score
-            const scoreDisplay = document.getElementById('scoreDisplay');
-            scoreDisplay.innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
-            drawLaser();
+        ctx.fillRect(o.x * gridSize, o.y * gridSize, gridSize * 2, gridSize * 2);
+    });
+
+    // Score
+    document.getElementById('scoreDisplay').innerHTML = `Score: ${score}<br>Lives: ${livecount}`;
+    
+    // Laser
+    drawLaser();
+}
+
+function applyParalysis(duration) {
+    paralysisTimer = duration; // duration in frames
+    isParalyzed = true;
+}
+
+function updateParalysis() {
+    if (paralysisTimer > 0) {
+        paralysisTimer--;
+        if (paralysisTimer === 0) {
+            isParalyzed = false;
         }
+    }
+}
+
+
         
         function drawInvincibilityAura(colorName) {
             // Mapping of color names to RGBA values
@@ -3698,7 +4371,9 @@
         if (!isPaused && lightninglord.length !== 0){
             manageLightningLord()
         }
-        
+         if (!isPaused && chaoslord.length !== 0){
+         manageChaosLord()
+         }
             
             lavacoords.forEach((coords, index) => {
             addLavaArea(coords.x, coords.y, 4,4)
@@ -3711,6 +4386,16 @@
         }
         if (lavaElement.countdown <= 0) {
             lava.splice(index, 1);
+        }
+            }
+        
+                    for (let index = chaosArea.length - 1; index >= 0; index--) {
+        let chaosElement = chaosArea[index];
+        if (chaosElement.countdown > 0) {
+            chaosElement.countdown -= 0.1;
+        }
+        if (chaosElement.countdown <= 0) {
+            chaosArea.splice(index, 1);
         }
             }
         
@@ -3873,19 +4558,10 @@
         checkCollisions(dynamicObstacles, true);
         checkCollisions(thunkers, true);
         
-        if (wizard.length === 0 && !physicsActive && ghostLord.length === 0 && hauntingChains.length === 0) {
-            isParalyzed = electric.some((electric) => electric.x === head.x && electric.y === head.y);
-        }
-        hauntingChains.forEach((chain, index) => {
-            if (chain.active) {
-        const nextX = chain.x + chain.directionX;
-        const nextY = chain.y + chain.directionY;
-        if(checkCollisionWithSnake(nextX, nextY)){
-        isParalyzed = checkCollisionWithSnake(nextX, nextY)
-        }
-        }
-        })
         
+        
+        
+updateParalysis()
         // Assume `ectoplasm` is an array of objects with properties `x` and `y`
         // `head` is an object with properties `x` and `y`
         // `isPossessed` is a boolean variable
@@ -3895,6 +4571,19 @@
         isPossessed = true;
             }
         });
+        
+        
+        electric.forEach((ghost) => {
+            if (ghost.x === head.x && ghost.y === head.y) {
+        isParalyzed = true;
+        // Execute a function after 2 seconds
+setTimeout(function() {
+isParalyzed = false
+}, 800);
+
+            }
+        });
+                
         
         const checkIfInScoreArea = (obstacles, isDynamic) => {
             obstacles.forEach((obstacle, index) => {
@@ -3911,6 +4600,10 @@
             });
         }
         
+        if (wizard.length >= 1||firelord.length >= 1||earthlord.length >= 1||icelord.length >= 1||lightninglord.length >= 1||ghostLord.length >= 1||chaoslord.length >= 1 ){
+        gravtimeuponreset = gravtimerreset
+        gravtime = 0
+        }
             checkIfInScoreArea(obstacles, false);
         checkIfInScoreArea(mirrors, false);
         checkIfInScoreArea(wells, false);
@@ -4234,23 +4927,62 @@
                 isEating = true;
                 eatingAnimationFrames = 8; // Set the number of frames for the eating animation
                 spawnFood();
-        if (Math.random() < 0.5) {
-          // This block of code has a 50% chance of executing
-        // Slice the snake array (excluding the head)
-        let statues = snake.slice(1);
-        
-        // Remove the 'color' property from each segment
-        let cleanedStatues = statues.map(segment => {
-            // Create a shallow copy without 'color'
-            const { color, ...rest } = segment;
-            return rest;
+// Keep a Set of obstacles that are currently being "monitored"
+let monitoredObstacles = new Set();
+
+if (Math.random() < 0.5) {
+    // Slice the snake array (excluding the head)
+    let statues = snake.slice(1);
+
+    // Remove the 'color' property from each segment
+    let cleanedStatues = statues.map(segment => {
+        const { color, ...rest } = segment;
+        return { ...rest, foodseaten: 0 }; // add foodseaten property on creation
+    });
+
+    const randomValue = Math.random();
+    const rare = [obstacles];
+    const randomIndex2 = Math.floor(Math.random() * rare.length);
+    let otype = rare[randomIndex2];
+
+    // Push new obstacles with foodseaten initialized
+    otype.push(...cleanedStatues);
+
+    // Add each newly added obstacle to the monitored set
+    cleanedStatues.forEach(obs => monitoredObstacles.add(obs));
+}
+
+// --- Maintenance step: increment or remove obstacles ---
+for (let i = obstacles.length - 1; i >= 0; i--) {
+    if (obstacles[i].foodseaten > 3) {
+        obstacles.splice(i, 1);
+        monitoredObstacles.delete(obstacles[i]); // remove from monitored if removed
+    } else {
+        obstacles[i].foodseaten++;
+    }
+}
+
+// --- Persistent collision check ---
+if (monitoredObstacles.size > 0) {
+    let anyTouching = false;
+
+    snake.forEach(segment => {
+        monitoredObstacles.forEach(obs => {
+            if (segment.x === obs.x && segment.y === obs.y) {
+                anyTouching = true;
+            }
         });
-        const randomValue = Math.random()
-            const rare = [obstacles, obstacles, mirrors, reflector];
-            const randomIndex2 = Math.floor(Math.random() * rare.length);
-            otype = rare[randomIndex2];
-            otype.push(...cleanedStatues);
-        } 
+    });
+
+    if (anyTouching) {
+        HaHaNoCollision(1);
+    } else {
+        // Once no segments are touching, stop monitoring these obstacles
+        monitoredObstacles.clear();
+    }
+}
+
+
         
          
         
@@ -4355,6 +5087,14 @@
         checkForEffects()
             if (!isPaused) { // Check if the game is not paused
         // Move Snake
+if (gravtimeuponreset != 0 && gravtimeuponreset < 0.10){
+        gravtimeuponreset = (gravtimeuponreset + 1)
+        GravityApplied = false
+        }else if (gravtimeuponreset === 0){
+        GravityApplied = true
+        gravitycount += 1        
+        }
+        
         if (!isParalyzed){
         snake.pop();
         snake.unshift(head);
@@ -4442,7 +5182,6 @@
         shadow.x += Math.cos(angleToSnake) * 0.3;
         shadow.y += Math.sin(angleToSnake) * 0.3;
         }
-        drawShadow(shadow.x, shadow.y);
         
         if (Math.abs(shadow.x - snakeHead.x) < 1 && Math.abs(shadow.y - snakeHead.y) < 1 && !isInvincible) {
             if (snake.length > 1) {
@@ -4476,7 +5215,7 @@
             }
             }
         
-        if (reflector.length === 12 && wizard.length === 0 && wizardappears === false && firelord.length ===0) {
+        if (reflector.length >= 12 && wizard.length === 0 && wizardappears === false && firelord.length ===0) {
             let wizardX2 = Math.floor(Math.random() * (canvas.width / gridSize));
             let wizardY2 = Math.floor(Math.random() * (canvas.height / gridSize));
             isPaused = true
@@ -4503,7 +5242,10 @@
             }
         });
             }
-                                
+   if (isghostspwaning === true){
+                phases = 'ghost'
+                isghostspwaning = false
+                }                                
         }
         function calculateObstacleSpawnProbability() {
             // Obstacle spawn probability increases with score
@@ -4699,10 +5441,17 @@
             chaosdefeated = false
             ectoplasm = [] 
             wizard = []
+            bossStats.ghostLord.current = bossStats.ghostLord.max;
+            bossStats.earthlord.current = bossStats.earthlord.max;
+            bossStats.firelord.current = bossStats.firelord.max;
+            bossStats.lightninglord.current = bossStats.lightninglord.max;
+            bossStats.icelord.current = bossStats.icelord.max;
+            bossStats.chaoslord.current = bossStats.chaoslord.max;
             isghostdead = false
             lightninglord = []
             icelord = []
             earthlord = []
+            isghostspwaning = false
             spectralSwipes = []; // Tracks active swipes
             possessionProjections = []; // Tracks active projections
         ghostAngle = 0;
@@ -4715,6 +5464,8 @@
         hauntingChains = []; // Store chains for "Haunting Chains" magic
         shadowSummons = []
             wellWarning = []
+            gravtimeuponreset = gravtimerreset
+            gravtime = 0
             isInvincible = false;
             eatingAnimationFrames = 0;
             lives = 0.5;
@@ -4911,21 +5662,24 @@
         
         case 'elementlords':
             if (allElementlordsDefeated() && lords.length === 0) {
-                initializeGhostPhase();
-                phases = 'ghost';
+                spawnGhostLordWithAnimation()
             } else if (lords.length > 0 && !ifLordExists()) {
                 addRandomLord(lords);
             }
             break;
         
         case 'ghost':
-            if (isghostdead && lords.length === 0 && ghostLord.length === 0) {
+            if (lords.length === 0 && ghostLord.length === 0 && !isghostspwaning) {
+                spawnChaosLordWithAnimation()
+            }
+            break;
+        case 'chaos':
+            if (chaoslord.length === 0){
+            spectralSwipes.length = 0
                 didwin = true
                 declareVictory()
                 phases = 'wizard'
             }
-            break;
-        
             }
         }
         
@@ -4934,9 +5688,7 @@
             addRandomLord(lords);
         }
         
-        function initializeGhostPhase() {
-            ghostLord.push({ x: startX / gridSize, y: startY / gridSize });
-        }
+     
         
         function allElementlordsDefeated() {
             return firelord.length === 0 && icelord.length === 0 && lightninglord.length === 0 && earthlord.length === 0 && lords.length === 0;
